@@ -4,69 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="color-scheme" content="light only">
-<title>Pakkeliste – Kroatien</title>
+<title>Vores Lister</title>
 <style>
   html { background: #f4f6f5 !important; color-scheme: light only; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0 0 90px 0;
-    color: #1a1a1a !important;
-    background: #f4f6f5 !important;
+    max-width: 600px; margin: 0 auto; padding: 0 0 20px 0;
+    color: #1a1a1a !important; background: #f4f6f5 !important;
   }
-
-  /* Top bar */
   .topbar {
     position: sticky; top: 0; z-index: 20;
     background: #2c6e49; color: white;
-    padding: 14px 16px 12px;
+    padding: 14px 16px 12px; display: flex; align-items: center; gap: 10px;
   }
-  .topbar h1 { font-size: 18px; margin: 0 0 10px; font-weight: 600; }
-  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .topbar h1 { font-size: 18px; margin: 0; font-weight: 600; flex: 1; }
+  .icon-btn {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    width: 34px; height: 34px; border-radius: 50%; font-size: 17px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .back-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0 4px 0 0; }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
   .progress-track { flex: 1; height: 8px; background: rgba(255,255,255,0.25); border-radius: 6px; overflow: hidden; }
   .progress-fill { height: 100%; background: #ffd166; border-radius: 6px; transition: width 0.3s ease; width: 0%; }
   .progress-label { font-size: 12px; white-space: nowrap; opacity: 0.9; }
 
-  /* Tab strip */
-  .tabstrip {
-    position: sticky; top: 62px; z-index: 19;
-    display: flex; overflow-x: auto; gap: 6px;
-    background: #ffffff; padding: 8px 10px;
-    border-bottom: 1px solid #e2e2e2;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+  .content { padding: 14px; }
+
+  /* Dashboard */
+  .list-card {
+    background: white; border-radius: 14px; padding: 14px 16px;
+    margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    cursor: pointer; display: flex; align-items: center; gap: 12px;
   }
-  .tabstrip::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    flex-shrink: 0; border: none; background: #eef1ef; color: #333;
-    padding: 8px 14px; border-radius: 20px; font-size: 13.5px; font-weight: 500;
-    cursor: pointer; white-space: nowrap;
+  .list-card .emoji { font-size: 28px; flex-shrink: 0; }
+  .list-card .info { flex: 1; min-width: 0; }
+  .list-card .info h3 { margin: 0 0 6px; font-size: 16px; }
+  .list-card .mini-track { height: 6px; background: #eee; border-radius: 4px; overflow: hidden; }
+  .list-card .mini-fill { height: 100%; background: #2c6e49; }
+  .list-card .count { font-size: 11.5px; color: #888; margin-top: 4px; }
+  .empty-state { text-align: center; color: #888; padding: 40px 20px; font-size: 14px; }
+
+  .fab {
+    position: fixed; bottom: 20px; right: 20px; z-index: 25;
+    background: #2c6e49; color: white; border: none; border-radius: 50%;
+    width: 56px; height: 56px; font-size: 26px; box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
   }
-  .tab-btn.active { background: #2c6e49; color: white; }
 
-  .content { padding: 14px 14px 0; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  .panel-progress { font-size: 13px; color: #666; margin-bottom: 10px; }
-
+  /* List view */
   ul { list-style: none; padding-left: 0; margin: 0; }
   li {
-    padding: 11px 4px; font-size: 15px; display: flex; align-items: flex-start;
-    border-bottom: 1px solid #eee;
+    padding: 11px 4px; font-size: 15px; display: flex; align-items: center;
+    border-bottom: 1px solid #eee; gap: 4px;
   }
   li:last-child { border-bottom: none; }
-  input[type="checkbox"] { margin-right: 12px; margin-top: 2px; transform: scale(1.35); flex-shrink: 0; accent-color: #2c6e49; }
-  li.checked-item { color: #999; text-decoration: line-through; }
-  .note { font-size: 11.5px; color: #888; font-style: italic; margin-left: 4px; }
-
-  .card {
-    background: white; border-radius: 12px; padding: 4px 14px;
-    margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  li .item-text { flex: 1; }
+  input[type="checkbox"] { margin-right: 12px; transform: scale(1.35); flex-shrink: 0; accent-color: #2c6e49; }
+  li.checked-item .item-text { color: #999; text-decoration: line-through; }
+  .del-item-btn {
+    background: none; border: none; color: #ccc; font-size: 18px; padding: 4px 6px; cursor: pointer; flex-shrink: 0;
   }
-  .card h2 { font-size: 15px; margin: 14px 0 2px; color: #2c6e49; }
+  .del-item-btn:hover { color: #c0392b; }
 
   details { background: white; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
   summary {
@@ -79,458 +79,455 @@
   details[open] summary .chev { transform: rotate(90deg); }
   details .card-body { padding: 0 14px 8px; }
 
-  .intro-text { font-size: 13.5px; color: #555; padding: 10px 14px 4px; }
-  .guide-text { font-size: 13.5px; color: #333; padding: 12px 14px 2px; line-height: 1.5; }
-
-  .print-btn {
-    background: white; color: #2c6e49; border: 1.5px solid #2c6e49;
-    padding: 8px 14px; font-size: 13px; border-radius: 20px; cursor: pointer;
-    position: fixed; bottom: 14px; right: 14px; z-index: 21;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  /* Add item bar */
+  .add-bar {
+    position: sticky; bottom: 0; background: white; border-top: 1px solid #e2e2e2;
+    padding: 10px 12px; display: flex; gap: 8px; margin-top: 16px;
+    border-radius: 14px 14px 0 0; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
   }
+  .add-bar input[type="text"] {
+    flex: 1; border: 1.5px solid #ddd; border-radius: 8px; padding: 10px 12px; font-size: 15px;
+  }
+  .add-bar select { border: 1.5px solid #ddd; border-radius: 8px; padding: 10px 6px; font-size: 13px; max-width: 100px; }
+  .add-bar button {
+    background: #2c6e49; color: white; border: none; border-radius: 8px; padding: 0 16px; font-size: 20px; cursor: pointer;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 40;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-box { background: white; border-radius: 14px; padding: 20px; width: 100%; max-width: 340px; }
+  .modal-box h3 { margin: 0 0 14px; font-size: 17px; }
+  .modal-box input { width: 100%; border: 1.5px solid #ddd; border-radius: 8px; padding: 10px 12px; font-size: 15px; margin-bottom: 10px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-size: 14.5px; cursor: pointer; }
+  .btn-cancel { background: #eee; color: #333; }
+  .btn-create { background: #2c6e49; color: white; }
 
   #sync-status { text-align: center; font-size: 12px; color: #2c6e49; padding: 6px 0 2px; min-height: 16px; }
+  .hidden { display: none !important; }
 
-  @media print {
-    .topbar, .tabstrip, .print-btn, #sync-status { display: none !important; }
-    .tab-panel { display: block !important; }
-    body { padding-bottom: 0; max-width: 100%; }
-    details { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
-    details:not([open]) summary ~ * { display: block !important; }
-    .card { box-shadow: none; border: 1px solid #ccc; }
-  }
-
-  @media screen and (min-width: 640px) {
-    body { max-width: 700px; }
-  }
+  @media screen and (min-width: 640px) { body { max-width: 700px; } }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <h1>🚙☀️ Pakkeliste – Kroatien</h1>
-  <div class="progress-row">
-    <div class="progress-track"><div class="progress-fill" id="overall-fill"></div></div>
-    <div class="progress-label" id="overall-label">0%</div>
-  </div>
+<div class="topbar" id="topbar">
+  <button class="back-btn hidden" id="back-btn">‹</button>
+  <h1 id="page-title">Mine lister</h1>
+  <button class="icon-btn hidden" id="delete-list-btn" title="Slet liste">🗑</button>
+</div>
+<div class="progress-row" id="header-progress-row" style="display:none; padding: 0 16px 12px; background:#2c6e49; margin-top:-12px;">
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-label" id="progress-label">0%</div>
 </div>
 
-<div class="tabstrip" id="tabstrip">
-  <button class="tab-btn active" data-tab="gaurav">Gaurav</button>
-  <button class="tab-btn" data-tab="ankita">Ankita</button>
-  <button class="tab-btn" data-tab="mahim">Mahim</button>
-  <button class="tab-btn" data-tab="yuvin">Yuvin</button>
-  <button class="tab-btn" data-tab="faelles">Fælles</button>
-  <button class="tab-btn" data-tab="rute">Rute</button>
-  <button class="tab-btn" data-tab="pakning">Bilpakning</button>
-</div>
+<div class="content" id="content"></div>
 
-<div class="content">
-
-  <!-- GAURAV -->
-  <div class="tab-panel active" data-panel="gaurav">
-    <div class="panel-progress" data-progress-for="gaurav"></div>
-    <div class="card">
-      <ul>
-        <li><input type="checkbox"> Solbriller</li>
-        <li><input type="checkbox"> 6 T-shirts (2 lyse, 2 marine/oliven, 2 mønstrede – alle matcher hinanden)</li>
-        <li><input type="checkbox"> 2 kortærmede skjorter (til middag ude)</li>
-        <li><input type="checkbox"> 3 shorts (2 casual, 1 lidt federe chino-shorts)</li>
-        <li><input type="checkbox"> 1 par lette bukser (køligere aftener/pænere middage)</li>
-        <li><input type="checkbox"> 1 let hoodie/trøje</li>
-        <li><input type="checkbox"> 1 pakbar regn-/vindjakke</li>
-        <li><input type="checkbox"> 7 sæt undertøj, 7 par sokker</li>
-        <li><input type="checkbox"> Badetøj (2 badebukser)</li>
-        <li><input type="checkbox"> Håndklæder (1 badehåndklæde + 1 almindeligt)</li>
-        <li><input type="checkbox"> Sneakers, sandaler, badesko</li>
-        <li><input type="checkbox"> Tandbørste</li>
-        <li><input type="checkbox"> Hårbørste</li>
-        <li><input type="checkbox"> Egen toilettaske</li>
-        <li><input type="checkbox"> Kørekort</li>
-        <li><input type="checkbox"> Pas og blåt sundhedskort</li>
-        <li><input type="checkbox"> Drikkedunk</li>
-        <li><input type="checkbox"> Oplader til telefon</li>
-        <li><input type="checkbox"> 2 sæt nattøj</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ANKITA -->
-  <div class="tab-panel" data-panel="ankita">
-    <div class="panel-progress" data-progress-for="ankita"></div>
-    <div class="card">
-      <ul>
-        <li><input type="checkbox"> Solbriller</li>
-        <li><input type="checkbox"> 6 toppe (2-3 farver der matcher hinanden)</li>
-        <li><input type="checkbox"> 2 sommerkjoler (1 casual, 1 lidt federe til middag ude)</li>
-        <li><input type="checkbox"> 2 shorts + 1 let nederdel/lette bukser</li>
-        <li><input type="checkbox"> 1 let cardigan/kimono (kan bruges som cover-up ved poolen og til aftener)</li>
-        <li><input type="checkbox"> 1 let tørklæde/sjal (sol + kølige aftener)</li>
-        <li><input type="checkbox"> 7 sæt undertøj, 7 par sokker</li>
-        <li><input type="checkbox"> Badetøj (2 badedragter/bikinier)</li>
-        <li><input type="checkbox"> Håndklæder (1 badehåndklæde + 1 almindeligt)</li>
-        <li><input type="checkbox"> Komfortable sandaler + 1 par lidt pænere sko</li>
-        <li><input type="checkbox"> Tandbørste</li>
-        <li><input type="checkbox"> Hårbørste</li>
-        <li><input type="checkbox"> Egen toilettaske</li>
-        <li><input type="checkbox"> Kørekort</li>
-        <li><input type="checkbox"> Pas og blåt sundhedskort</li>
-        <li><input type="checkbox"> Drikkedunk</li>
-        <li><input type="checkbox"> Oplader til telefon</li>
-        <li><input type="checkbox"> 2 sæt nattøj</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- MAHIM -->
-  <div class="tab-panel" data-panel="mahim">
-    <div class="panel-progress" data-progress-for="mahim"></div>
-    <div class="card">
-      <ul>
-        <li><input type="checkbox"> Solbriller</li>
-        <li><input type="checkbox"> 7 T-shirts (holdbart, hurtigttørrende stof)</li>
-        <li><input type="checkbox"> 4 shorts</li>
-        <li><input type="checkbox"> 1 let jakke</li>
-        <li><input type="checkbox"> 7 sæt undertøj, 7 par sokker</li>
-        <li><input type="checkbox"> Badetøj (2 UV-heldragter)</li>
-        <li><input type="checkbox"> Håndklæder (1 badehåndklæde + 1 almindeligt)</li>
-        <li><input type="checkbox"> Sneakers + sandaler (velcro/slip-on hvis de ikke selv kan binde snørebånd)</li>
-        <li><input type="checkbox"> Tandbørste</li>
-        <li><input type="checkbox"> Hårbørste</li>
-        <li><input type="checkbox"> Egen toilettaske</li>
-        <li><input type="checkbox"> Pas og blåt sundhedskort</li>
-        <li><input type="checkbox"> Drikkedunk</li>
-        <li><input type="checkbox"> Oplader/iPad</li>
-        <li><input type="checkbox"> 2 sæt nattøj</li>
-        <li><input type="checkbox"> Solhat</li>
-        <li><input type="checkbox"> Badevinger og dykkerbriller</li>
-        <li><input type="checkbox"> Yndlingsbamse</li>
-        <li><input type="checkbox"> Underholdning i bilen: FIDGET, pop it, vinduesklistermærker, magnetisk leg, klistermærkebøger, opgavebøger</li>
-        <li><input type="checkbox"> Spillemaskine/iPad</li>
-        <li><input type="checkbox"> Børnebøger</li>
-        <li><input type="checkbox"> Tissemønter/lommepenge</li>
-        <li><input type="checkbox"> Løbecykel/løbehjul og cykelhjelm <span class="note">(hvis relevant for alderen)</span></li>
-        <li><input type="checkbox"> Bleer og vådservietter <span class="note">(hvis stadig relevant)</span></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- YUVIN -->
-  <div class="tab-panel" data-panel="yuvin">
-    <div class="panel-progress" data-progress-for="yuvin"></div>
-    <div class="card">
-      <ul>
-        <li><input type="checkbox"> Solbriller</li>
-        <li><input type="checkbox"> 7 T-shirts (holdbart, hurtigttørrende stof)</li>
-        <li><input type="checkbox"> 4 shorts</li>
-        <li><input type="checkbox"> 1 let jakke</li>
-        <li><input type="checkbox"> 7 sæt undertøj, 7 par sokker</li>
-        <li><input type="checkbox"> Badetøj (2 UV-heldragter)</li>
-        <li><input type="checkbox"> Håndklæder (1 badehåndklæde + 1 almindeligt)</li>
-        <li><input type="checkbox"> Sneakers + sandaler (velcro/slip-on hvis de ikke selv kan binde snørebånd)</li>
-        <li><input type="checkbox"> Tandbørste</li>
-        <li><input type="checkbox"> Hårbørste</li>
-        <li><input type="checkbox"> Egen toilettaske</li>
-        <li><input type="checkbox"> Pas og blåt sundhedskort</li>
-        <li><input type="checkbox"> Drikkedunk</li>
-        <li><input type="checkbox"> Oplader/iPad</li>
-        <li><input type="checkbox"> 2 sæt nattøj</li>
-        <li><input type="checkbox"> Solhat</li>
-        <li><input type="checkbox"> Badevinger og dykkerbriller</li>
-        <li><input type="checkbox"> Yndlingsbamse</li>
-        <li><input type="checkbox"> Underholdning i bilen: FIDGET, pop it, vinduesklistermærker, magnetisk leg, klistermærkebøger, opgavebøger</li>
-        <li><input type="checkbox"> Spillemaskine/iPad</li>
-        <li><input type="checkbox"> Børnebøger</li>
-        <li><input type="checkbox"> Tissemønter/lommepenge</li>
-        <li><input type="checkbox"> Løbecykel/løbehjul og cykelhjelm <span class="note">(hvis relevant for alderen)</span></li>
-        <li><input type="checkbox"> Bleer og vådservietter <span class="note">(hvis stadig relevant)</span></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- FÆLLES -->
-  <div class="tab-panel" data-panel="faelles">
-    <div class="panel-progress" data-progress-for="faelles"></div>
-
-    <details open>
-      <summary>Sengetøj og bad <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Sengetøj</li>
-          <li><input type="checkbox"> Tisseunderlag/vandtæt lagen</li>
-          <li><input type="checkbox"> Shampoo (familiestørrelse)</li>
-          <li><input type="checkbox"> Tandpasta (familiestørrelse)</li>
-          <li><input type="checkbox"> Solcreme og aftersun</li>
-          <li><input type="checkbox"> Vaskemiddel (inkl. "colour & dirt collector")</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Camping-køkken <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Viskestykker, klude og opvaskebørste</li>
-          <li><input type="checkbox"> Voksdug til bordet</li>
-          <li><input type="checkbox"> Opvaskemiddel</li>
-          <li><input type="checkbox"> Vinoptrækker og en god skarp kniv</li>
-          <li><input type="checkbox"> Toastjern</li>
-          <li><input type="checkbox"> Isterningforme/-poser</li>
-          <li><input type="checkbox"> Hvidløgspresser</li>
-          <li><input type="checkbox"> Fryseposer</li>
-          <li><input type="checkbox"> Fluesmækker</li>
-          <li><input type="checkbox"> Lighter (til myggelys og grill)</li>
-          <li><input type="checkbox"> Kaffe til første morgen</li>
-          <li><input type="checkbox"> Mad til første aften + det børnene ikke kan undvære</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Rejseapotek <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Pincet og negleklipper</li>
-          <li><input type="checkbox"> Myggespray</li>
-          <li><input type="checkbox"> Plaster</li>
-          <li><input type="checkbox"> Vitaminer (mælkesyrebakterier)</li>
-          <li><input type="checkbox"> Flåttang</li>
-          <li><input type="checkbox"> Giftsuger (hvepsestik) og allergitabletter</li>
-          <li><input type="checkbox"> Væskeerstatning (rejsemave)</li>
-          <li><input type="checkbox"> Termometer</li>
-          <li><input type="checkbox"> Panodil (alm. og junior)</li>
-          <li><input type="checkbox"> Creme til myggestik</li>
-          <li><input type="checkbox"> Creme til solskoldning</li>
-          <li><input type="checkbox"> Zinkspray (hvis skoldkopper)</li>
-          <li><input type="checkbox"> Jodtabletter</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Papirer og bil <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Registreringsattest og forsikringspapir</li>
-          <li><input type="checkbox"> Førstehjælpskasse</li>
-          <li><input type="checkbox"> Gule sikkerhedsveste (én pr. person)</li>
-          <li><input type="checkbox"> Advarselstrekant</li>
-          <li><input type="checkbox"> Feriepenge</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Under kørslen <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Puder og tæpper</li>
-          <li><input type="checkbox"> Køletaske og mange snacks</li>
-          <li><input type="checkbox"> Vådservietter</li>
-          <li><input type="checkbox"> Skraldeposer</li>
-          <li><input type="checkbox"> Toiletpapir</li>
-          <li><input type="checkbox"> Opladere/kabler til bilen</li>
-          <li><input type="checkbox"> Solskærm til ruderne</li>
-          <li><input type="checkbox"> Nemme brætspil til børn og voksne</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Legetøj og aktiviteter <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <ul>
-          <li><input type="checkbox"> Trækvogn eller klapvogn</li>
-          <li><input type="checkbox"> Strandlegetøj og dykkeleg</li>
-          <li><input type="checkbox"> Boldspil (fodbold, bordtennis, badminton)</li>
-          <li><input type="checkbox"> Sæbebobler</li>
-          <li><input type="checkbox"> Andre spil</li>
-          <li><input type="checkbox"> Krea: tuscher, papir, vandfarver, frugtfarve, lim, elastikker, tape, ispinde, sakse</li>
-        </ul>
-      </div>
-    </details>
-  </div>
-
-  <!-- RUTE -->
-  <div class="tab-panel" data-panel="rute">
-    <div class="panel-progress" data-progress-for="rute"></div>
-    <div class="card">
-      <ul>
-        <li><input type="checkbox"> Ladekabel + evt. adapter</li>
-        <li><input type="checkbox"> Østrig vignet</li>
-        <li><input type="checkbox"> Slovenien vignet</li>
-        <li><input type="checkbox"> Evt. Tjekkiet vignet, hvis I ender med den rute</li>
-        <li><input type="checkbox"> Lidt kontanter/EUR til Kroatien</li>
-        <li><input type="checkbox"> Scandlines færgebillet Gedser–Rostock (printet/på telefon)</li>
-        <li><input type="checkbox"> Powerbank</li>
-        <li><input type="checkbox"> Offline kort/ruteplan som backup</li>
-        <li><input type="checkbox"> Rejseforsikring – dokumentation</li>
-        <li><input type="checkbox"> Stik-adapter, hvis I lader andet end bilen undervejs</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PAKNING -->
-  <div class="tab-panel" data-panel="pakning">
-    <div class="panel-progress" data-progress-for="pakning"></div>
-
-    <details open>
-      <summary>Sådan pakker I Model Y <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <p class="intro-text" style="padding-left:0;">Model Y har tre rum: bagagerum bag sæderne (ca. 800L med sæderne oppe), frunk foran (ca. 117L) og et rum under bagagerumsgulvet (ca. 87L).</p>
-        <ul>
-          <li><input type="checkbox"> <strong>Frunk (foran):</strong> Ladekabel, adapter, førstehjælpskasse, gule veste, advarselstrekant</li>
-          <li><input type="checkbox"> <strong>Under bagagerumsgulvet:</strong> Tunge/flade ting I ikke skal bruge dagligt</li>
-          <li><input type="checkbox"> <strong>Bagagerum – bund:</strong> Tunge kufferter/tasker, liggende fladt</li>
-          <li><input type="checkbox"> <strong>Bagagerum – top:</strong> Det I skal bruge dagligt/hver aften</li>
-        </ul>
-        <p class="note" style="display:block; padding: 6px 0 4px;">Biltema-tasken (72L) er et godt valg som fælles "dagstaske" i toppen af bagagerummet.</p>
-      </div>
-    </details>
-
-    <details>
-      <summary>Trin-for-trin pakkeguide <span class="chev">▸</span></summary>
-      <div class="card-body">
-        <p class="guide-text" style="padding-left:0;"><strong>Kort svar: Ja</strong>, alt fylder ca. 500-600L, Model Y har ca. 1000L til rådighed. Den eneste risiko er uregelmæssige ting som klapvogn og køletaske.</p>
-        <ul>
-          <li><input type="checkbox"> <strong>Trin 1:</strong> Sortér alt i bunker først – tøj pr. person, fælles-ting, køkken, legetøj, strand/pool</li>
-          <li><input type="checkbox"> <strong>Trin 2 – Frunk:</strong> Ladekabel, adapter, førstehjælpskasse, gule veste, advarselstrekant</li>
-          <li><input type="checkbox"> <strong>Trin 3 – Underfloor:</strong> Fladt og tungt – ekstra kølertaske, badetøj til senere</li>
-          <li><input type="checkbox"> <strong>Trin 4 – Bund:</strong> De 4 personers tøjtasker, bløde tasker frem for hårde kufferter</li>
-          <li><input type="checkbox"> <strong>Trin 5 – Mellemlag:</strong> Sengetøj, håndklæder, krea-kasse, brætspil</li>
-          <li><input type="checkbox"> <strong>Trin 6 – Toplag:</strong> Nattøj, toilettasker, underholdning, snacks</li>
-          <li><input type="checkbox"> <strong>Trin 7:</strong> Fold klapvognen sammen og sæt den lodret op ad siden</li>
-          <li><input type="checkbox"> <strong>Trin 8:</strong> Pak ikke højere end sædernes overkant – tjek bakspejlet</li>
-          <li><input type="checkbox"> <strong>Trin 9:</strong> Overvej en tagboks, hvis det stadig er stramt</li>
-        </ul>
-      </div>
-    </details>
-  </div>
-
-</div>
-
+<button class="fab" id="fab-add">+</button>
 <p id="sync-status"></p>
-<button class="print-btn" onclick="window.print()">🖨️ Print</button>
+
+<div class="modal-overlay hidden" id="new-list-modal">
+  <div class="modal-box">
+    <h3>Ny liste</h3>
+    <input type="text" id="new-list-emoji" placeholder="Emoji (fx 🛒)" maxlength="4" value="📋">
+    <input type="text" id="new-list-name" placeholder="Navn på liste (fx Indkøb)">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-new-list">Annuller</button>
+      <button class="btn-create" id="create-new-list">Opret</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const FIREBASE_URL = 'https://ourmemory-7cd11-default-rtdb.europe-west1.firebasedatabase.app/pakkeliste.json';
+const BASE_URL = 'https://ourmemory-7cd11-default-rtdb.europe-west1.firebasedatabase.app';
+const statusEl = document.getElementById('sync-status');
+
+let allLists = {};
+let currentListId = null;
+let itemCounter = 0;
+
+function showStatus(msg, ok) {
+  statusEl.textContent = msg;
+  if (ok) setTimeout(() => { if (statusEl.textContent === msg) statusEl.textContent = ''; }, 1500);
+}
+
+async function fbGet(path) {
+  try {
+    const res = await fetch(BASE_URL + path + '.json');
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) { console.error('fbGet failed', e); return null; }
+}
+async function fbPut(path, value) {
+  try {
+    const res = await fetch(BASE_URL + path + '.json', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
+    return res.ok;
+  } catch (e) { console.error('fbPut failed', e); return false; }
+}
+async function fbPatch(path, value) {
+  try {
+    const res = await fetch(BASE_URL + path + '.json', { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
+    return res.ok;
+  } catch (e) { console.error('fbPatch failed', e); return false; }
+}
+async function fbDelete(path) {
+  try {
+    const res = await fetch(BASE_URL + path + '.json', { method: 'DELETE' });
+    return res.ok;
+  } catch (e) { console.error('fbDelete failed', e); return false; }
+}
 
 function sanitizeKey(text) {
-  return text.replace(/[.#$\[\]\/]/g, '_').substring(0, 300);
+  return text.replace(/[.#$\[\]\/\s]/g, '_').substring(0, 200);
 }
 
-let localState = {};
-let checkboxMap = {};
+// ---------- Seed data for the Croatia trip list (migrated from the old flat format) ----------
+const CROATIA_SEED = [
+  ['Gaurav','Solbriller'],['Gaurav','6 T-shirts (2 lyse, 2 marine/oliven, 2 mønstrede – alle matcher hinanden)'],
+  ['Gaurav','2 kortærmede skjorter (til middag ude)'],['Gaurav','3 shorts (2 casual, 1 lidt federe chino-shorts)'],
+  ['Gaurav','1 par lette bukser (køligere aftener/pænere middage)'],['Gaurav','1 let hoodie/trøje'],
+  ['Gaurav','1 pakbar regn-/vindjakke'],['Gaurav','7 sæt undertøj, 7 par sokker'],['Gaurav','Badetøj (2 badebukser)'],
+  ['Gaurav','Håndklæder (1 badehåndklæde + 1 almindeligt)'],['Gaurav','Sneakers, sandaler, badesko'],
+  ['Gaurav','Tandbørste'],['Gaurav','Hårbørste'],['Gaurav','Egen toilettaske'],['Gaurav','Kørekort'],
+  ['Gaurav','Pas og blåt sundhedskort'],['Gaurav','Drikkedunk'],['Gaurav','Oplader til telefon'],['Gaurav','2 sæt nattøj'],
 
-async function loadState() {
-  try {
-    const res = await fetch(FIREBASE_URL);
-    if (res.ok) {
-      const data = await res.json();
-      return data || {};
-    }
-  } catch (e) {
-    console.log('Kunne ikke hente delt status endnu:', e);
+  ['Ankita','Solbriller'],['Ankita','6 toppe (2-3 farver der matcher hinanden)'],
+  ['Ankita','2 sommerkjoler (1 casual, 1 lidt federe til middag ude)'],['Ankita','2 shorts + 1 let nederdel/lette bukser'],
+  ['Ankita','1 let cardigan/kimono (kan bruges som cover-up ved poolen og til aftener)'],
+  ['Ankita','1 let tørklæde/sjal (sol + kølige aftener)'],['Ankita','7 sæt undertøj, 7 par sokker'],
+  ['Ankita','Badetøj (2 badedragter/bikinier)'],['Ankita','Håndklæder (1 badehåndklæde + 1 almindeligt)'],
+  ['Ankita','Komfortable sandaler + 1 par lidt pænere sko'],['Ankita','Tandbørste'],['Ankita','Hårbørste'],
+  ['Ankita','Egen toilettaske'],['Ankita','Kørekort'],['Ankita','Pas og blåt sundhedskort'],['Ankita','Drikkedunk'],
+  ['Ankita','Oplader til telefon'],['Ankita','2 sæt nattøj'],
+
+  ['Mahim','Solbriller'],['Mahim','7 T-shirts (holdbart, hurtigttørrende stof)'],['Mahim','4 shorts'],['Mahim','1 let jakke'],
+  ['Mahim','7 sæt undertøj, 7 par sokker'],['Mahim','Badetøj (2 UV-heldragter)'],
+  ['Mahim','Håndklæder (1 badehåndklæde + 1 almindeligt)'],
+  ['Mahim','Sneakers + sandaler (velcro/slip-on hvis de ikke selv kan binde snørebånd)'],
+  ['Mahim','Tandbørste'],['Mahim','Hårbørste'],['Mahim','Egen toilettaske'],['Mahim','Pas og blåt sundhedskort'],
+  ['Mahim','Drikkedunk'],['Mahim','Oplader/iPad'],['Mahim','2 sæt nattøj'],['Mahim','Solhat'],
+  ['Mahim','Badevinger og dykkerbriller'],['Mahim','Yndlingsbamse'],
+  ['Mahim','Underholdning i bilen: FIDGET, pop it, vinduesklistermærker, magnetisk leg, klistermærkebøger, opgavebøger'],
+  ['Mahim','Spillemaskine/iPad'],['Mahim','Børnebøger'],['Mahim','Tissemønter/lommepenge'],
+  ['Mahim','Løbecykel/løbehjul og cykelhjelm (hvis relevant for alderen)'],
+  ['Mahim','Bleer og vådservietter (hvis stadig relevant)'],
+
+  ['Yuvin','Solbriller'],['Yuvin','7 T-shirts (holdbart, hurtigttørrende stof)'],['Yuvin','4 shorts'],['Yuvin','1 let jakke'],
+  ['Yuvin','7 sæt undertøj, 7 par sokker'],['Yuvin','Badetøj (2 UV-heldragter)'],
+  ['Yuvin','Håndklæder (1 badehåndklæde + 1 almindeligt)'],
+  ['Yuvin','Sneakers + sandaler (velcro/slip-on hvis de ikke selv kan binde snørebånd)'],
+  ['Yuvin','Tandbørste'],['Yuvin','Hårbørste'],['Yuvin','Egen toilettaske'],['Yuvin','Pas og blåt sundhedskort'],
+  ['Yuvin','Drikkedunk'],['Yuvin','Oplader/iPad'],['Yuvin','2 sæt nattøj'],['Yuvin','Solhat'],
+  ['Yuvin','Badevinger og dykkerbriller'],['Yuvin','Yndlingsbamse'],
+  ['Yuvin','Underholdning i bilen: FIDGET, pop it, vinduesklistermærker, magnetisk leg, klistermærkebøger, opgavebøger'],
+  ['Yuvin','Spillemaskine/iPad'],['Yuvin','Børnebøger'],['Yuvin','Tissemønter/lommepenge'],
+  ['Yuvin','Løbecykel/løbehjul og cykelhjelm (hvis relevant for alderen)'],
+  ['Yuvin','Bleer og vådservietter (hvis stadig relevant)'],
+
+  ['Sengetøj og bad','Sengetøj'],['Sengetøj og bad','Tisseunderlag/vandtæt lagen'],['Sengetøj og bad','Shampoo (familiestørrelse)'],
+  ['Sengetøj og bad','Tandpasta (familiestørrelse)'],['Sengetøj og bad','Solcreme og aftersun'],
+  ['Sengetøj og bad','Vaskemiddel (inkl. "colour & dirt collector")'],
+
+  ['Camping-køkken','Viskestykker, klude og opvaskebørste'],['Camping-køkken','Voksdug til bordet'],
+  ['Camping-køkken','Opvaskemiddel'],['Camping-køkken','Vinoptrækker og en god skarp kniv'],['Camping-køkken','Toastjern'],
+  ['Camping-køkken','Isterningforme/-poser'],['Camping-køkken','Hvidløgspresser'],['Camping-køkken','Fryseposer'],
+  ['Camping-køkken','Fluesmækker'],['Camping-køkken','Lighter (til myggelys og grill)'],
+  ['Camping-køkken','Kaffe til første morgen'],['Camping-køkken','Mad til første aften + det børnene ikke kan undvære'],
+
+  ['Rejseapotek','Pincet og negleklipper'],['Rejseapotek','Myggespray'],['Rejseapotek','Plaster'],
+  ['Rejseapotek','Vitaminer (mælkesyrebakterier)'],['Rejseapotek','Flåttang'],['Rejseapotek','Giftsuger (hvepsestik) og allergitabletter'],
+  ['Rejseapotek','Væskeerstatning (rejsemave)'],['Rejseapotek','Termometer'],['Rejseapotek','Panodil (alm. og junior)'],
+  ['Rejseapotek','Creme til myggestik'],['Rejseapotek','Creme til solskoldning'],['Rejseapotek','Zinkspray (hvis skoldkopper)'],
+  ['Rejseapotek','Jodtabletter'],
+
+  ['Papirer og bil','Registreringsattest og forsikringspapir'],['Papirer og bil','Førstehjælpskasse'],
+  ['Papirer og bil','Gule sikkerhedsveste (én pr. person)'],['Papirer og bil','Advarselstrekant'],['Papirer og bil','Feriepenge'],
+
+  ['Under kørslen','Puder og tæpper'],['Under kørslen','Køletaske og mange snacks'],['Under kørslen','Vådservietter'],
+  ['Under kørslen','Skraldeposer'],['Under kørslen','Toiletpapir'],['Under kørslen','Opladere/kabler til bilen'],
+  ['Under kørslen','Solskærm til ruderne'],['Under kørslen','Nemme brætspil til børn og voksne'],
+
+  ['Legetøj og aktiviteter','Trækvogn eller klapvogn'],['Legetøj og aktiviteter','Strandlegetøj og dykkeleg'],
+  ['Legetøj og aktiviteter','Boldspil (fodbold, bordtennis, badminton)'],['Legetøj og aktiviteter','Sæbebobler'],
+  ['Legetøj og aktiviteter','Andre spil'],
+  ['Legetøj og aktiviteter','Krea: tuscher, papir, vandfarver, frugtfarve, lim, elastikker, tape, ispinde, sakse'],
+
+  ['Rute (Tesla + 3 lande)','Ladekabel + evt. adapter'],['Rute (Tesla + 3 lande)','Østrig vignet'],
+  ['Rute (Tesla + 3 lande)','Slovenien vignet'],['Rute (Tesla + 3 lande)','Evt. Tjekkiet vignet, hvis I ender med den rute'],
+  ['Rute (Tesla + 3 lande)','Lidt kontanter/EUR til Kroatien'],
+  ['Rute (Tesla + 3 lande)','Scandlines færgebillet Gedser–Rostock (printet/på telefon)'],
+  ['Rute (Tesla + 3 lande)','Powerbank'],['Rute (Tesla + 3 lande)','Offline kort/ruteplan som backup'],
+  ['Rute (Tesla + 3 lande)','Rejseforsikring – dokumentation'],
+  ['Rute (Tesla + 3 lande)','Stik-adapter, hvis I lader andet end bilen undervejs'],
+
+  ['Bilpakning Model Y','Frunk: Ladekabel, adapter, førstehjælpskasse, gule veste, advarselstrekant'],
+  ['Bilpakning Model Y','Under bagagerumsgulvet: Tunge/flade ting I ikke skal bruge dagligt'],
+  ['Bilpakning Model Y','Bagagerum bund: Tunge kufferter/tasker, liggende fladt'],
+  ['Bilpakning Model Y','Bagagerum top: Det I skal bruge dagligt/hver aften'],
+];
+
+async function seedCroatiaListIfMissing() {
+  const existing = await fbGet('/lists/kroatien2026');
+  if (existing) return;
+
+  // Try to migrate checked state from the old flat format
+  const oldFlat = await fbGet('/pakkeliste');
+
+  const items = {};
+  CROATIA_SEED.forEach(([group, text], idx) => {
+    const oldKey = sanitizeKey(text);
+    const wasChecked = oldFlat && oldFlat[oldKey] ? true : false;
+    items['i' + idx] = { text, group, checked: wasChecked, order: idx };
+  });
+
+  await fbPut('/lists/kroatien2026', {
+    name: 'Kroatien 2026',
+    emoji: '🚙',
+    order: 0,
+    items
+  });
+}
+
+// ---------- Dashboard ----------
+function renderDashboard() {
+  document.getElementById('page-title').textContent = 'Mine lister';
+  document.getElementById('back-btn').classList.add('hidden');
+  document.getElementById('delete-list-btn').classList.add('hidden');
+  document.getElementById('header-progress-row').style.display = 'none';
+  document.getElementById('fab-add').textContent = '+';
+  document.getElementById('fab-add').onclick = openNewListModal;
+
+  const content = document.getElementById('content');
+  const listIds = Object.keys(allLists).sort((a,b) => (allLists[a].order||0) - (allLists[b].order||0));
+
+  if (listIds.length === 0) {
+    content.innerHTML = '<div class="empty-state">Ingen lister endnu.<br>Tryk + for at oprette din første liste.</div>';
+    return;
   }
-  return {};
+
+  content.innerHTML = listIds.map(id => {
+    const list = allLists[id];
+    const items = list.items || {};
+    const total = Object.keys(items).length;
+    const checked = Object.values(items).filter(i => i.checked).length;
+    const pct = total ? Math.round((checked/total)*100) : 0;
+    return '<div class="list-card" onclick="openList(\'' + id + '\')">' +
+      '<div class="emoji">' + (list.emoji || '📋') + '</div>' +
+      '<div class="info">' +
+        '<h3>' + escapeHtml(list.name) + '</h3>' +
+        '<div class="mini-track"><div class="mini-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="count">' + checked + ' / ' + total + ' pakket</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
-async function saveState(statusEl) {
-  if (statusEl) statusEl.textContent = 'Gemmer…';
-  try {
-    const res = await fetch(FIREBASE_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(localState)
-    });
-    if (!res.ok) throw new Error('Firebase svarede med fejl: ' + res.status);
-    if (statusEl) {
-      statusEl.textContent = '✓ Synkroniseret';
-      setTimeout(() => { if (statusEl.textContent === '✓ Synkroniseret') statusEl.textContent = ''; }, 1800);
-    }
-  } catch (e) {
-    console.error('Kunne ikke gemme:', e);
-    if (statusEl) statusEl.textContent = '⚠ Kunne ikke gemme';
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ---------- List view ----------
+function openList(id) {
+  currentListId = id;
+  location.hash = 'list-' + id;
+  renderListView();
+}
+
+function renderListView() {
+  const list = allLists[currentListId];
+  if (!list) { location.hash = ''; return; }
+
+  document.getElementById('page-title').textContent = (list.emoji || '') + ' ' + list.name;
+  document.getElementById('back-btn').classList.remove('hidden');
+  document.getElementById('delete-list-btn').classList.remove('hidden');
+  document.getElementById('header-progress-row').style.display = 'flex';
+  document.getElementById('fab-add').textContent = '✎';
+  document.getElementById('fab-add').onclick = () => document.getElementById('quick-add-input').focus();
+
+  const items = list.items || {};
+  const total = Object.keys(items).length;
+  const checkedCount = Object.values(items).filter(i => i.checked).length;
+  const pct = total ? Math.round((checkedCount/total)*100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = checkedCount + '/' + total;
+
+  // group items
+  const groups = {};
+  Object.entries(items).forEach(([itemId, item]) => {
+    const g = item.group || 'Andet';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push([itemId, item]);
+  });
+  Object.values(groups).forEach(arr => arr.sort((a,b) => (a[1].order||0) - (b[1].order||0)));
+  const groupNames = Object.keys(groups).sort((a,b) => {
+    const minA = Math.min(...groups[a].map(x => x[1].order||0));
+    const minB = Math.min(...groups[b].map(x => x[1].order||0));
+    return minA - minB;
+  });
+
+  const content = document.getElementById('content');
+  if (total === 0) {
+    content.innerHTML = '<div class="empty-state">Denne liste er tom.<br>Tilføj din første vare nedenfor.</div>' + addBarHtml(groupNames);
+  } else {
+    content.innerHTML = groupNames.map((g, idx) => {
+      const groupItems = groups[g];
+      const groupChecked = groupItems.filter(([id,i]) => i.checked).length;
+      return '<details ' + (idx === 0 ? 'open' : '') + '>' +
+        '<summary>' + escapeHtml(g) + ' (' + groupChecked + '/' + groupItems.length + ') <span class="chev">▸</span></summary>' +
+        '<div class="card-body"><ul>' +
+        groupItems.map(([itemId, item]) => itemRowHtml(itemId, item)).join('') +
+        '</ul></div></details>';
+    }).join('') + addBarHtml(groupNames);
   }
-  updateProgress();
+
+  content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, cb.checked));
+  });
+  content.querySelectorAll('.del-item-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteItem(btn.dataset.itemId));
+  });
+  const addForm = document.getElementById('quick-add-form');
+  if (addForm) addForm.addEventListener('submit', handleQuickAdd);
 }
 
-function applyStateToCheckboxes(state) {
-  Object.keys(checkboxMap).forEach(key => {
-    const cb = checkboxMap[key];
-    const shouldBeChecked = !!state[key];
-    if (cb !== document.activeElement) {
-      cb.checked = shouldBeChecked;
-      cb.closest('li').classList.toggle('checked-item', shouldBeChecked);
-    }
-  });
-  updateProgress();
+function itemRowHtml(itemId, item) {
+  return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
+    '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
+    '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
+    '<button class="del-item-btn" data-item-id="' + itemId + '">✕</button>' +
+  '</li>';
 }
 
-function updateProgress() {
-  const panels = document.querySelectorAll('.tab-panel');
-  let totalAll = 0, checkedAll = 0;
-  panels.forEach(panel => {
-    const boxes = panel.querySelectorAll('input[type="checkbox"]');
-    const checked = panel.querySelectorAll('input[type="checkbox"]:checked').length;
-    totalAll += boxes.length;
-    checkedAll += checked;
-    const label = document.querySelector('[data-progress-for="' + panel.dataset.panel + '"]');
-    if (label) label.textContent = checked + ' / ' + boxes.length + ' pakket';
-  });
-  const pct = totalAll ? Math.round((checkedAll / totalAll) * 100) : 0;
-  document.getElementById('overall-fill').style.width = pct + '%';
-  document.getElementById('overall-label').textContent = checkedAll + '/' + totalAll + ' (' + pct + '%)';
+function addBarHtml(groupNames) {
+  const options = groupNames.map(g => '<option value="' + escapeHtml(g) + '">' + escapeHtml(g) + '</option>').join('');
+  return '<form class="add-bar" id="quick-add-form">' +
+    '<input type="text" id="quick-add-input" placeholder="Tilføj vare..." required>' +
+    '<select id="quick-add-group">' + options + '<option value="__new__">+ Ny gruppe</option></select>' +
+    '<button type="submit">+</button>' +
+  '</form>';
 }
 
-function setupTabs() {
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelector('[data-panel="' + btn.dataset.tab + '"]').classList.add('active');
-      btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    });
-  });
+async function handleQuickAdd(e) {
+  e.preventDefault();
+  const textInput = document.getElementById('quick-add-input');
+  const groupSelect = document.getElementById('quick-add-group');
+  const text = textInput.value.trim();
+  if (!text) return;
+
+  let group = groupSelect.value;
+  if (group === '__new__') {
+    group = prompt('Navn på ny gruppe:', 'Andet') || 'Andet';
+  }
+
+  const list = allLists[currentListId];
+  const items = list.items || {};
+  const maxOrder = Object.values(items).reduce((m,i) => Math.max(m, i.order||0), 0);
+  const newId = 'i' + Date.now() + Math.floor(Math.random()*1000);
+  const newItem = { text, group, checked: false, order: maxOrder + 1 };
+
+  items[newId] = newItem;
+  list.items = items;
+
+  textInput.value = '';
+  renderListView();
+  document.getElementById('quick-add-input').focus();
+
+  showStatus('Gemmer…');
+  const ok = await fbPatch('/lists/' + currentListId + '/items', { [newId]: newItem });
+  showStatus(ok ? '✓ Tilføjet' : '⚠ Kunne ikke gemme', true);
 }
 
-async function initChecklist() {
-  const statusEl = document.getElementById('sync-status');
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+async function toggleItem(itemId, checked) {
+  const list = allLists[currentListId];
+  if (!list.items[itemId]) return;
+  list.items[itemId].checked = checked;
+  renderListView();
+  showStatus('Gemmer…');
+  const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: list.items[itemId] });
+  showStatus(ok ? '✓ Synkroniseret' : '⚠ Kunne ikke gemme', true);
+}
 
-  checkboxes.forEach((cb, idx) => {
-    const li = cb.closest('li');
-    const rawKey = li ? li.textContent.trim() : ('item-' + idx);
-    const key = sanitizeKey(rawKey);
-    cb.dataset.key = key;
-    checkboxMap[key] = cb;
-  });
+async function deleteItem(itemId) {
+  if (!confirm('Slet denne vare?')) return;
+  delete allLists[currentListId].items[itemId];
+  renderListView();
+  await fbDelete('/lists/' + currentListId + '/items/' + itemId);
+  showStatus('✓ Slettet', true);
+}
 
-  setupTabs();
+async function deleteCurrentList() {
+  const list = allLists[currentListId];
+  if (!confirm('Slet hele listen "' + list.name + '"? Dette kan ikke fortrydes.')) return;
+  delete allLists[currentListId];
+  await fbDelete('/lists/' + currentListId);
+  currentListId = null;
+  location.hash = '';
+}
 
-  localState = await loadState();
-  applyStateToCheckboxes(localState);
+// ---------- New list modal ----------
+function openNewListModal() {
+  document.getElementById('new-list-modal').classList.remove('hidden');
+  document.getElementById('new-list-name').value = '';
+  document.getElementById('new-list-emoji').value = '📋';
+  document.getElementById('new-list-name').focus();
+}
+function closeNewListModal() {
+  document.getElementById('new-list-modal').classList.add('hidden');
+}
+async function createNewList() {
+  const name = document.getElementById('new-list-name').value.trim();
+  const emoji = document.getElementById('new-list-emoji').value.trim() || '📋';
+  if (!name) return;
+  const id = 'l' + Date.now();
+  const maxOrder = Object.values(allLists).reduce((m,l) => Math.max(m, l.order||0), 0);
+  const newList = { name, emoji, order: maxOrder + 1, items: {} };
+  allLists[id] = newList;
+  closeNewListModal();
+  await fbPut('/lists/' + id, newList);
+  location.hash = 'list-' + id;
+}
 
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', async () => {
-      localState[cb.dataset.key] = cb.checked;
-      cb.closest('li').classList.toggle('checked-item', cb.checked);
-      updateProgress();
-      await saveState(statusEl);
-    });
-  });
+// ---------- Routing ----------
+function handleRoute() {
+  const hash = location.hash.replace('#', '');
+  if (hash.startsWith('list-')) {
+    currentListId = hash.replace('list-', '');
+    if (allLists[currentListId]) renderListView(); else renderDashboard();
+  } else {
+    currentListId = null;
+    renderDashboard();
+  }
+}
+
+// ---------- Init & polling ----------
+async function loadAllLists() {
+  const data = await fbGet('/lists');
+  allLists = data || {};
+}
+
+async function init() {
+  await seedCroatiaListIfMissing();
+  await loadAllLists();
+  handleRoute();
+
+  window.addEventListener('hashchange', handleRoute);
+  document.getElementById('back-btn').addEventListener('click', () => { location.hash = ''; });
+  document.getElementById('delete-list-btn').addEventListener('click', deleteCurrentList);
+  document.getElementById('cancel-new-list').addEventListener('click', closeNewListModal);
+  document.getElementById('create-new-list').addEventListener('click', createNewList);
 
   setInterval(async () => {
-    const fresh = await loadState();
-    localState = fresh;
-    applyStateToCheckboxes(fresh);
+    await loadAllLists();
+    handleRoute();
   }, 6000);
 }
 
-initChecklist();
+init();
 </script>
-
 </body>
 </html>
