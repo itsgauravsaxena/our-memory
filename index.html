@@ -26,6 +26,7 @@
   }
   .back-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0 4px 0 0; }
   .progress-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  #header-progress-row { position: sticky; top: var(--topbar-h, 50px); z-index: 19; }
   .progress-track { flex: 1; height: 8px; background: rgba(255,255,255,0.25); border-radius: 6px; overflow: hidden; }
   .progress-fill { height: 100%; background: #ffd166; border-radius: 6px; transition: width 0.3s ease; width: 0%; }
   .progress-label { font-size: 12px; white-space: nowrap; opacity: 0.9; }
@@ -81,7 +82,7 @@
 
   /* Sub-list tab strip */
   .subtabstrip {
-    position: sticky; top: 0; z-index: 15;
+    position: sticky; top: var(--header-h, 62px); z-index: 15;
     display: flex; overflow-x: auto; gap: 6px;
     background: #f4f6f5; padding: 4px 0 10px;
     -webkit-overflow-scrolling: touch;
@@ -319,6 +320,7 @@ function renderDashboard() {
   document.getElementById('header-progress-row').style.display = 'none';
   document.getElementById('fab-add').textContent = '+';
   document.getElementById('fab-add').onclick = openNewListModal;
+  updateHeaderHeightVar();
 
   const content = document.getElementById('content');
   const listIds = Object.keys(allLists).sort((a,b) => (allLists[a].order||0) - (allLists[b].order||0));
@@ -351,6 +353,19 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
+function updateHeaderHeightVar() {
+  const topbar = document.getElementById('topbar');
+  const progressRow = document.getElementById('header-progress-row');
+  const topbarH = topbar.offsetHeight;
+  document.documentElement.style.setProperty('--topbar-h', topbarH + 'px');
+  let h = topbarH;
+  if (progressRow && progressRow.style.display !== 'none') {
+    h += progressRow.offsetHeight;
+  }
+  document.documentElement.style.setProperty('--header-h', h + 'px');
+}
+window.addEventListener('resize', updateHeaderHeightVar);
+
 // ---------- List view ----------
 function openList(id) {
   currentListId = id;
@@ -368,6 +383,7 @@ function renderListView() {
   document.getElementById('header-progress-row').style.display = 'flex';
   document.getElementById('fab-add').textContent = '✎';
   document.getElementById('fab-add').onclick = () => document.getElementById('quick-add-input').focus();
+  updateHeaderHeightVar();
 
   const items = list.items || {};
   const total = Object.keys(items).length;
