@@ -79,6 +79,23 @@
   details[open] summary .chev { transform: rotate(90deg); }
   details .card-body { padding: 0 14px 8px; }
 
+  /* Sub-list tab strip */
+  .subtabstrip {
+    position: sticky; top: 0; z-index: 15;
+    display: flex; overflow-x: auto; gap: 6px;
+    background: #f4f6f5; padding: 4px 0 10px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .subtabstrip::-webkit-scrollbar { display: none; }
+  .subtab-btn {
+    flex-shrink: 0; border: none; background: white; color: #333;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .subtab-btn.active { background: #2c6e49; color: white; }
+  .subtab-panel { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 12px; }
+
   /* Add item bar */
   .add-bar {
     position: sticky; bottom: 0; background: white; border-top: 1px solid #e2e2e2;
@@ -148,6 +165,7 @@ const statusEl = document.getElementById('sync-status');
 let allLists = {};
 let currentListId = null;
 let itemCounter = 0;
+let activeGroupByList = {}; // remembers which sub-list tab is open per list, survives re-renders
 
 function showStatus(msg, ok) {
   statusEl.textContent = msg;
@@ -374,17 +392,32 @@ function renderListView() {
   if (total === 0) {
     content.innerHTML = '<div class="empty-state">Denne liste er tom.<br>Tilføj din første vare nedenfor.</div>' + addBarHtml(groupNames);
   } else {
-    content.innerHTML = groupNames.map((g, idx) => {
-      const groupItems = groups[g];
-      const groupChecked = groupItems.filter(([id,i]) => i.checked).length;
-      return '<details ' + (idx === 0 ? 'open' : '') + '>' +
-        '<summary>' + escapeHtml(g) + ' (' + groupChecked + '/' + groupItems.length + ') <span class="chev">▸</span></summary>' +
-        '<div class="card-body"><ul>' +
-        groupItems.map(([itemId, item]) => itemRowHtml(itemId, item)).join('') +
-        '</ul></div></details>';
-    }).join('') + addBarHtml(groupNames);
+    // Keep whichever tab was already open for this list; default to the first group only the first time.
+    if (!activeGroupByList[currentListId] || !groupNames.includes(activeGroupByList[currentListId])) {
+      activeGroupByList[currentListId] = groupNames[0];
+    }
+    const activeGroup = activeGroupByList[currentListId];
+
+    const tabsHtml = '<div class="subtabstrip">' + groupNames.map(g => {
+      const gc = groups[g].filter(([id,i]) => i.checked).length;
+      return '<button class="subtab-btn ' + (g === activeGroup ? 'active' : '') + '" data-group="' + escapeHtml(g) + '">' +
+        escapeHtml(g) + ' (' + gc + '/' + groups[g].length + ')</button>';
+    }).join('') + '</div>';
+
+    const activeItems = groups[activeGroup] || [];
+    const panelHtml = '<div class="subtab-panel"><ul>' +
+      activeItems.map(([itemId, item]) => itemRowHtml(itemId, item)).join('') +
+      '</ul></div>';
+
+    content.innerHTML = tabsHtml + panelHtml + addBarHtml(groupNames, activeGroup);
   }
 
+  content.querySelectorAll('.subtab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeGroupByList[currentListId] = btn.dataset.group;
+      renderListView();
+    });
+  });
   content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, cb.checked));
   });
@@ -403,8 +436,8 @@ function itemRowHtml(itemId, item) {
   '</li>';
 }
 
-function addBarHtml(groupNames) {
-  const options = groupNames.map(g => '<option value="' + escapeHtml(g) + '">' + escapeHtml(g) + '</option>').join('');
+function addBarHtml(groupNames, activeGroup) {
+  const options = groupNames.map(g => '<option value="' + escapeHtml(g) + '"' + (g === activeGroup ? ' selected' : '') + '>' + escapeHtml(g) + '</option>').join('');
   return '<form class="add-bar" id="quick-add-form">' +
     '<input type="text" id="quick-add-input" placeholder="Tilføj vare..." required>' +
     '<select id="quick-add-group">' + options + '<option value="__new__">+ Ny gruppe</option></select>' +
@@ -432,6 +465,7 @@ async function handleQuickAdd(e) {
 
   items[newId] = newItem;
   list.items = items;
+  activeGroupByList[currentListId] = group;
 
   textInput.value = '';
   renderListView();
