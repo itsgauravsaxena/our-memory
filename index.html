@@ -217,7 +217,7 @@
   <div class="modal-box">
     <h3 id="item-menu-title">Item</h3>
     <button class="menu-action-btn" id="menu-edit-btn">✎ Edit name</button>
-    <button class="menu-action-btn hidden" id="menu-move-btn">🛒 Move to shopping list</button>
+    <button class="menu-action-btn hidden" id="menu-move-btn">🛒 Add to shopping list</button>
     <button class="menu-action-btn menu-danger" id="menu-delete-btn">🗑 Delete item</button>
     <button class="btn-cancel" id="menu-cancel-btn" style="width:100%;">Cancel</button>
   </div>
@@ -236,12 +236,12 @@
 
 <div class="modal-overlay hidden" id="move-item-modal">
   <div class="modal-box">
-    <h3>Move to shopping list</h3>
+    <h3>Add to shopping list</h3>
     <div id="move-item-options"></div>
     <input type="text" id="move-item-new-name" placeholder="Or type a new list name">
     <div class="modal-actions">
       <button class="btn-cancel" id="cancel-move-item">Cancel</button>
-      <button class="btn-create" id="confirm-move-new-list">Create &amp; move</button>
+      <button class="btn-create" id="confirm-move-new-list">Create &amp; add</button>
     </div>
   </div>
 </div>
@@ -782,8 +782,8 @@ async function moveItemToList(targetListId) {
 
   closeMoveItemModal();
 
-  delete sourceList.items[itemId];
-
+  // Copy rather than remove: the item still needs to be packed, it just also
+  // needs to be bought, so it should stay visible on the travel list too.
   const targetItems = targetList.items || {};
   const maxOrder = Object.values(targetItems).reduce((m,i) => Math.max(m, i.order||0), 0);
   const newId = 'i' + Date.now() + Math.floor(Math.random()*1000);
@@ -792,11 +792,10 @@ async function moveItemToList(targetListId) {
   targetList.items = targetItems;
 
   renderListView();
-  showStatus('Moving…');
-  const ok1 = await fbDelete('/lists/' + currentListId + '/items/' + itemId);
-  const ok2 = await fbPatch('/lists/' + targetListId + '/items', { [newId]: newItem });
-  showStatus((ok1 && ok2) ? ('✓ Moved to ' + targetList.name) : '⚠ Could not move', true);
-  if (ok1 && ok2) logChange('moved', item.text, (item.group ? item.group + ' ' : '') + '→ ' + targetList.name);
+  showStatus('Adding…');
+  const ok = await fbPatch('/lists/' + targetListId + '/items', { [newId]: newItem });
+  showStatus(ok ? ('✓ Added to ' + targetList.name) : '⚠ Could not add', true);
+  if (ok) logChange('copied', item.text, (item.group ? item.group + ' ' : '') + '→ ' + targetList.name);
 }
 
 async function moveItemToNewList() {
@@ -874,7 +873,7 @@ function buildSummaryText(logEntries, sinceTs) {
     added:      '➕ Added',
     deleted:    '🗑 Removed',
     renamed:    '✎ Renamed',
-    moved:      '🛒 Moved',
+    copied:     '🛒 Added to shopping list',
     checked:    '✅ Done',
     unchecked:  '↩️ Undone',
     unhave:     '↩️ No longer have',
@@ -882,7 +881,7 @@ function buildSummaryText(logEntries, sinceTs) {
     unrepacked: '↩️ Not packed for home'
   };
 
-  ['have', 'packed', 'repacked', 'checked', 'added', 'renamed', 'moved', 'deleted', 'unchecked', 'unhave', 'unpacked', 'unrepacked'].forEach(action => {
+  ['have', 'packed', 'repacked', 'checked', 'added', 'renamed', 'copied', 'deleted', 'unchecked', 'unhave', 'unpacked', 'unrepacked'].forEach(action => {
     const entries = buckets[action];
     if (!entries || !entries.length) return;
     text += '\n\n' + labels[action] + ':';
