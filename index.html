@@ -66,8 +66,11 @@
   li.checked-item .item-text { color: #999; text-decoration: line-through; }
 
   /* Travel list: three-stage toggles */
-  li.travel-row { flex-wrap: wrap; align-items: center; }
-  li.travel-row .item-text { flex: 1 1 auto; min-width: 0; padding-right: 6px; }
+  li.travel-row { flex-wrap: nowrap; align-items: center; gap: 8px; }
+  li.travel-row .item-text {
+    flex: 1 1 auto; min-width: 0; padding-right: 0;
+    overflow-wrap: anywhere; word-break: break-word;
+  }
   .stage-group { display: flex; gap: 6px; flex: 0 0 auto; }
   .stage-btn {
     width: 34px; height: 34px; border-radius: 9px; border: 1.5px solid #ddd;
@@ -379,14 +382,18 @@ function renderDashboard() {
     const list = allLists[id];
     const items = list.items || {};
     const total = Object.keys(items).length;
-    const checked = Object.values(items).filter(i => i.checked).length;
+    const isTravel = list.type === 'travel';
+    const checked = isTravel
+      ? Object.values(items).filter(i => i.packed).length
+      : Object.values(items).filter(i => i.checked).length;
     const pct = total ? Math.round((checked/total)*100) : 0;
+    const label = isTravel ? ' packed' : ' checked';
     return '<div class="list-card" onclick="openList(\'' + id + '\')">' +
       '<div class="emoji">' + (list.emoji || '📋') + '</div>' +
       '<div class="info">' +
         '<h3>' + escapeHtml(list.name) + '</h3>' +
         '<div class="mini-track"><div class="mini-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="count">' + checked + ' / ' + total + ' checked</div>' +
+        '<div class="count">' + checked + ' / ' + total + label + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -671,9 +678,12 @@ function buildSummaryText(logEntries, sinceTs) {
   if (!list) return '';
   const items = Object.values(list.items || {});
   const total = items.length;
-  const checked = items.filter(i => i.checked).length;
+  const isTravel = list.type === 'travel';
+  const checked = isTravel
+    ? items.filter(i => i.packed).length
+    : items.filter(i => i.checked).length;
 
-  let text = (list.emoji || '') + ' ' + list.name + ' — ' + checked + '/' + total + ' done';
+  let text = (list.emoji || '') + ' ' + list.name + ' — ' + checked + '/' + total + (isTravel ? ' packed' : ' done');
 
   if (!logEntries.length) {
     text += '\n\nNo changes since the last update.';
