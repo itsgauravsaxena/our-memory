@@ -98,9 +98,9 @@
 
   /* Add item bar */
   .add-bar {
-    position: sticky; bottom: 0; background: white; border-top: 1px solid #e2e2e2;
+    background: white; border-top: 1px solid #e2e2e2;
     padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
-    border-radius: 14px 14px 0 0; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
   .add-bar input[type="text"] {
     flex: 1 1 100%; min-width: 0;
@@ -558,7 +558,12 @@ async function init() {
   document.getElementById('create-new-list').addEventListener('click', createNewList);
 
   setInterval(async () => {
-    await loadAllLists();
+    const activeInput = document.getElementById('quick-add-input');
+    const formHasFocus = document.activeElement && document.activeElement.closest && document.activeElement.closest('#quick-add-form');
+    const isTyping = (activeInput && activeInput.value.trim() !== '') || formHasFocus;
+    if (isTyping) return; // don't touch the DOM at all while the user is composing an item
+    const data = await fbGet('/lists');
+    allLists = data || {};
     handleRoute();
   }, 6000);
 }
