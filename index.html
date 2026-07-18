@@ -254,6 +254,7 @@ let allLists = {};
 let currentListId = null;
 let itemCounter = 0;
 let activeGroupByList = {}; // remembers which sub-list tab is open per list, survives re-renders
+let lastRenderedListId = null; // tracks whether the last renderListView() call was for this same list
 
 function showStatus(msg, ok) {
   statusEl.textContent = msg;
@@ -515,6 +516,12 @@ function renderListView() {
   });
 
   const content = document.getElementById('content');
+  // The 6s poll re-renders this list's DOM from scratch; if we don't carry the
+  // scroll position forward, it snaps back to the active tab mid-swipe.
+  const sameListAsBefore = lastRenderedListId === currentListId;
+  const prevStrip = sameListAsBefore ? content.querySelector('.subtabstrip') : null;
+  const prevScrollLeft = prevStrip ? prevStrip.scrollLeft : null;
+
   if (total === 0) {
     content.innerHTML = '<div class="empty-state">This list is empty.<br>Add your first item below.</div>' + addBarHtml(groupNames);
   } else {
@@ -550,10 +557,16 @@ function renderListView() {
       renderListView();
     });
   });
-  const activeTabBtn = content.querySelector('.subtab-btn.active');
-  if (activeTabBtn) {
-    activeTabBtn.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+  const newStrip = content.querySelector('.subtabstrip');
+  if (newStrip) {
+    if (prevScrollLeft !== null) {
+      newStrip.scrollLeft = prevScrollLeft;
+    } else {
+      const activeTabBtn = newStrip.querySelector('.subtab-btn.active');
+      if (activeTabBtn) activeTabBtn.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+    }
   }
+  lastRenderedListId = currentListId;
   content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, 'checked', cb.checked));
   });
