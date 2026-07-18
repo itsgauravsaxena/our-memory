@@ -99,10 +99,22 @@
   }
   .return-mode-bar.active { background: #b5651d; border-color: #b5651d; color: white; }
   .return-mode-bar.active button { background: white; color: #b5651d; }
-  .del-item-btn {
-    background: none; border: none; color: #ccc; font-size: 18px; padding: 4px 6px; cursor: pointer; flex-shrink: 0;
+  .item-menu-btn {
+    background: none; border: none; color: #ccc; font-size: 20px; padding: 4px 8px; cursor: pointer; flex-shrink: 0;
   }
-  .del-item-btn:hover { color: #c0392b; }
+  .item-menu-btn:hover { color: #2c6e49; }
+  .menu-action-btn {
+    display: block; width: 100%; text-align: left; padding: 12px 14px;
+    border: none; background: #f7f7f7; border-radius: 8px; font-size: 15px;
+    cursor: pointer; margin-bottom: 8px;
+  }
+  .menu-action-btn.menu-danger { color: #c0392b; }
+  .move-list-option {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    background: #f7f7f7; border: none; border-radius: 8px; padding: 10px 12px;
+    font-size: 14.5px; cursor: pointer; margin-bottom: 8px;
+  }
+  .move-list-empty { color: #888; font-size: 13px; padding: 4px 2px 12px; }
 
   details { background: white; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
   summary {
@@ -197,6 +209,39 @@
     <div class="modal-actions">
       <button class="btn-cancel" id="cancel-new-list">Cancel</button>
       <button class="btn-create" id="create-new-list">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="item-menu-modal">
+  <div class="modal-box">
+    <h3 id="item-menu-title">Item</h3>
+    <button class="menu-action-btn" id="menu-edit-btn">✎ Edit name</button>
+    <button class="menu-action-btn hidden" id="menu-move-btn">🛒 Move to shopping list</button>
+    <button class="menu-action-btn menu-danger" id="menu-delete-btn">🗑 Delete item</button>
+    <button class="btn-cancel" id="menu-cancel-btn" style="width:100%;">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="edit-item-modal">
+  <div class="modal-box">
+    <h3>Edit item</h3>
+    <input type="text" id="edit-item-input" placeholder="Item name">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-edit-item">Cancel</button>
+      <button class="btn-create" id="save-edit-item">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="move-item-modal">
+  <div class="modal-box">
+    <h3>Move to shopping list</h3>
+    <div id="move-item-options"></div>
+    <input type="text" id="move-item-new-name" placeholder="Or type a new list name">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-move-item">Cancel</button>
+      <button class="btn-create" id="confirm-move-new-list">Create &amp; move</button>
     </div>
   </div>
 </div>
@@ -520,8 +565,8 @@ function renderListView() {
       toggleItem(btn.dataset.itemId, stage, !item[stage]);
     });
   });
-  content.querySelectorAll('.del-item-btn').forEach(btn => {
-    btn.addEventListener('click', () => deleteItem(btn.dataset.itemId));
+  content.querySelectorAll('.item-menu-btn').forEach(btn => {
+    btn.addEventListener('click', () => openItemMenu(btn.dataset.itemId));
   });
   const addForm = document.getElementById('quick-add-form');
   if (addForm) addForm.addEventListener('submit', handleQuickAdd);
@@ -532,7 +577,7 @@ function itemRowHtml(itemId, item, isTravel) {
     return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
       '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
       '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
-      '<button class="del-item-btn" data-item-id="' + itemId + '">✕</button>' +
+      '<button class="item-menu-btn" data-item-id="' + itemId + '" title="More">⋮</button>' +
     '</li>';
   }
 
@@ -552,7 +597,7 @@ function itemRowHtml(itemId, item, isTravel) {
       stage('packed', packed, '🧳', 'Packed for the trip') +
       stage('returned', returned, '🔙', 'Packed for the way home', 'stage-returned') +
     '</div>' +
-    '<button class="del-item-btn" data-item-id="' + itemId + '">✕</button>' +
+    '<button class="item-menu-btn" data-item-id="' + itemId + '" title="More">⋮</button>' +
   '</li>';
 }
 
@@ -648,6 +693,123 @@ async function deleteCurrentList() {
   location.hash = '';
 }
 
+// ---------- Item menu (⋮) ----------
+let menuPendingItemId = null;
+
+function openItemMenu(itemId) {
+  const list = allLists[currentListId];
+  const item = list.items[itemId];
+  if (!item) return;
+  menuPendingItemId = itemId;
+  document.getElementById('item-menu-title').textContent = item.text;
+  document.getElementById('menu-move-btn').classList.toggle('hidden', list.type !== 'travel');
+  document.getElementById('item-menu-modal').classList.remove('hidden');
+}
+function closeItemMenu() {
+  document.getElementById('item-menu-modal').classList.add('hidden');
+}
+
+// ---------- Edit item name ----------
+let editItemPendingId = null;
+
+function openEditItemModal(itemId) {
+  const item = allLists[currentListId].items[itemId];
+  if (!item) return;
+  editItemPendingId = itemId;
+  const input = document.getElementById('edit-item-input');
+  input.value = item.text;
+  document.getElementById('edit-item-modal').classList.remove('hidden');
+  input.focus();
+}
+function closeEditItemModal() {
+  document.getElementById('edit-item-modal').classList.add('hidden');
+  editItemPendingId = null;
+}
+async function saveEditItem() {
+  const itemId = editItemPendingId;
+  const newText = document.getElementById('edit-item-input').value.trim();
+  const list = allLists[currentListId];
+  const item = itemId && list.items[itemId];
+  if (!newText || !item) { closeEditItemModal(); return; }
+
+  item.text = newText;
+  closeEditItemModal();
+  renderListView();
+
+  showStatus('Saving…');
+  const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: item });
+  showStatus(ok ? '✓ Saved' : '⚠ Could not save', true);
+  if (ok) logChange('renamed', newText, item.group);
+}
+
+// ---------- Move item to another (shopping) list ----------
+let movePendingItemId = null;
+
+function openMoveItemModal(itemId) {
+  movePendingItemId = itemId;
+  const optionsEl = document.getElementById('move-item-options');
+  const otherLists = Object.entries(allLists)
+    .filter(([id]) => id !== currentListId)
+    .sort((a,b) => (a[1].order||0) - (b[1].order||0));
+
+  if (!otherLists.length) {
+    optionsEl.innerHTML = '<div class="move-list-empty">No other lists yet — create one below.</div>';
+  } else {
+    optionsEl.innerHTML = otherLists.map(([id, list]) =>
+      '<button class="move-list-option" data-target-id="' + id + '">' +
+        '<span>' + (list.emoji || '📋') + '</span><span>' + escapeHtml(list.name) + '</span>' +
+      '</button>'
+    ).join('');
+    optionsEl.querySelectorAll('.move-list-option').forEach(btn => {
+      btn.addEventListener('click', () => moveItemToList(btn.dataset.targetId));
+    });
+  }
+
+  document.getElementById('move-item-new-name').value = '';
+  document.getElementById('move-item-modal').classList.remove('hidden');
+}
+function closeMoveItemModal() {
+  document.getElementById('move-item-modal').classList.add('hidden');
+  movePendingItemId = null;
+}
+
+async function moveItemToList(targetListId) {
+  const itemId = movePendingItemId;
+  const sourceList = allLists[currentListId];
+  const targetList = allLists[targetListId];
+  const item = itemId && sourceList.items[itemId];
+  if (!item || !targetList) { closeMoveItemModal(); return; }
+
+  closeMoveItemModal();
+
+  delete sourceList.items[itemId];
+
+  const targetItems = targetList.items || {};
+  const maxOrder = Object.values(targetItems).reduce((m,i) => Math.max(m, i.order||0), 0);
+  const newId = 'i' + Date.now() + Math.floor(Math.random()*1000);
+  const newItem = { text: item.text, group: item.group || 'Other', checked: false, order: maxOrder + 1 };
+  targetItems[newId] = newItem;
+  targetList.items = targetItems;
+
+  renderListView();
+  showStatus('Moving…');
+  const ok1 = await fbDelete('/lists/' + currentListId + '/items/' + itemId);
+  const ok2 = await fbPatch('/lists/' + targetListId + '/items', { [newId]: newItem });
+  showStatus((ok1 && ok2) ? ('✓ Moved to ' + targetList.name) : '⚠ Could not move', true);
+  if (ok1 && ok2) logChange('moved', item.text, (item.group ? item.group + ' ' : '') + '→ ' + targetList.name);
+}
+
+async function moveItemToNewList() {
+  const name = document.getElementById('move-item-new-name').value.trim();
+  if (!name || !movePendingItemId) return;
+  const id = 'l' + Date.now();
+  const maxOrder = Object.values(allLists).reduce((m,l) => Math.max(m, l.order||0), 0);
+  const newList = { name, emoji: '🛒', type: 'simple', order: maxOrder + 1, items: {} };
+  allLists[id] = newList;
+  await fbPut('/lists/' + id, newList);
+  await moveItemToList(id);
+}
+
 // ---------- Change log ----------
 function getWhoAmI() {
   let who = localStorage.getItem('whoami');
@@ -711,6 +873,8 @@ function buildSummaryText(logEntries, sinceTs) {
     repacked:   '🔙 Packed for home',
     added:      '➕ Added',
     deleted:    '🗑 Removed',
+    renamed:    '✎ Renamed',
+    moved:      '🛒 Moved',
     checked:    '✅ Done',
     unchecked:  '↩️ Undone',
     unhave:     '↩️ No longer have',
@@ -718,7 +882,7 @@ function buildSummaryText(logEntries, sinceTs) {
     unrepacked: '↩️ Not packed for home'
   };
 
-  ['have', 'packed', 'repacked', 'checked', 'added', 'deleted', 'unchecked', 'unhave', 'unpacked', 'unrepacked'].forEach(action => {
+  ['have', 'packed', 'repacked', 'checked', 'added', 'renamed', 'moved', 'deleted', 'unchecked', 'unhave', 'unpacked', 'unrepacked'].forEach(action => {
     const entries = buckets[action];
     if (!entries || !entries.length) return;
     text += '\n\n' + labels[action] + ':';
@@ -831,6 +995,35 @@ async function init() {
   document.getElementById('share-list-btn').addEventListener('click', shareCurrentList);
   document.getElementById('cancel-new-list').addEventListener('click', closeNewListModal);
   document.getElementById('create-new-list').addEventListener('click', createNewList);
+
+  document.getElementById('menu-cancel-btn').addEventListener('click', closeItemMenu);
+  document.getElementById('menu-edit-btn').addEventListener('click', () => {
+    const id = menuPendingItemId;
+    closeItemMenu();
+    openEditItemModal(id);
+  });
+  document.getElementById('menu-move-btn').addEventListener('click', () => {
+    const id = menuPendingItemId;
+    closeItemMenu();
+    openMoveItemModal(id);
+  });
+  document.getElementById('menu-delete-btn').addEventListener('click', () => {
+    const id = menuPendingItemId;
+    closeItemMenu();
+    deleteItem(id);
+  });
+
+  document.getElementById('cancel-edit-item').addEventListener('click', closeEditItemModal);
+  document.getElementById('save-edit-item').addEventListener('click', saveEditItem);
+  document.getElementById('edit-item-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveEditItem();
+  });
+
+  document.getElementById('cancel-move-item').addEventListener('click', closeMoveItemModal);
+  document.getElementById('confirm-move-new-list').addEventListener('click', moveItemToNewList);
+  document.getElementById('move-item-new-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') moveItemToNewList();
+  });
 
   setInterval(async () => {
     const activeInput = document.getElementById('quick-add-input');
