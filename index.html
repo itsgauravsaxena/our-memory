@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="color-scheme" content="light only">
-<title>Vores Lister</title>
+<title>My Lists</title>
 <style>
   html { background: #f4f6f5 !important; color-scheme: light only; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -135,8 +135,8 @@
 
 <div class="topbar" id="topbar">
   <button class="back-btn hidden" id="back-btn">‹</button>
-  <h1 id="page-title">Mine lister</h1>
-  <button class="icon-btn hidden" id="delete-list-btn" title="Slet liste">🗑</button>
+  <h1 id="page-title">My Lists</h1>
+  <button class="icon-btn hidden" id="delete-list-btn" title="Delete list">🗑</button>
 </div>
 <div class="progress-row" id="header-progress-row" style="display:none; padding: 0 16px 12px; background:#2c6e49; margin-top:-12px;">
   <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
@@ -150,12 +150,12 @@
 
 <div class="modal-overlay hidden" id="new-list-modal">
   <div class="modal-box">
-    <h3>Ny liste</h3>
-    <input type="text" id="new-list-emoji" placeholder="Emoji (fx 🛒)" maxlength="4" value="📋">
-    <input type="text" id="new-list-name" placeholder="Navn på liste (fx Indkøb)">
+    <h3>New list</h3>
+    <input type="text" id="new-list-emoji" placeholder="Emoji (e.g. 🛒)" maxlength="4" value="📋">
+    <input type="text" id="new-list-name" placeholder="List name (e.g. Groceries)">
     <div class="modal-actions">
-      <button class="btn-cancel" id="cancel-new-list">Annuller</button>
-      <button class="btn-create" id="create-new-list">Opret</button>
+      <button class="btn-cancel" id="cancel-new-list">Cancel</button>
+      <button class="btn-create" id="create-new-list">Create</button>
     </div>
   </div>
 </div>
@@ -313,7 +313,7 @@ async function seedCroatiaListIfMissing() {
 
 // ---------- Dashboard ----------
 function renderDashboard() {
-  document.getElementById('page-title').textContent = 'Mine lister';
+  document.getElementById('page-title').textContent = 'My Lists';
   document.getElementById('back-btn').classList.add('hidden');
   document.getElementById('delete-list-btn').classList.add('hidden');
   document.getElementById('header-progress-row').style.display = 'none';
@@ -324,7 +324,7 @@ function renderDashboard() {
   const listIds = Object.keys(allLists).sort((a,b) => (allLists[a].order||0) - (allLists[b].order||0));
 
   if (listIds.length === 0) {
-    content.innerHTML = '<div class="empty-state">Ingen lister endnu.<br>Tryk + for at oprette din første liste.</div>';
+    content.innerHTML = '<div class="empty-state">No lists yet.<br>Tap + to create your first list.</div>';
     return;
   }
 
@@ -339,7 +339,7 @@ function renderDashboard() {
       '<div class="info">' +
         '<h3>' + escapeHtml(list.name) + '</h3>' +
         '<div class="mini-track"><div class="mini-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="count">' + checked + ' / ' + total + ' pakket</div>' +
+        '<div class="count">' + checked + ' / ' + total + ' checked</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -379,7 +379,7 @@ function renderListView() {
   // group items
   const groups = {};
   Object.entries(items).forEach(([itemId, item]) => {
-    const g = item.group || 'Andet';
+    const g = item.group || 'Other';
     if (!groups[g]) groups[g] = [];
     groups[g].push([itemId, item]);
   });
@@ -392,7 +392,7 @@ function renderListView() {
 
   const content = document.getElementById('content');
   if (total === 0) {
-    content.innerHTML = '<div class="empty-state">Denne liste er tom.<br>Tilføj din første vare nedenfor.</div>' + addBarHtml(groupNames);
+    content.innerHTML = '<div class="empty-state">This list is empty.<br>Add your first item below.</div>' + addBarHtml(groupNames);
   } else {
     // Keep whichever tab was already open for this list; default to the first group only the first time.
     if (!activeGroupByList[currentListId] || !groupNames.includes(activeGroupByList[currentListId])) {
@@ -441,8 +441,8 @@ function itemRowHtml(itemId, item) {
 function addBarHtml(groupNames, activeGroup) {
   const options = groupNames.map(g => '<option value="' + escapeHtml(g) + '"' + (g === activeGroup ? ' selected' : '') + '>' + escapeHtml(g) + '</option>').join('');
   return '<form class="add-bar" id="quick-add-form">' +
-    '<input type="text" id="quick-add-input" placeholder="Tilføj vare..." required>' +
-    '<select id="quick-add-group">' + options + '<option value="__new__">+ Ny gruppe</option></select>' +
+    '<input type="text" id="quick-add-input" placeholder="Add item..." required>' +
+    '<select id="quick-add-group">' + options + '<option value="__new__">+ New group</option></select>' +
     '<button type="submit">+</button>' +
   '</form>';
 }
@@ -456,7 +456,7 @@ async function handleQuickAdd(e) {
 
   let group = groupSelect.value;
   if (group === '__new__') {
-    group = prompt('Navn på ny gruppe:', 'Andet') || 'Andet';
+    group = prompt('Name for new group:', 'Other') || 'Other';
   }
 
   const list = allLists[currentListId];
@@ -473,9 +473,9 @@ async function handleQuickAdd(e) {
   renderListView();
   document.getElementById('quick-add-input').focus();
 
-  showStatus('Gemmer…');
+  showStatus('Saving…');
   const ok = await fbPatch('/lists/' + currentListId + '/items', { [newId]: newItem });
-  showStatus(ok ? '✓ Tilføjet' : '⚠ Kunne ikke gemme', true);
+  showStatus(ok ? '✓ Added' : '⚠ Could not save', true);
 }
 
 async function toggleItem(itemId, checked) {
@@ -483,22 +483,22 @@ async function toggleItem(itemId, checked) {
   if (!list.items[itemId]) return;
   list.items[itemId].checked = checked;
   renderListView();
-  showStatus('Gemmer…');
+  showStatus('Saving…');
   const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: list.items[itemId] });
-  showStatus(ok ? '✓ Synkroniseret' : '⚠ Kunne ikke gemme', true);
+  showStatus(ok ? '✓ Synced' : '⚠ Could not save', true);
 }
 
 async function deleteItem(itemId) {
-  if (!confirm('Slet denne vare?')) return;
+  if (!confirm('Delete this item?')) return;
   delete allLists[currentListId].items[itemId];
   renderListView();
   await fbDelete('/lists/' + currentListId + '/items/' + itemId);
-  showStatus('✓ Slettet', true);
+  showStatus('✓ Deleted', true);
 }
 
 async function deleteCurrentList() {
   const list = allLists[currentListId];
-  if (!confirm('Slet hele listen "' + list.name + '"? Dette kan ikke fortrydes.')) return;
+  if (!confirm('Delete the entire list "' + list.name + '"? This cannot be undone.')) return;
   delete allLists[currentListId];
   await fbDelete('/lists/' + currentListId);
   currentListId = null;
