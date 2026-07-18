@@ -436,6 +436,10 @@ function renderListView() {
       renderListView();
     });
   });
+  const activeTabBtn = content.querySelector('.subtab-btn.active');
+  if (activeTabBtn) {
+    activeTabBtn.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+  }
   content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, cb.checked));
   });
