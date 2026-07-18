@@ -137,6 +137,7 @@
 <div class="topbar" id="topbar">
   <button class="back-btn hidden" id="back-btn">‹</button>
   <h1 id="page-title">My Lists</h1>
+  <button class="icon-btn hidden" id="share-list-btn" title="Send update">📤</button>
   <button class="icon-btn hidden" id="delete-list-btn" title="Delete list">🗑</button>
 </div>
 <div class="progress-row" id="header-progress-row" style="display:none; padding: 0 16px 12px; background:#2c6e49; margin-top:-12px;">
@@ -317,6 +318,7 @@ function renderDashboard() {
   document.getElementById('page-title').textContent = 'My Lists';
   document.getElementById('back-btn').classList.add('hidden');
   document.getElementById('delete-list-btn').classList.add('hidden');
+  document.getElementById('share-list-btn').classList.add('hidden');
   document.getElementById('header-progress-row').style.display = 'none';
   document.getElementById('fab-add').textContent = '+';
   document.getElementById('fab-add').onclick = openNewListModal;
@@ -380,6 +382,7 @@ function renderListView() {
   document.getElementById('page-title').textContent = (list.emoji || '') + ' ' + list.name;
   document.getElementById('back-btn').classList.remove('hidden');
   document.getElementById('delete-list-btn').classList.remove('hidden');
+  document.getElementById('share-list-btn').classList.remove('hidden');
   document.getElementById('header-progress-row').style.display = 'flex';
   document.getElementById('fab-add').textContent = '✎';
   document.getElementById('fab-add').onclick = () => document.getElementById('quick-add-input').focus();
@@ -525,6 +528,71 @@ async function deleteCurrentList() {
   location.hash = '';
 }
 
+// ---------- Share / send update ----------
+function buildSummaryText() {
+  const list = allLists[currentListId];
+  if (!list) return '';
+  const items = Object.values(list.items || {});
+  const total = items.length;
+  const checked = items.filter(i => i.checked).length;
+  const pct = total ? Math.round((checked / total) * 100) : 0;
+
+  let text = (list.emoji || '') + ' ' + list.name + ': ' + checked + '/' + total + ' done (' + pct + '%)\n';
+
+  // Group the remaining items so the message is actionable, not just a number
+  const remainingByGroup = {};
+  items.filter(i => !i.checked).forEach(i => {
+    const g = i.group || 'Other';
+    if (!remainingByGroup[g]) remainingByGroup[g] = [];
+    remainingByGroup[g].push(i.text);
+  });
+
+  const groupNames = Object.keys(remainingByGroup);
+  if (groupNames.length === 0) {
+    text += '\nAll done! 🎉';
+    return text;
+  }
+
+  text += '\nStill to do:';
+  groupNames.forEach(g => {
+    const groupItems = remainingByGroup[g];
+    // Keep the message readable - cap each group, note the overflow
+    const shown = groupItems.slice(0, 5);
+    text += '\n\n' + g + ' (' + groupItems.length + '):';
+    shown.forEach(t => { text += '\n• ' + t; });
+    if (groupItems.length > shown.length) {
+      text += '\n• …and ' + (groupItems.length - shown.length) + ' more';
+    }
+  });
+
+  text += '\n\n' + location.origin + location.pathname + '#list-' + currentListId;
+  return text;
+}
+
+async function shareCurrentList() {
+  const text = buildSummaryText();
+  if (!text) return;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+    } catch (e) {
+      // User cancelled the share sheet - not an error worth reporting
+      if (e.name !== 'AbortError') console.error('Share failed:', e);
+    }
+    return;
+  }
+
+  // Desktop / unsupported browsers: fall back to clipboard
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus('✓ Summary copied to clipboard', true);
+  } catch (e) {
+    console.error('Clipboard failed:', e);
+    showStatus('⚠ Could not share', true);
+  }
+}
+
 // ---------- New list modal ----------
 function openNewListModal() {
   document.getElementById('new-list-modal').classList.remove('hidden');
@@ -574,6 +642,7 @@ async function init() {
   window.addEventListener('hashchange', handleRoute);
   document.getElementById('back-btn').addEventListener('click', () => { location.hash = ''; });
   document.getElementById('delete-list-btn').addEventListener('click', deleteCurrentList);
+  document.getElementById('share-list-btn').addEventListener('click', shareCurrentList);
   document.getElementById('cancel-new-list').addEventListener('click', closeNewListModal);
   document.getElementById('create-new-list').addEventListener('click', createNewList);
 
