@@ -64,6 +64,38 @@
   li .item-text { flex: 1; }
   input[type="checkbox"] { margin-right: 12px; transform: scale(1.35); flex-shrink: 0; accent-color: #2c6e49; }
   li.checked-item .item-text { color: #999; text-decoration: line-through; }
+
+  /* Travel list: three-stage toggles */
+  li.travel-row { flex-wrap: wrap; align-items: center; }
+  li.travel-row .item-text { flex: 1 1 auto; min-width: 0; padding-right: 6px; }
+  .stage-group { display: flex; gap: 6px; flex: 0 0 auto; }
+  .stage-btn {
+    width: 34px; height: 34px; border-radius: 9px; border: 1.5px solid #ddd;
+    background: #fafafa; font-size: 15px; cursor: pointer; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1; transition: background 0.15s, border-color 0.15s;
+  }
+  .stage-btn.on { background: #2c6e49; border-color: #2c6e49; }
+  .stage-btn.on.stage-returned { background: #b5651d; border-color: #b5651d; }
+  .stage-btn .ico { filter: grayscale(1); opacity: 0.45; }
+  .stage-btn.on .ico { filter: none; opacity: 1; }
+  li.fully-done .item-text { color: #999; text-decoration: line-through; }
+
+  .stage-legend {
+    font-size: 11.5px; color: #777; padding: 2px 4px 10px;
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .return-mode-bar {
+    background: #fff4e6; border: 1px solid #f0d0a8; border-radius: 10px;
+    padding: 8px 12px; font-size: 13px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .return-mode-bar button {
+    border: none; background: #b5651d; color: white; border-radius: 16px;
+    padding: 6px 12px; font-size: 12.5px; cursor: pointer; flex-shrink: 0;
+  }
+  .return-mode-bar.active { background: #b5651d; border-color: #b5651d; color: white; }
+  .return-mode-bar.active button { background: white; color: #b5651d; }
   .del-item-btn {
     background: none; border: none; color: #ccc; font-size: 18px; padding: 4px 6px; cursor: pointer; flex-shrink: 0;
   }
@@ -155,6 +187,10 @@
     <h3>New list</h3>
     <input type="text" id="new-list-emoji" placeholder="Emoji (e.g. 🛒)" maxlength="4" value="📋">
     <input type="text" id="new-list-name" placeholder="List name (e.g. Groceries)">
+    <select id="new-list-type" style="width:100%; border:1.5px solid #ddd; border-radius:8px; padding:10px 12px; font-size:15px; margin-bottom:10px;">
+      <option value="simple">Simple list (one checkbox)</option>
+      <option value="travel">Travel list (have → packed → packed back)</option>
+    </select>
     <div class="modal-actions">
       <button class="btn-cancel" id="cancel-new-list">Cancel</button>
       <button class="btn-create" id="create-new-list">Create</button>
@@ -293,7 +329,13 @@ const CROATIA_SEED = [
 
 async function seedCroatiaListIfMissing() {
   const existing = await fbGet('/lists/kroatien2026');
-  if (existing) return;
+  if (existing) {
+    // Existing list from before list-types were introduced: upgrade it in place.
+    if (!existing.type) {
+      await fbPatch('/lists/kroatien2026', { type: 'travel' });
+    }
+    return;
+  }
 
   // Try to migrate checked state from the old flat format
   const oldFlat = await fbGet('/pakkeliste');
@@ -308,6 +350,7 @@ async function seedCroatiaListIfMissing() {
   await fbPut('/lists/kroatien2026', {
     name: 'Kroatien 2026',
     emoji: '🚙',
+    type: 'travel',
     order: 0,
     items
   });
@@ -389,11 +432,21 @@ function renderListView() {
   updateHeaderHeightVar();
 
   const items = list.items || {};
+  const isTravel = list.type === 'travel';
   const total = Object.keys(items).length;
-  const checkedCount = Object.values(items).filter(i => i.checked).length;
-  const pct = total ? Math.round((checkedCount/total)*100) : 0;
+  const vals = Object.values(items);
+  const haveCount = vals.filter(i => i.checked).length;
+  const packedCount = vals.filter(i => i.packed).length;
+  const returnedCount = vals.filter(i => i.returned).length;
+
+  // On travel lists the headline number tracks packing, since that's the stage
+  // you're actually racing against on departure day.
+  const primaryCount = isTravel ? packedCount : haveCount;
+  const pct = total ? Math.round((primaryCount/total)*100) : 0;
   document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-label').textContent = checkedCount + '/' + total;
+  document.getElementById('progress-label').textContent = isTravel
+    ? ('🏠' + haveCount + ' 🧳' + packedCount + ' 🔙' + returnedCount + ' /' + total)
+    : (primaryCount + '/' + total);
 
   // group items
   const groups = {};
@@ -420,17 +473,23 @@ function renderListView() {
     const activeGroup = activeGroupByList[currentListId];
 
     const tabsHtml = '<div class="subtabstrip">' + groupNames.map(g => {
-      const gc = groups[g].filter(([id,i]) => i.checked).length;
+      const gc = isTravel
+        ? groups[g].filter(([id,i]) => i.packed).length
+        : groups[g].filter(([id,i]) => i.checked).length;
       return '<button class="subtab-btn ' + (g === activeGroup ? 'active' : '') + '" data-group="' + escapeHtml(g) + '">' +
         escapeHtml(g) + ' (' + gc + '/' + groups[g].length + ')</button>';
     }).join('') + '</div>';
 
+    const legendHtml = isTravel
+      ? '<div class="stage-legend"><span>🏠 Have it / bought</span><span>🧳 Packed</span><span>🔙 Packed for home</span></div>'
+      : '';
+
     const activeItems = groups[activeGroup] || [];
     const panelHtml = '<div class="subtab-panel"><ul>' +
-      activeItems.map(([itemId, item]) => itemRowHtml(itemId, item)).join('') +
+      activeItems.map(([itemId, item]) => itemRowHtml(itemId, item, isTravel)).join('') +
       '</ul></div>';
 
-    content.innerHTML = tabsHtml + panelHtml + addBarHtml(groupNames, activeGroup);
+    content.innerHTML = tabsHtml + legendHtml + panelHtml + addBarHtml(groupNames, activeGroup);
   }
 
   content.querySelectorAll('.subtab-btn').forEach(btn => {
@@ -444,7 +503,15 @@ function renderListView() {
     activeTabBtn.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
   }
   content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, cb.checked));
+    cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, 'checked', cb.checked));
+  });
+  content.querySelectorAll('.stage-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = allLists[currentListId].items[btn.dataset.itemId];
+      if (!item) return;
+      const stage = btn.dataset.stage;
+      toggleItem(btn.dataset.itemId, stage, !item[stage]);
+    });
   });
   content.querySelectorAll('.del-item-btn').forEach(btn => {
     btn.addEventListener('click', () => deleteItem(btn.dataset.itemId));
@@ -453,10 +520,31 @@ function renderListView() {
   if (addForm) addForm.addEventListener('submit', handleQuickAdd);
 }
 
-function itemRowHtml(itemId, item) {
-  return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
-    '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
+function itemRowHtml(itemId, item, isTravel) {
+  if (!isTravel) {
+    return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
+      '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
+      '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
+      '<button class="del-item-btn" data-item-id="' + itemId + '">✕</button>' +
+    '</li>';
+  }
+
+  const have = !!item.checked;        // stage 1 reuses the original field, so old data still counts
+  const packed = !!item.packed;       // stage 2
+  const returned = !!item.returned;   // stage 3
+
+  const stage = (key, on, icon, title, extraClass) =>
+    '<button class="stage-btn ' + (on ? 'on ' : '') + (extraClass || '') +
+    '" data-item-id="' + itemId + '" data-stage="' + key + '" title="' + title + '">' +
+    '<span class="ico">' + icon + '</span></button>';
+
+  return '<li class="travel-row ' + (returned ? 'fully-done' : '') + '">' +
     '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
+    '<div class="stage-group">' +
+      stage('checked', have, '🏠', 'Have it / bought') +
+      stage('packed', packed, '🧳', 'Packed for the trip') +
+      stage('returned', returned, '🔙', 'Packed for the way home', 'stage-returned') +
+    '</div>' +
     '<button class="del-item-btn" data-item-id="' + itemId + '">✕</button>' +
   '</li>';
 }
@@ -502,15 +590,36 @@ async function handleQuickAdd(e) {
   if (ok) logChange('added', newItem.text, newItem.group);
 }
 
-async function toggleItem(itemId, checked) {
+async function toggleItem(itemId, stage, value) {
   const list = allLists[currentListId];
-  if (!list.items[itemId]) return;
-  list.items[itemId].checked = checked;
+  const item = list.items[itemId];
+  if (!item) return;
+
+  item[stage] = value;
+
+  // Cascade so the stages stay in a sensible order rather than allowing
+  // impossible states like "packed but we don't have it".
+  if (value) {
+    if (stage === 'packed') item.checked = true;
+    if (stage === 'returned') { item.checked = true; item.packed = true; }
+  } else {
+    if (stage === 'checked') { item.packed = false; item.returned = false; }
+    if (stage === 'packed') item.returned = false;
+  }
+
   renderListView();
   showStatus('Saving…');
-  const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: list.items[itemId] });
+  const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: item });
   showStatus(ok ? '✓ Synced' : '⚠ Could not save', true);
-  if (ok) logChange(checked ? 'checked' : 'unchecked', list.items[itemId].text, list.items[itemId].group);
+
+  if (ok) {
+    const verbs = {
+      checked:  value ? 'have' : 'unhave',
+      packed:   value ? 'packed' : 'unpacked',
+      returned: value ? 'repacked' : 'unrepacked'
+    };
+    logChange(verbs[stage], item.text, item.group);
+  }
 }
 
 async function deleteItem(itemId) {
@@ -580,19 +689,28 @@ function buildSummaryText(logEntries, sinceTs) {
   });
   const net = Object.values(netByItem).sort((a, b) => a.at - b.at);
 
-  const buckets = { checked: [], unchecked: [], added: [], deleted: [] };
-  net.forEach(e => { if (buckets[e.action]) buckets[e.action].push(e); });
+  const buckets = {};
+  net.forEach(e => {
+    if (!buckets[e.action]) buckets[e.action] = [];
+    buckets[e.action].push(e);
+  });
 
   const labels = {
-    checked:   '✅ Packed',
-    added:     '➕ Added',
-    deleted:   '🗑 Removed',
-    unchecked: '↩️ Unpacked'
+    have:       '🏠 Got / bought',
+    packed:     '🧳 Packed',
+    repacked:   '🔙 Packed for home',
+    added:      '➕ Added',
+    deleted:    '🗑 Removed',
+    checked:    '✅ Done',
+    unchecked:  '↩️ Undone',
+    unhave:     '↩️ No longer have',
+    unpacked:   '↩️ Unpacked',
+    unrepacked: '↩️ Not packed for home'
   };
 
-  ['checked', 'added', 'deleted', 'unchecked'].forEach(action => {
+  ['have', 'packed', 'repacked', 'checked', 'added', 'deleted', 'unchecked', 'unhave', 'unpacked', 'unrepacked'].forEach(action => {
     const entries = buckets[action];
-    if (!entries.length) return;
+    if (!entries || !entries.length) return;
     text += '\n\n' + labels[action] + ':';
     entries.forEach(e => {
       text += '\n• ' + e.text + (e.group ? ' (' + e.group + ')' : '');
@@ -662,10 +780,11 @@ function closeNewListModal() {
 async function createNewList() {
   const name = document.getElementById('new-list-name').value.trim();
   const emoji = document.getElementById('new-list-emoji').value.trim() || '📋';
+  const type = document.getElementById('new-list-type').value || 'simple';
   if (!name) return;
   const id = 'l' + Date.now();
   const maxOrder = Object.values(allLists).reduce((m,l) => Math.max(m, l.order||0), 0);
-  const newList = { name, emoji, order: maxOrder + 1, items: {} };
+  const newList = { name, emoji, type, order: maxOrder + 1, items: {} };
   allLists[id] = newList;
   closeNewListModal();
   await fbPut('/lists/' + id, newList);
