@@ -499,6 +499,7 @@ async function handleQuickAdd(e) {
   showStatus('Saving…');
   const ok = await fbPatch('/lists/' + currentListId + '/items', { [newId]: newItem });
   showStatus(ok ? '✓ Added' : '⚠ Could not save', true);
+  if (ok) logChange('added', newItem.text, newItem.group);
 }
 
 async function toggleItem(itemId, checked) {
@@ -509,14 +510,17 @@ async function toggleItem(itemId, checked) {
   showStatus('Saving…');
   const ok = await fbPatch('/lists/' + currentListId + '/items', { [itemId]: list.items[itemId] });
   showStatus(ok ? '✓ Synced' : '⚠ Could not save', true);
+  if (ok) logChange(checked ? 'checked' : 'unchecked', list.items[itemId].text, list.items[itemId].group);
 }
 
 async function deleteItem(itemId) {
   if (!confirm('Delete this item?')) return;
+  const removed = allLists[currentListId].items[itemId];
   delete allLists[currentListId].items[itemId];
   renderListView();
   await fbDelete('/lists/' + currentListId + '/items/' + itemId);
   showStatus('✓ Deleted', true);
+  if (removed) logChange('deleted', removed.text, removed.group);
 }
 
 async function deleteCurrentList() {
@@ -528,68 +532,120 @@ async function deleteCurrentList() {
   location.hash = '';
 }
 
+// ---------- Change log ----------
+function getWhoAmI() {
+  let who = localStorage.getItem('whoami');
+  if (!who) {
+    who = prompt('Your name (shown in update messages):', '') || '';
+    who = who.trim();
+    if (who) localStorage.setItem('whoami', who);
+  }
+  return who;
+}
+
+// Records what changed so the share button can report only the delta.
+async function logChange(action, itemText, group) {
+  if (!currentListId) return;
+  const entry = {
+    action: action,          // 'checked' | 'unchecked' | 'added' | 'deleted'
+    text: itemText,
+    group: group || '',
+    who: localStorage.getItem('whoami') || '',
+    at: Date.now()
+  };
+  await fbPatch('/lists/' + currentListId + '/log', { ['e' + entry.at + Math.floor(Math.random()*1000)]: entry });
+}
+
 // ---------- Share / send update ----------
-function buildSummaryText() {
+function buildSummaryText(logEntries, sinceTs) {
   const list = allLists[currentListId];
   if (!list) return '';
   const items = Object.values(list.items || {});
   const total = items.length;
   const checked = items.filter(i => i.checked).length;
-  const pct = total ? Math.round((checked / total) * 100) : 0;
 
-  let text = (list.emoji || '') + ' ' + list.name + ': ' + checked + '/' + total + ' done (' + pct + '%)\n';
+  let text = (list.emoji || '') + ' ' + list.name + ' — ' + checked + '/' + total + ' done';
 
-  // Group the remaining items so the message is actionable, not just a number
-  const remainingByGroup = {};
-  items.filter(i => !i.checked).forEach(i => {
-    const g = i.group || 'Other';
-    if (!remainingByGroup[g]) remainingByGroup[g] = [];
-    remainingByGroup[g].push(i.text);
-  });
-
-  const groupNames = Object.keys(remainingByGroup);
-  if (groupNames.length === 0) {
-    text += '\nAll done! 🎉';
+  if (!logEntries.length) {
+    text += '\n\nNo changes since the last update.';
+    text += '\n' + location.origin + location.pathname + '#list-' + currentListId;
     return text;
   }
 
-  text += '\nStill to do:';
-  groupNames.forEach(g => {
-    const groupItems = remainingByGroup[g];
-    // Keep the message readable - cap each group, note the overflow
-    const shown = groupItems.slice(0, 5);
-    text += '\n\n' + g + ' (' + groupItems.length + '):';
-    shown.forEach(t => { text += '\n• ' + t; });
-    if (groupItems.length > shown.length) {
-      text += '\n• …and ' + (groupItems.length - shown.length) + ' more';
-    }
+  // Collapse to net effect: if something was checked then unchecked, only the
+  // latest state matters, so later entries overwrite earlier ones per item.
+  const netByItem = {};
+  logEntries.forEach(e => {
+    netByItem[e.group + '||' + e.text] = e;
+  });
+  const net = Object.values(netByItem).sort((a, b) => a.at - b.at);
+
+  const buckets = { checked: [], unchecked: [], added: [], deleted: [] };
+  net.forEach(e => { if (buckets[e.action]) buckets[e.action].push(e); });
+
+  const labels = {
+    checked:   '✅ Packed',
+    added:     '➕ Added',
+    deleted:   '🗑 Removed',
+    unchecked: '↩️ Unpacked'
+  };
+
+  ['checked', 'added', 'deleted', 'unchecked'].forEach(action => {
+    const entries = buckets[action];
+    if (!entries.length) return;
+    text += '\n\n' + labels[action] + ':';
+    entries.forEach(e => {
+      text += '\n• ' + e.text + (e.group ? ' (' + e.group + ')' : '');
+    });
   });
 
-  text += '\n\n' + location.origin + location.pathname + '#list-' + currentListId;
+  const names = [...new Set(net.map(e => e.who).filter(Boolean))];
+  if (names.length) text += '\n\nBy: ' + names.join(', ');
+
+  text += '\n' + location.origin + location.pathname + '#list-' + currentListId;
   return text;
 }
 
 async function shareCurrentList() {
-  const text = buildSummaryText();
+  const sinceTs = (await fbGet('/lists/' + currentListId + '/lastSharedAt')) || 0;
+  const logObj = (await fbGet('/lists/' + currentListId + '/log')) || {};
+  const entries = Object.values(logObj).filter(e => e && e.at > sinceTs).sort((a, b) => a.at - b.at);
+
+  const text = buildSummaryText(entries, sinceTs);
   if (!text) return;
 
+  let shared = false;
   if (navigator.share) {
     try {
       await navigator.share({ text });
+      shared = true;
     } catch (e) {
       // User cancelled the share sheet - not an error worth reporting
       if (e.name !== 'AbortError') console.error('Share failed:', e);
     }
-    return;
+  } else {
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus('✓ Update copied to clipboard', true);
+      shared = true;
+    } catch (e) {
+      console.error('Clipboard failed:', e);
+      showStatus('⚠ Could not share', true);
+    }
   }
 
-  // Desktop / unsupported browsers: fall back to clipboard
-  try {
-    await navigator.clipboard.writeText(text);
-    showStatus('✓ Summary copied to clipboard', true);
-  } catch (e) {
-    console.error('Clipboard failed:', e);
-    showStatus('⚠ Could not share', true);
+  // Only move the baseline if the update actually went out, so a cancelled
+  // share doesn't silently swallow the changes.
+  if (shared && entries.length) {
+    const newest = entries[entries.length - 1].at;
+    await fbPut('/lists/' + currentListId + '/lastSharedAt', newest);
+    // Trim the log so it can't grow without bound
+    const stale = Object.entries(logObj).filter(([id, e]) => e && e.at <= newest);
+    if (stale.length > 200) {
+      for (const [id] of stale.slice(0, stale.length - 100)) {
+        await fbDelete('/lists/' + currentListId + '/log/' + id);
+      }
+    }
   }
 }
 
@@ -635,6 +691,7 @@ async function loadAllLists() {
 }
 
 async function init() {
+  getWhoAmI();
   await seedCroatiaListIfMissing();
   await loadAllLists();
   handleRoute();
