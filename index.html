@@ -184,6 +184,7 @@
 <div class="topbar" id="topbar">
   <button class="back-btn hidden" id="back-btn">‹</button>
   <h1 id="page-title">My Lists</h1>
+  <button class="icon-btn hidden" id="edit-list-btn" title="Rename list">✎</button>
   <button class="icon-btn hidden" id="share-list-btn" title="Send update">📤</button>
   <button class="icon-btn hidden" id="delete-list-btn" title="Delete list">🗑</button>
 </div>
@@ -209,6 +210,18 @@
     <div class="modal-actions">
       <button class="btn-cancel" id="cancel-new-list">Cancel</button>
       <button class="btn-create" id="create-new-list">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="edit-list-modal">
+  <div class="modal-box">
+    <h3>Edit list</h3>
+    <input type="text" id="edit-list-emoji" placeholder="Emoji (e.g. 🛒)" maxlength="4">
+    <input type="text" id="edit-list-name" placeholder="List name">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-edit-list">Cancel</button>
+      <button class="btn-create" id="save-edit-list">Save</button>
     </div>
   </div>
 </div>
@@ -409,6 +422,7 @@ async function seedCroatiaListIfMissing() {
 function renderDashboard() {
   document.getElementById('page-title').textContent = 'My Lists';
   document.getElementById('back-btn').classList.add('hidden');
+  document.getElementById('edit-list-btn').classList.add('hidden');
   document.getElementById('delete-list-btn').classList.add('hidden');
   document.getElementById('share-list-btn').classList.add('hidden');
   document.getElementById('header-progress-row').style.display = 'none';
@@ -477,6 +491,7 @@ function renderListView() {
 
   document.getElementById('page-title').textContent = (list.emoji || '') + ' ' + list.name;
   document.getElementById('back-btn').classList.remove('hidden');
+  document.getElementById('edit-list-btn').classList.remove('hidden');
   document.getElementById('delete-list-btn').classList.remove('hidden');
   document.getElementById('share-list-btn').classList.remove('hidden');
   document.getElementById('header-progress-row').style.display = 'flex';
@@ -704,6 +719,34 @@ async function deleteCurrentList() {
   await fbDelete('/lists/' + currentListId);
   currentListId = null;
   location.hash = '';
+}
+
+// ---------- Edit list name/emoji ----------
+function openEditListModal() {
+  const list = allLists[currentListId];
+  if (!list) return;
+  document.getElementById('edit-list-emoji').value = list.emoji || '📋';
+  document.getElementById('edit-list-name').value = list.name;
+  document.getElementById('edit-list-modal').classList.remove('hidden');
+  document.getElementById('edit-list-name').focus();
+}
+function closeEditListModal() {
+  document.getElementById('edit-list-modal').classList.add('hidden');
+}
+async function saveEditList() {
+  const name = document.getElementById('edit-list-name').value.trim();
+  const emoji = document.getElementById('edit-list-emoji').value.trim() || '📋';
+  const list = allLists[currentListId];
+  if (!name || !list) { closeEditListModal(); return; }
+
+  list.name = name;
+  list.emoji = emoji;
+  closeEditListModal();
+  renderListView();
+
+  showStatus('Saving…');
+  const ok = await fbPatch('/lists/' + currentListId, { name, emoji });
+  showStatus(ok ? '✓ Saved' : '⚠ Could not save', true);
 }
 
 // ---------- Item menu (⋮) ----------
@@ -1003,10 +1046,17 @@ async function init() {
 
   window.addEventListener('hashchange', handleRoute);
   document.getElementById('back-btn').addEventListener('click', () => { location.hash = ''; });
+  document.getElementById('edit-list-btn').addEventListener('click', openEditListModal);
   document.getElementById('delete-list-btn').addEventListener('click', deleteCurrentList);
   document.getElementById('share-list-btn').addEventListener('click', shareCurrentList);
   document.getElementById('cancel-new-list').addEventListener('click', closeNewListModal);
   document.getElementById('create-new-list').addEventListener('click', createNewList);
+
+  document.getElementById('cancel-edit-list').addEventListener('click', closeEditListModal);
+  document.getElementById('save-edit-list').addEventListener('click', saveEditList);
+  document.getElementById('edit-list-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveEditList();
+  });
 
   document.getElementById('menu-cancel-btn').addEventListener('click', closeItemMenu);
   document.getElementById('menu-edit-btn').addEventListener('click', () => {
