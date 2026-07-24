@@ -189,7 +189,12 @@
     display: flex; align-items: center; justify-content: center;
   }
   .search-results-info { font-size: 12.5px; color: #888; padding: 6px 6px 10px; }
-  .item-group-sub { display: block; font-size: 11px; color: #2c6e49; margin-top: 2px; }
+  .item-group-sub {
+    display: flex; align-items: center; gap: 3px; width: fit-content;
+    font-size: 11px; color: #2c6e49; background: #e8f1ec;
+    border-radius: 10px; padding: 2px 8px; margin-top: 4px;
+    max-width: 100%; overflow-wrap: anywhere;
+  }
 
   @media screen and (min-width: 640px) { body { max-width: 700px; } }
 </style>
@@ -662,8 +667,9 @@ function wireItemHandlers() {
 
 function itemRowHtml(itemId, item, isTravel, groupLabel) {
   // In search results the group tab is gone, so each row carries its group as a
-  // small sub-label to keep the item's context.
-  const groupSub = groupLabel ? '<span class="item-group-sub">' + escapeHtml(groupLabel) + '</span>' : '';
+  // "located in" tag. On the per-bag packing lists the group is the bag itself
+  // (e.g. "Bag 3 · Sengetøj"), so this tells you which bag the item is packed in.
+  const groupSub = groupLabel ? '<span class="item-group-sub">📍 ' + escapeHtml(groupLabel) + '</span>' : '';
   if (!isTravel) {
     return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
       '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
