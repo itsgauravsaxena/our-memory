@@ -63,7 +63,7 @@
   li:last-child { border-bottom: none; }
   li .item-text { flex: 1; }
   input[type="checkbox"] { margin-right: 12px; transform: scale(1.35); flex-shrink: 0; accent-color: #2c6e49; }
-  li.checked-item .item-text { color: #999; text-decoration: line-through; }
+  li.checked-item .item-name { color: #9aa0a0; }
 
   /* Travel list: three-stage toggles */
   li.travel-row { flex-wrap: nowrap; align-items: center; gap: 8px; }
@@ -82,7 +82,12 @@
   .stage-btn.on.stage-returned { background: #b5651d; border-color: #b5651d; }
   .stage-btn .ico { filter: grayscale(1); opacity: 0.45; }
   .stage-btn.on .ico { filter: none; opacity: 1; }
-  li.fully-done .item-text { color: #999; text-decoration: line-through; }
+  li.fully-done .item-name { color: #9aa0a0; }
+  /* Completed items read as "done" via a soft green check + muted name,
+     which is calmer than a strikethrough. */
+  li.checked-item .item-name::after, li.fully-done .item-name::after {
+    content: "✓"; color: #2c6e49; font-weight: 700; margin-left: 6px; font-size: 13px;
+  }
 
   .stage-legend {
     font-size: 11.5px; color: #777; padding: 2px 4px 10px;
@@ -673,7 +678,7 @@ function itemRowHtml(itemId, item, isTravel, groupLabel) {
   if (!isTravel) {
     return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
       '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
-      '<span class="item-text">' + escapeHtml(item.text) + groupSub + '</span>' +
+      '<span class="item-text"><span class="item-name">' + escapeHtml(item.text) + '</span>' + groupSub + '</span>' +
       '<button class="item-menu-btn" data-item-id="' + itemId + '" title="More">⋮</button>' +
     '</li>';
   }
@@ -688,7 +693,7 @@ function itemRowHtml(itemId, item, isTravel, groupLabel) {
     '<span class="ico">' + icon + '</span></button>';
 
   return '<li class="travel-row ' + (returned ? 'fully-done' : '') + '">' +
-    '<span class="item-text">' + escapeHtml(item.text) + groupSub + '</span>' +
+    '<span class="item-text"><span class="item-name">' + escapeHtml(item.text) + '</span>' + groupSub + '</span>' +
     '<div class="stage-group">' +
       stage('checked', have, '🏠', 'Have it / bought') +
       stage('packed', packed, '🧳', 'Packed for the trip') +
