@@ -176,6 +176,21 @@
   #sync-status { text-align: center; font-size: 12px; color: #2c6e49; padding: 6px 0 2px; min-height: 16px; }
   .hidden { display: none !important; }
 
+  /* Search */
+  .search-row { display: flex; gap: 8px; align-items: center; padding: 12px 14px 2px; }
+  .search-row input {
+    flex: 1; min-width: 0; border: 1.5px solid #ddd; border-radius: 22px;
+    padding: 9px 16px; font-size: 14px; background: white;
+  }
+  .search-row input:focus { outline: none; border-color: #2c6e49; }
+  .clear-search-btn {
+    flex: 0 0 auto; background: #eee; border: none; color: #555;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .search-results-info { font-size: 12.5px; color: #888; padding: 6px 6px 10px; }
+  .item-group-sub { display: block; font-size: 11px; color: #2c6e49; margin-top: 2px; }
+
   @media screen and (min-width: 640px) { body { max-width: 700px; } }
 </style>
 </head>
@@ -191,6 +206,11 @@
 <div class="progress-row" id="header-progress-row" style="display:none; padding: 0 16px 12px; background:#2c6e49; margin-top:-12px;">
   <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="progress-label" id="progress-label">0%</div>
+</div>
+
+<div class="search-row hidden" id="search-row">
+  <input type="text" id="list-search-input" placeholder="Search items…" autocomplete="off">
+  <button class="clear-search-btn hidden" id="clear-search-btn" title="Clear search">✕</button>
 </div>
 
 <div class="content" id="content"></div>
@@ -268,6 +288,7 @@ let currentListId = null;
 let itemCounter = 0;
 let activeGroupByList = {}; // remembers which sub-list tab is open per list, survives re-renders
 let lastRenderedListId = null; // tracks whether the last renderListView() call was for this same list
+let searchQuery = ''; // current in-list search text; filters items across every group
 
 function showStatus(msg, ok) {
   statusEl.textContent = msg;
@@ -426,6 +447,7 @@ function renderDashboard() {
   document.getElementById('delete-list-btn').classList.add('hidden');
   document.getElementById('share-list-btn').classList.add('hidden');
   document.getElementById('header-progress-row').style.display = 'none';
+  document.getElementById('search-row').classList.add('hidden');
   document.getElementById('fab-add').textContent = '+';
   document.getElementById('fab-add').onclick = openNewListModal;
   updateHeaderHeightVar();
@@ -481,6 +503,7 @@ window.addEventListener('resize', updateHeaderHeightVar);
 // ---------- List view ----------
 function openList(id) {
   currentListId = id;
+  clearSearch();
   location.hash = 'list-' + id;
   renderListView();
 }
@@ -495,6 +518,7 @@ function renderListView() {
   document.getElementById('delete-list-btn').classList.remove('hidden');
   document.getElementById('share-list-btn').classList.remove('hidden');
   document.getElementById('header-progress-row').style.display = 'flex';
+  document.getElementById('search-row').classList.remove('hidden');
   document.getElementById('fab-add').textContent = '✎';
   document.getElementById('fab-add').onclick = () => document.getElementById('quick-add-input').focus();
   updateHeaderHeightVar();
@@ -536,6 +560,35 @@ function renderListView() {
   const sameListAsBefore = lastRenderedListId === currentListId;
   const prevStrip = sameListAsBefore ? content.querySelector('.subtabstrip') : null;
   const prevScrollLeft = prevStrip ? prevStrip.scrollLeft : null;
+
+  // Search mode: flatten every group into one filtered list. The whole point is
+  // to find an item without first guessing which tab it lives under, so the tab
+  // strip is replaced by results tagged with their group.
+  const q = searchQuery.trim().toLowerCase();
+  if (q) {
+    const matches = Object.entries(items)
+      .filter(([id, it]) => (it.text || '').toLowerCase().includes(q))
+      .sort((a, b) => (a[1].order || 0) - (b[1].order || 0));
+
+    const info = '<div class="search-results-info">' +
+      (matches.length ? (matches.length + ' match' + (matches.length === 1 ? '' : 'es')) : 'No items match') +
+      ' “' + escapeHtml(searchQuery.trim()) + '”</div>';
+
+    const legendHtml = (isTravel && matches.length)
+      ? '<div class="stage-legend"><span>🏠 Have it / bought</span><span>🧳 Packed</span><span>🔙 Packed for home</span></div>'
+      : '';
+
+    const panelHtml = matches.length
+      ? '<div class="subtab-panel"><ul>' +
+          matches.map(([itemId, item]) => itemRowHtml(itemId, item, isTravel, item.group || 'Other')).join('') +
+        '</ul></div>'
+      : '';
+
+    content.innerHTML = info + legendHtml + panelHtml;
+    wireItemHandlers();
+    lastRenderedListId = currentListId;
+    return;
+  }
 
   if (total === 0) {
     content.innerHTML = '<div class="empty-state">This list is empty.<br>Add your first item below.</div>' + addBarHtml(groupNames);
@@ -582,6 +635,13 @@ function renderListView() {
     }
   }
   lastRenderedListId = currentListId;
+  wireItemHandlers();
+}
+
+// Attaches the per-item interactions to whatever rows are currently in #content.
+// Shared by the normal tab view and the flat search-results view.
+function wireItemHandlers() {
+  const content = document.getElementById('content');
   content.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => toggleItem(cb.dataset.itemId, 'checked', cb.checked));
   });
@@ -600,11 +660,14 @@ function renderListView() {
   if (addForm) addForm.addEventListener('submit', handleQuickAdd);
 }
 
-function itemRowHtml(itemId, item, isTravel) {
+function itemRowHtml(itemId, item, isTravel, groupLabel) {
+  // In search results the group tab is gone, so each row carries its group as a
+  // small sub-label to keep the item's context.
+  const groupSub = groupLabel ? '<span class="item-group-sub">' + escapeHtml(groupLabel) + '</span>' : '';
   if (!isTravel) {
     return '<li class="' + (item.checked ? 'checked-item' : '') + '">' +
       '<input type="checkbox" data-item-id="' + itemId + '" ' + (item.checked ? 'checked' : '') + '>' +
-      '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
+      '<span class="item-text">' + escapeHtml(item.text) + groupSub + '</span>' +
       '<button class="item-menu-btn" data-item-id="' + itemId + '" title="More">⋮</button>' +
     '</li>';
   }
@@ -619,7 +682,7 @@ function itemRowHtml(itemId, item, isTravel) {
     '<span class="ico">' + icon + '</span></button>';
 
   return '<li class="travel-row ' + (returned ? 'fully-done' : '') + '">' +
-    '<span class="item-text">' + escapeHtml(item.text) + '</span>' +
+    '<span class="item-text">' + escapeHtml(item.text) + groupSub + '</span>' +
     '<div class="stage-group">' +
       stage('checked', have, '🏠', 'Have it / bought') +
       stage('packed', packed, '🧳', 'Packed for the trip') +
@@ -719,6 +782,19 @@ async function deleteCurrentList() {
   await fbDelete('/lists/' + currentListId);
   currentListId = null;
   location.hash = '';
+}
+
+// ---------- In-list search ----------
+function onSearchInput(value) {
+  searchQuery = value;
+  document.getElementById('clear-search-btn').classList.toggle('hidden', !value);
+  if (currentListId && allLists[currentListId]) renderListView();
+}
+function clearSearch() {
+  searchQuery = '';
+  const input = document.getElementById('list-search-input');
+  if (input) input.value = '';
+  document.getElementById('clear-search-btn').classList.add('hidden');
 }
 
 // ---------- Edit list name/emoji ----------
@@ -1051,6 +1127,13 @@ async function init() {
   document.getElementById('share-list-btn').addEventListener('click', shareCurrentList);
   document.getElementById('cancel-new-list').addEventListener('click', closeNewListModal);
   document.getElementById('create-new-list').addEventListener('click', createNewList);
+
+  document.getElementById('list-search-input').addEventListener('input', (e) => onSearchInput(e.target.value));
+  document.getElementById('clear-search-btn').addEventListener('click', () => {
+    clearSearch();
+    document.getElementById('list-search-input').focus();
+    if (currentListId && allLists[currentListId]) renderListView();
+  });
 
   document.getElementById('cancel-edit-list').addEventListener('click', closeEditListModal);
   document.getElementById('save-edit-list').addEventListener('click', saveEditList);
