@@ -229,6 +229,8 @@
   .tag { font-size:10.5px; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:2px 7px; white-space:nowrap; }
   .tag.meat { background:#fbeae0; color:#b5651d; }
   .tag.cuisine { background:#eae6f5; color:#5b4b9e; }
+  .recipe-source { font-size:12px; color:#999; margin-top:10px; }
+  .recipe-source a { color:#2c6e49; }
 
   .stars { display:inline-flex; gap:2px; font-size:14px; color:#dcdcdc; line-height:1; }
   .stars .star.on { color:#f2b705; }
@@ -414,6 +416,8 @@
     <textarea id="re-ingredients" rows="5" placeholder="Pasta | Pantry&#10;Grated cheese | Mejeri&#10;Onion | Veggies"></textarea>
     <div class="field-label">Steps — one per line</div>
     <textarea id="re-steps" rows="4" placeholder="Fry the onion&#10;Add sauce and simmer"></textarea>
+    <div class="field-label">Source / credit (optional)</div>
+    <input type="text" id="re-source" placeholder="e.g. Inspired by Valdemarsro, Grandma's recipe">
     <div class="modal-actions">
       <button class="btn-cancel" id="cancel-recipe-editor">Cancel</button>
       <button class="btn-create" id="save-recipe-editor">Save</button>
@@ -1359,6 +1363,99 @@ const RECIPE_SEED = [
     proteinVeg:{name:'Eggs / æg (5–6)',cat:'Mejeri'}, proteinMeat:null,
     ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Cumin & paprika / spidskommen & paprika',cat:'Pantry'},{name:'Bread for dipping / brød',cat:'Bread'},{name:'Feta (optional)',cat:'Mejeri'}],
     steps:['Fry onion, pepper and garlic with cumin & paprika.','Add the tomatoes; simmer 8 min until thick.','Make wells and crack in the eggs; cover and cook 5 min.','Crumble over feta and serve with bread.'] },
+
+  // ----- Danish classics & family favourites (my own adaptations of popular dishes;
+  //        source credited per recipe, not copied from the originals) -----
+  { seedKey:'boller-i-karry', cuisine:'Danish', source:'Danish classic', name:'Boller i karry', emoji:'🍛', time:30,
+    tags:['high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Meat-free balls / vegetarboller',cat:'Frozen stuff'}, proteinMeat:{name:'Pork/veal meatballs / frikadellefars (500g)',cat:'Kød'},
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Curry powder / karry',cat:'Pantry'},{name:'Flour / hvedemel',cat:'Baking'},{name:'Stock or milk / bouillon el. mælk',cat:'Pantry'},{name:'Rice / ris',cat:'Pantry'},{name:'Apple / æble',cat:'Fruits'}],
+    steps:['Simmer the meatballs (or veg balls) in lightly salted water 6 min.','Fry onion with curry, stir in flour, then whisk in stock or milk to a sauce.','Add the balls and a little diced apple; simmer 5 min.','Serve over rice.'] },
+  { seedKey:'frikadeller', cuisine:'Danish', source:'Inspired by Valdemarsro', sourceUrl:'https://www.valdemarsro.dk/frikadeller/', name:'Frikadeller med kartofler', emoji:'🧆', time:30,
+    tags:['high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Meat-free mince / vegehakket (500g)',cat:'Frozen stuff'}, proteinMeat:{name:'Minced pork/veal or chicken / hakket kød (500g)',cat:'Kød'},
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Egg / æg',cat:'Mejeri'},{name:'Flour or breadcrumbs / mel el. rasp',cat:'Baking'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Carrot for slaw / gulerod',cat:'Veggies'}],
+    steps:['Mix the mince with grated onion, egg, flour and a splash of milk; rest 10 min.','Shape oval frikadeller and fry in butter about 4 min per side.','Boil the potatoes.','Serve with potatoes and a quick grated-carrot slaw.'] },
+  { seedKey:'biksemad', cuisine:'Danish', source:'Danish classic', name:'Biksemad med spejlæg', emoji:'🍳', time:20,
+    tags:['kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs / æg (4)',cat:'Mejeri'}, proteinMeat:{name:'Leftover meat or bacon / bacon (200g)',cat:'Kød'},
+    ingredients:[{name:'Boiled potatoes / kogte kartofler',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Soy or Worcestershire / soja',cat:'Asian'},{name:'Beetroot / rødbeder',cat:'Pantry'},{name:'Bread / brød',cat:'Bread'}],
+    steps:['Dice and fry the potatoes until crisp.','Add onion and the meat or bacon; season with soy.','Fry the eggs sunny-side up.','Top each plate with an egg; serve with beetroot.'] },
+  { seedKey:'aeggekage', cuisine:'Danish', source:'Danish classic', name:'Dansk æggekage', emoji:'🍳', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs / æg (6)',cat:'Mejeri'}, proteinMeat:{name:'Bacon (optional) / bacon',cat:'Kød'},
+    ingredients:[{name:'Milk / mælk',cat:'Mejeri'},{name:'Chives or spring onion / purløg',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Rye bread / rugbrød',cat:'Bread'},{name:'Flour / mel',cat:'Baking'}],
+    steps:['Whisk the eggs with a little milk and flour; season.','Pour into a buttered pan and cook gently until almost set.','Top with tomato and chives (and crisp bacon if using).','Serve straight from the pan with rye bread.'] },
+  { seedKey:'millionboef', cuisine:'Danish', source:'Danish classic', name:'Millionbøf med kartoffelmos', emoji:'🥩', time:25,
+    tags:['high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Meat-free mince / vegehakket (400g)',cat:'Frozen stuff'}, proteinMeat:{name:'Minced beef / hakket oksekød (400g)',cat:'Kød'},
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Beef stock / oksebouillon',cat:'Pantry'},{name:'Flour / hvedemel',cat:'Baking'},{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Milk & butter / mælk & smør',cat:'Mejeri'},{name:'Peas / ærter',cat:'Frozen stuff'}],
+    steps:['Brown the mince with onion.','Sprinkle over flour, then add stock and simmer to a gravy.','Boil the potatoes and mash with milk and butter.','Serve the mince over the mash with peas.'] },
+  { seedKey:'kaalwok', cuisine:'Chinese', source:'Inspired by Valdemarsro', sourceUrl:'https://www.valdemarsro.dk/kaalwok-med-kylling/', name:'Kålwok med kylling', emoji:'🥢', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Pointed cabbage / spidskål',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Soy + sweet chili / soja',cat:'Asian'},{name:'Rice or noodles / ris el. nudler',cat:'Pantry'}],
+    steps:['Fry the chicken (or tofu) until golden.','Add shredded cabbage, carrot and garlic; stir-fry on high 4 min.','Splash in soy and sweet chili.','Serve with rice or noodles.'] },
+  { seedKey:'kokoskarry-fad', cuisine:'Indian', source:'Inspired by Valdemarsro', sourceUrl:'https://www.valdemarsro.dk/kylling-i-fad-med-kokosmaelk-og-karry/', name:'Kylling i fad med kokos og karry', emoji:'🍛', time:35,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken thighs / kyllingelår (600g)',cat:'Kød'},
+    ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Curry / karry',cat:'Pantry'},{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Rice / ris',cat:'Pantry'}],
+    steps:['Brown the chicken (or drain the chickpeas) and place in an oven dish with sliced potatoes and pepper.','Mix coconut milk with curry and pour over.','Bake 25 min at 200°C.','Serve with rice.'] },
+  { seedKey:'pesto-pasta', cuisine:'Italian', source:'Inspired by Spis Bedre', sourceUrl:'https://spisbedre.dk/temaer/familiefavoritter-bornevenlige-opskrifter', name:'Cremet kylling- og pestopasta', emoji:'🍝', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Chickpeas / kikærter (1 can)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Green pesto / pesto',cat:'Pantry'},{name:'Cream or cream cheese / fløde el. flødeost',cat:'Mejeri'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Spinach / spinat',cat:'Veggies'},{name:'Parmesan',cat:'Mejeri'}],
+    steps:['Cook the pasta.','Fry the chicken (or warm the chickpeas), then add tomatoes and spinach.','Stir in pesto and cream to a sauce.','Toss with the pasta and top with parmesan.'] },
+  { seedKey:'pasta-meatballs', cuisine:'Italian', source:'Family favourite', name:'Pasta med kødboller i tomatsauce', emoji:'🍝', time:25,
+    tags:['high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Meat-free balls / vegetarboller',cat:'Frozen stuff'}, proteinMeat:{name:'Meatballs / kødboller (400g)',cat:'Kød'},
+    ingredients:[{name:'Spaghetti',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Grated cheese / revet ost',cat:'Mejeri'}],
+    steps:['Brown the meatballs (or veg balls).','Add onion, garlic and tomatoes; simmer 12 min.','Cook the spaghetti.','Serve the sauce over the pasta with cheese.'] },
+  { seedKey:'lasagne', cuisine:'Italian', source:'Italian classic', name:'Lasagne (okse eller linser)', emoji:'🧀', time:45,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Red lentils / røde linser (250g)',cat:'Pantry'}, proteinMeat:{name:'Minced beef / hakket oksekød (500g)',cat:'Kød'},
+    ingredients:[{name:'Lasagne sheets / lasagneplader',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Butter, flour & milk / smør, mel & mælk',cat:'Mejeri'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Onion / løg',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}],
+    steps:['Fry the mince (or lentils) with onion, carrot and tomatoes; simmer 15 min.','Make a quick béchamel from butter, flour and milk.','Layer meat sauce, sheets and béchamel; top with cheese.','Bake 25 min at 200°C.'] },
+  { seedKey:'tomatsuppe', cuisine:'Danish', source:'Danish classic', name:'Tomatsuppe med brød', emoji:'🍅', time:20,
+    tags:['vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'White beans / hvide bønner (1 can)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Cream / fløde',cat:'Mejeri'},{name:'Bread / brød',cat:'Bread'},{name:'Stock / bouillon',cat:'Pantry'}],
+    steps:['Fry the onion and garlic.','Add tomatoes, beans and stock; simmer 10 min.','Blend smooth and stir in a splash of cream.','Serve with warm bread and cheese.'] },
+  { seedKey:'fiskefingre', cuisine:'Danish', source:'Family favourite', name:'Fiskefingre med kartoffelmos', emoji:'🐟', time:20,
+    tags:['kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Veggie nuggets / grøntsagsnuggets',cat:'Frozen stuff'}, proteinMeat:{name:'Fish fingers / fiskefingre (frozen)',cat:'Frozen stuff'},
+    ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Milk & butter / mælk & smør',cat:'Mejeri'},{name:'Peas / ærter',cat:'Frozen stuff'},{name:'Remoulade or ketchup',cat:'Pantry'},{name:'Lemon / citron',cat:'Fruits'}],
+    steps:['Bake the fish fingers per the pack.','Boil the potatoes and mash with milk and butter.','Warm the peas.','Serve with remoulade and a wedge of lemon.'] },
+  { seedKey:'fiskefrikadeller', cuisine:'Danish', source:'Danish classic', name:'Fiskefrikadeller med kartofler', emoji:'🐟', time:25,
+    tags:['high-protein','kid-friendly'], rating:4,
+    proteinVeg:null, proteinMeat:{name:'Fish cakes / fiskefrikadeller (ready or fresh)',cat:'Køledisk'},
+    ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Remoulade',cat:'Pantry'},{name:'Lemon / citron',cat:'Fruits'},{name:'Rye bread / rugbrød',cat:'Bread'},{name:'Lettuce / salat',cat:'Veggies'}],
+    steps:['Fry the fish cakes until golden (or per the pack).','Boil the potatoes.','Serve with remoulade, lemon and salad.','Lovely cold in rye bread the next day.'] },
+  { seedKey:'laks-fad', cuisine:'Nordic', source:'Family favourite', name:'Ovnbagt laks med kartofler og grønt', emoji:'🐟', time:30,
+    tags:['high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Salmon fillets / laks (400g)',cat:'Køledisk'},
+    ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Broccoli or green beans / broccoli',cat:'Veggies'},{name:'Lemon / citron',cat:'Fruits'},{name:'Olive oil / olie',cat:'Pantry'},{name:'Crème fraîche & dill / dild',cat:'Mejeri'}],
+    steps:['Chop the potatoes onto a tray with oil; roast 15 min.','Add the salmon (or halloumi) and broccoli; roast 12 min more.','Squeeze over lemon.','Serve with a crème fraîche and dill dip.'] },
+  { seedKey:'veg-pastafad', cuisine:'Italian', source:'Inspired by Spis Bedre', name:'Vegetarisk pastafad med linser', emoji:'🧀', time:30,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Lentils & chickpeas / linser & kikærter',cat:'Pantry'}, proteinMeat:{name:'Minced chicken / hakket kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Spinach / spinat',cat:'Veggies'},{name:'Grated cheese / revet ost',cat:'Mejeri'}],
+    steps:['Cook the pasta.','Simmer lentils and chickpeas (or chicken) with onion, garlic and tomatoes 10 min.','Fold in the pasta and spinach; tip into an oven dish.','Top with cheese and bake 15 min at 200°C.'] },
+  { seedKey:'chili', cuisine:'Mexican', source:'Family favourite', name:'Chili con/sin carne', emoji:'🌶️', time:30,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Kidney & black beans / bønner (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Minced beef / hakket oksekød (400g)',cat:'Kød'},
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Sweetcorn / majs',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Mild chili & paprika / paprika',cat:'Pantry'},{name:'Rice / ris',cat:'Pantry'}],
+    steps:['Fry the onion and garlic with paprika and a little mild chili.','Add beans (or browned mince), tomatoes and corn.','Simmer 15 min.','Serve with rice or bread.'] },
+  { seedKey:'pandekager', cuisine:'Danish', source:'Family favourite', name:'Pandekager til aftensmad', emoji:'🥞', time:25,
+    tags:['vegetarian','kid-friendly'], rating:4,
+    proteinVeg:{name:'Eggs / æg (in the batter)',cat:'Mejeri'}, proteinMeat:{name:'Ham or chicken filling / skinke (200g)',cat:'Kød'},
+    ingredients:[{name:'Flour / mel',cat:'Baking'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Sweetcorn / majs',cat:'Pantry'},{name:'Lettuce / salat',cat:'Veggies'}],
+    steps:['Whisk flour, eggs and milk into a thin batter; rest 10 min.','Fry thin pancakes.','Fill with cheese, corn and ham or chicken (or just cheese).','Roll up and serve with salad.'] },
+  { seedKey:'kartoffelsuppe', cuisine:'Danish', source:'Danish classic', name:'Kartoffel-porresuppe', emoji:'🥣', time:25,
+    tags:['vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'White beans / hvide bønner (1 can, optional)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Leek / porre',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Stock / bouillon',cat:'Pantry'},{name:'Cream / fløde',cat:'Mejeri'},{name:'Bread / brød',cat:'Bread'}],
+    steps:['Fry the leek and onion.','Add diced potatoes (and beans) with stock; simmer 15 min.','Blend smooth and stir in cream.','Serve with bread.'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1611,12 +1708,17 @@ function renderRecipeDetail(id) {
     : '';
 
   const ings = recipeIngredients(r, detailProtein);
+  const sourceHtml = r.source
+    ? '<div class="recipe-source">' + (r.sourceUrl
+        ? 'Inspiration: <a href="' + escapeHtml(r.sourceUrl) + '" target="_blank" rel="noopener">' + escapeHtml(r.source) + '</a>'
+        : escapeHtml(r.source)) + '</div>'
+    : '';
   const content = document.getElementById('content');
   content.innerHTML =
     '<div class="detail-section">' +
       '<div class="recipe-meta" style="margin-bottom:8px;">⏱ ' + (r.time || '?') + ' min ' + recipeTagsHtml(r) + '</div>' +
       '<div class="field-label" style="margin:0 0 4px;">Tap to rate</div>' + starsHtml(r.rating, true, id) +
-      proteinToggle +
+      proteinToggle + sourceHtml +
     '</div>' +
     '<div class="detail-actions">' +
       '<button id="rd-grocery">🛒 Add to grocery list</button>' +
@@ -1773,6 +1875,7 @@ function openRecipeEditor(id) {
   document.getElementById('re-protein-meat-cat').innerHTML = catOptionsHtml(r && r.proteinMeat ? r.proteinMeat.cat : 'Kød');
   document.getElementById('re-ingredients').value = r ? (r.ingredients || []).map(i => i.name + ' | ' + (i.cat || 'Other')).join('\n') : '';
   document.getElementById('re-steps').value = r ? (r.steps || []).join('\n') : '';
+  document.getElementById('re-source').value = r ? (r.source || '') : '';
   document.querySelectorAll('#re-tags label').forEach(lbl => {
     const on = r ? (r.tags || []).includes(lbl.dataset.tag) : false;
     lbl.classList.toggle('on', on);
@@ -1803,11 +1906,13 @@ async function saveRecipe() {
     proteinMeat: meatName ? { name: meatName, cat: document.getElementById('re-protein-meat-cat').value } : null,
     ingredients: parseIngredientLines(document.getElementById('re-ingredients').value),
     steps: document.getElementById('re-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
+    source: document.getElementById('re-source').value.trim(),
   };
   const id = editingRecipeId || ('r' + Date.now());
   if (editingRecipeId) {
     recipe.rating = allRecipes[id].rating || 0;
     recipe.createdAt = allRecipes[id].createdAt || Date.now();
+    if (allRecipes[id].sourceUrl) recipe.sourceUrl = allRecipes[id].sourceUrl;
   } else {
     recipe.rating = 0; recipe.createdAt = Date.now();
   }
