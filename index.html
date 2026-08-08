@@ -228,6 +228,7 @@
   .recipe-meta { font-size:12px; color:#777; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
   .tag { font-size:10.5px; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:2px 7px; white-space:nowrap; }
   .tag.meat { background:#fbeae0; color:#b5651d; }
+  .tag.cuisine { background:#eae6f5; color:#5b4b9e; }
 
   .stars { display:inline-flex; gap:2px; font-size:14px; color:#dcdcdc; line-height:1; }
   .stars .star.on { color:#f2b705; }
@@ -393,6 +394,8 @@
     <h3 id="recipe-editor-title">New recipe</h3>
     <input type="text" id="re-emoji" maxlength="4" placeholder="Emoji (e.g. 🍝)" value="🍽️">
     <input type="text" id="re-name" placeholder="Recipe name">
+    <input type="text" id="re-cuisine" placeholder="Cuisine (e.g. Indian, Thai, Mexican)" list="cuisine-suggestions">
+    <datalist id="cuisine-suggestions"></datalist>
     <input type="number" id="re-time" placeholder="Time to make (minutes)">
     <div class="field-label">Tags</div>
     <div class="tag-picker" id="re-tags">
@@ -1251,73 +1254,150 @@ async function createNewList() {
 
 // ========== Recipes & weekly dinner plan ==========
 
-// Seed recipes: vegetarian + high-protein first, all quick and kid-friendly, and
-// each with a chicken swap so the same recipe works for meat-eating days too.
+// Seeded recipes: family favourites across the cuisines we love, all fast, cheap
+// and kid-friendly, using ingredients that are easy to find in Danish supermarkets
+// (Netto/Føtex/Rema). Most start vegetarian + high-protein with a one-tap chicken
+// swap. Each has a stable seedKey so new ones can be added later without dupes.
 const RECIPE_SEED = [
-  { name:'Chickpea & spinach coconut curry', emoji:'🍛', time:20,
+  { seedKey:'chickpea-curry', cuisine:'Indian', name:'Chickpea & spinach coconut curry', emoji:'🍛', time:20,
     tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
-    proteinVeg:{name:'Chickpeas (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast (400g)',cat:'Kød'},
-    ingredients:[{name:'Coconut milk (1 can)',cat:'Pantry'},{name:'Spinach (frozen)',cat:'Frozen stuff'},{name:'Onion',cat:'Veggies'},{name:'Garlic',cat:'Veggies'},{name:'Mild curry paste',cat:'Pantry'},{name:'Basmati rice',cat:'Pantry'}],
+    proteinVeg:{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Spinach / spinat (frozen)',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Mild curry paste / karrypasta',cat:'Pantry'},{name:'Basmati rice / ris',cat:'Pantry'}],
     steps:['Fry chopped onion & garlic for 3 min.','Stir in curry paste, then pour in coconut milk.','Add chickpeas (or diced chicken) and spinach; simmer 10 min.','Serve over rice.'] },
-  { name:'Black bean & cheese quesadillas', emoji:'🌯', time:15,
+  { seedKey:'black-bean-quesadilla', cuisine:'Mexican', name:'Black bean & cheese quesadillas', emoji:'🌯', time:15,
     tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
-    proteinVeg:{name:'Black beans (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken strips (300g)',cat:'Kød'},
-    ingredients:[{name:'Tortilla wraps',cat:'Bread'},{name:'Grated cheese',cat:'Mejeri'},{name:'Sweetcorn (1 can)',cat:'Pantry'},{name:'Bell pepper',cat:'Veggies'}],
+    proteinVeg:{name:'Black beans / sorte bønner (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken strips / kylling (300g)',cat:'Kød'},
+    ingredients:[{name:'Tortilla wraps',cat:'Bread'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Sweetcorn / majs (1 can)',cat:'Pantry'},{name:'Bell pepper / peberfrugt',cat:'Veggies'}],
     steps:['Lightly mash beans with corn and diced pepper.','Fill tortillas with the mix and plenty of cheese; fold.','Toast in a dry pan ~2 min per side until golden.','Cut into triangles.'] },
-  { name:'Red lentil bolognese pasta', emoji:'🍝', time:25,
+  { seedKey:'lentil-bolognese', cuisine:'Italian', name:'Red lentil bolognese pasta', emoji:'🍝', time:25,
     tags:['vegetarian','high-protein','kid-friendly'], rating:4,
-    proteinVeg:{name:'Red lentils (250g)',cat:'Pantry'}, proteinMeat:{name:'Minced chicken or beef (400g)',cat:'Kød'},
-    ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Chopped tomatoes (2 cans)',cat:'Pantry'},{name:'Onion',cat:'Veggies'},{name:'Carrot',cat:'Veggies'},{name:'Garlic',cat:'Veggies'},{name:'Parmesan',cat:'Mejeri'}],
+    proteinVeg:{name:'Red lentils / røde linser (250g)',cat:'Pantry'}, proteinMeat:{name:'Minced beef/chicken / hakket kød (400g)',cat:'Kød'},
+    ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Parmesan',cat:'Mejeri'}],
     steps:['Fry onion, grated carrot and garlic.','Add lentils (or mince) and chopped tomatoes plus a splash of water.','Simmer 15 min until the lentils are soft.','Toss with cooked pasta and top with parmesan.'] },
-  { name:'Plant-based or chicken burgers', emoji:'🍔', time:15,
+  { seedKey:'burgers', cuisine:'American', name:'Plant-based or chicken burgers', emoji:'🍔', time:15,
     tags:['vegetarian','kid-friendly','quick'], rating:5,
-    proteinVeg:{name:'Plant-based patties',cat:'Frozen stuff'}, proteinMeat:{name:'Chicken burger patties',cat:'Kød'},
-    ingredients:[{name:'Burger buns',cat:'Bread'},{name:'Cheese slices',cat:'Mejeri'},{name:'Lettuce',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Ketchup',cat:'Pantry'}],
+    proteinVeg:{name:'Plant-based patties / vegetarbøffer',cat:'Frozen stuff'}, proteinMeat:{name:'Chicken burger patties / kyllingebøffer',cat:'Kød'},
+    ingredients:[{name:'Burger buns / burgerboller',cat:'Bread'},{name:'Cheese slices / ost',cat:'Mejeri'},{name:'Lettuce / salat',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Ketchup',cat:'Pantry'}],
     steps:['Cook the patties per the pack.','Toast the buns.','Build with cheese, lettuce, tomato and ketchup.','Serve with oven fries if you like.'] },
-  { name:'Quick veggie / chicken pizza', emoji:'🍕', time:20,
+  { seedKey:'pizza', cuisine:'Italian', name:'Quick veggie / chicken pizza', emoji:'🍕', time:20,
     tags:['vegetarian','kid-friendly','quick'], rating:4,
-    proteinVeg:{name:'Extra mozzarella + sweetcorn',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken (200g)',cat:'Kød'},
-    ingredients:[{name:'Pizza bases',cat:'Bread'},{name:'Passata / pizza sauce',cat:'Pantry'},{name:'Mozzarella',cat:'Mejeri'},{name:'Sweetcorn',cat:'Pantry'},{name:'Bell pepper',cat:'Veggies'}],
+    proteinVeg:{name:'Extra mozzarella + sweetcorn',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken / kylling (200g)',cat:'Kød'},
+    ingredients:[{name:'Pizza bases / pizzabunde',cat:'Bread'},{name:'Passata / pizzasauce',cat:'Pantry'},{name:'Mozzarella',cat:'Mejeri'},{name:'Sweetcorn / majs',cat:'Pantry'},{name:'Bell pepper / peberfrugt',cat:'Veggies'}],
     steps:['Spread sauce over the bases.','Top with cheese, corn and peppers (plus chicken if using).','Bake 10–12 min at 220°C.','Slice and serve.'] },
-  { name:'Peanut tofu noodles', emoji:'🍜', time:20,
+  { seedKey:'peanut-noodles', cuisine:'Thai', name:'Peanut tofu noodles', emoji:'🍜', time:20,
     tags:['vegetarian','high-protein','quick'], rating:4,
-    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast (300g)',cat:'Kød'},
-    ingredients:[{name:'Egg noodles',cat:'Asian'},{name:'Peanut butter',cat:'Pantry'},{name:'Soy sauce',cat:'Asian'},{name:'Edamame',cat:'Frozen stuff'},{name:'Carrot',cat:'Veggies'},{name:'Broccoli',cat:'Veggies'}],
+    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast / kylling (300g)',cat:'Kød'},
+    ingredients:[{name:'Egg noodles / nudler',cat:'Asian'},{name:'Peanut butter / peanutbutter',cat:'Pantry'},{name:'Soy sauce / soja',cat:'Asian'},{name:'Edamame',cat:'Frozen stuff'},{name:'Carrot / gulerod',cat:'Veggies'},{name:'Broccoli',cat:'Veggies'}],
     steps:['Cook the noodles.','Pan-fry cubed tofu (or chicken) until golden.','Add the veg and stir-fry 3 min.','Whisk peanut butter + soy + a splash of water into a sauce; toss everything together.'] },
-  { name:'Halloumi & chickpea traybake', emoji:'🧆', time:25,
+  { seedKey:'halloumi-traybake', cuisine:'Mediterranean', name:'Halloumi & chickpea traybake', emoji:'🧆', time:25,
     tags:['vegetarian','high-protein','kid-friendly'], rating:5,
-    proteinVeg:{name:'Halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Chicken thighs (500g)',cat:'Kød'},
-    ingredients:[{name:'Chickpeas (2 cans)',cat:'Pantry'},{name:'Cherry tomatoes',cat:'Veggies'},{name:'Courgette',cat:'Veggies'},{name:'Bell pepper',cat:'Veggies'},{name:'Olive oil & paprika',cat:'Pantry'}],
+    proteinVeg:{name:'Halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Chicken thighs / kyllingelår (500g)',cat:'Kød'},
+    ingredients:[{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Courgette / squash',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Olive oil & paprika',cat:'Pantry'}],
     steps:['Chop the veg onto a tray and toss with oil and paprika.','Add the chickpeas and roast 15 min.','Add sliced halloumi (or chicken) and roast 8 min more.','Serve with bread or rice.'] },
-  { name:'Egg fried rice with edamame', emoji:'🍚', time:15,
+  { seedKey:'egg-fried-rice', cuisine:'Chinese', name:'Egg fried rice with edamame', emoji:'🍚', time:15,
     tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
-    proteinVeg:{name:'Eggs (4)',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken (200g)',cat:'Kød'},
-    ingredients:[{name:'Cooked / leftover rice',cat:'Pantry'},{name:'Edamame & peas',cat:'Frozen stuff'},{name:'Soy sauce',cat:'Asian'},{name:'Spring onion',cat:'Veggies'},{name:'Carrot',cat:'Veggies'}],
+    proteinVeg:{name:'Eggs / æg (4)',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken / kylling (200g)',cat:'Kød'},
+    ingredients:[{name:'Cooked / leftover rice',cat:'Pantry'},{name:'Edamame & peas / ærter',cat:'Frozen stuff'},{name:'Soy sauce / soja',cat:'Asian'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}],
     steps:['Scramble the eggs and set aside.','Fry diced carrot with peas and edamame 3 min.','Add rice and soy; stir-fry over high heat.','Fold the eggs (or chicken) back in and top with spring onion.'] },
+
+  // ----- More Indian -----
+  { seedKey:'butter-chicken-chana', cuisine:'Indian', name:'Butter chicken / chana masala', emoji:'🍗', time:25,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast / kylling (500g)',cat:'Kød'},
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Cream / fløde or crème fraîche',cat:'Mejeri'},{name:'Butter / smør',cat:'Mejeri'},{name:'Garam masala',cat:'Pantry'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Basmati rice / ris',cat:'Pantry'},{name:'Naan bread / naanbrød',cat:'Bread'}],
+    steps:['Fry onion, garlic & ginger in butter.','Stir in garam masala, then the tomatoes; simmer 5 min.','Add chicken (or chickpeas) and cream; simmer 12 min.','Serve with rice and naan.'] },
+  { seedKey:'dal-tarka', cuisine:'Indian', name:'Red lentil dal (dal tarka)', emoji:'🍲', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Red lentils / røde linser (300g)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Cumin & turmeric / spidskommen & gurkemeje',cat:'Pantry'},{name:'Butter or oil / smør',cat:'Mejeri'},{name:'Basmati rice / ris',cat:'Pantry'},{name:'Naan bread / naanbrød',cat:'Bread'}],
+    steps:['Simmer the lentils in water ~15 min until soft.','Fry onion, garlic, ginger, cumin & turmeric in butter.','Stir the fried spices through the lentils; season.','Serve with rice or naan.'] },
+  { seedKey:'palak-paneer', cuisine:'Indian', name:'Palak paneer (spinach & cheese)', emoji:'🥬', time:20,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Paneer or halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Spinach / spinat (frozen, 400g)',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Garam masala',cat:'Pantry'},{name:'Cream / fløde or crème fraîche',cat:'Mejeri'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Fry onion, garlic, ginger & garam masala.','Add spinach and a splash of water; cook 5 min.','Stir in cream and cubed paneer (or chicken); heat through.','Serve with rice.'] },
+  { seedKey:'tikka-wraps', cuisine:'Indian', name:'Tikka wraps (paneer or chicken)', emoji:'🌯', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Paneer or halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Chicken breast / kylling (500g)',cat:'Kød'},
+    ingredients:[{name:'Tikka / tandoori paste',cat:'Pantry'},{name:'Yoghurt / yoghurt naturel',cat:'Mejeri'},{name:'Tortilla or naan wraps',cat:'Bread'},{name:'Cucumber / agurk',cat:'Veggies'},{name:'Red onion / rødløg',cat:'Veggies'},{name:'Lettuce / salat',cat:'Veggies'}],
+    steps:['Toss paneer (or chicken) in tikka paste + a spoon of yoghurt.','Pan-fry or grill until charred, ~8 min.','Warm the wraps.','Fill with tikka, salad and a drizzle of yoghurt.'] },
+
+  // ----- More Thai -----
+  { seedKey:'thai-curry', cuisine:'Thai', name:'Thai red/green curry', emoji:'🍛', time:20,
+    tags:['vegetarian','high-protein','quick'], rating:5,
+    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Thai red or green curry paste',cat:'Asian'},{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Broccoli or sugar snaps',cat:'Veggies'},{name:'Soy or fish sauce / fiskesauce',cat:'Asian'},{name:'Jasmine rice / jasminris',cat:'Pantry'}],
+    steps:['Fry the curry paste 1 min.','Pour in the coconut milk.','Add tofu (or chicken) and veg; simmer 10 min.','Season with soy/fish sauce; serve with rice.'] },
+  { seedKey:'pad-thai', cuisine:'Thai', name:'Easy pad thai noodles', emoji:'🍜', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast / kylling (300g)',cat:'Kød'},
+    ingredients:[{name:'Rice noodles / risnudler',cat:'Asian'},{name:'Eggs / æg (2)',cat:'Mejeri'},{name:'Carrot / gulerod',cat:'Veggies'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Pointed cabbage / spidskål',cat:'Veggies'},{name:'Sweet chili + soy',cat:'Asian'},{name:'Peanuts / peanuts',cat:'Dry snacks'},{name:'Lime',cat:'Fruits'}],
+    steps:['Soak or cook the noodles.','Fry tofu (or chicken), push aside, scramble the eggs.','Add veg + noodles + sweet chili and soy; toss.','Top with peanuts and a squeeze of lime.'] },
+
+  // ----- More Mexican -----
+  { seedKey:'tacos', cuisine:'Mexican', name:'Build-your-own tacos', emoji:'🌮', time:15,
+    tags:['vegetarian','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Black/kidney beans / bønner (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Minced beef/chicken / hakket kød (400g)',cat:'Kød'},
+    ingredients:[{name:'Taco shells or tortillas',cat:'Bread'},{name:'Taco spice mix / tacokrydderi',cat:'Pantry'},{name:'Sweetcorn / majs',cat:'Pantry'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Lettuce / salat',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Crème fraîche',cat:'Mejeri'}],
+    steps:['Fry beans (or mince) with taco spice + a splash of water.','Warm the shells.','Set out cheese, salad, corn and crème fraîche.','Let everyone build their own.'] },
+  { seedKey:'burrito-bowl', cuisine:'Mexican', name:'Burrito bowls', emoji:'🥙', time:15,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Black beans / sorte bønner (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
+    ingredients:[{name:'Rice / ris',cat:'Pantry'},{name:'Sweetcorn / majs',cat:'Pantry'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Avocado',cat:'Fruits'},{name:'Salsa',cat:'Pantry'},{name:'Crème fraîche',cat:'Mejeri'},{name:'Lettuce / salat',cat:'Veggies'}],
+    steps:['Cook the rice.','Warm the beans (or pan-fry the chicken) with a little taco spice.','Build bowls with rice, beans, corn and cheese.','Top with avocado, salsa and crème fraîche.'] },
+
+  // ----- More Chinese noodle -----
+  { seedKey:'chow-mein', cuisine:'Chinese', name:'Veg (or chicken) chow mein', emoji:'🥡', time:15,
+    tags:['vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Firm tofu (400g) or edamame',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast / kylling (300g)',cat:'Kød'},
+    ingredients:[{name:'Egg noodles / nudler',cat:'Asian'},{name:'Pointed cabbage / spidskål',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Soy + oyster sauce',cat:'Asian'},{name:'Sesame oil / sesamolie',cat:'Asian'}],
+    steps:['Boil the noodles.','Stir-fry garlic, carrot and cabbage over high heat.','Add tofu (or chicken) and the noodles.','Toss with soy, oyster sauce and a drop of sesame oil.'] },
+
+  // ----- Store-cupboard classic -----
+  { seedKey:'shakshuka', cuisine:'Middle-Eastern', name:'Shakshuka (eggs in tomato)', emoji:'🍳', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs / æg (5–6)',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Cumin & paprika / spidskommen & paprika',cat:'Pantry'},{name:'Bread for dipping / brød',cat:'Bread'},{name:'Feta (optional)',cat:'Mejeri'}],
+    steps:['Fry onion, pepper and garlic with cumin & paprika.','Add the tomatoes; simmer 8 min until thick.','Make wells and crack in the eggs; cover and cook 5 min.','Crumble over feta and serve with bread.'] },
 ];
 
-async function seedRecipesIfMissing() {
-  const existing = await fbGet('/recipes');
-  if (existing && Object.keys(existing).length) return;
-  const obj = {};
-  RECIPE_SEED.forEach((r, i) => { obj['r' + i] = Object.assign({ createdAt: Date.now() + i }, r); });
-  await fbPut('/recipes', obj);
+// Additive seeding: add any seed recipe whose key hasn't been applied yet, without
+// duplicating (by name) or overwriting recipes you've edited/rated. Applied keys
+// are tracked so deleting a seeded recipe doesn't make it reappear.
+async function seedRecipes() {
+  const applied = (await fbGet('/meta/seededRecipeKeys')) || {};
+  const existing = (await fbGet('/recipes')) || {};
+  const existingNames = new Set(Object.values(existing).map(r => r && r.name));
+  const patchRecipes = {}, patchKeys = {};
+  RECIPE_SEED.forEach((r, i) => {
+    if (applied[r.seedKey]) return;
+    if (!existingNames.has(r.name)) patchRecipes['r_' + r.seedKey] = Object.assign({ createdAt: Date.now() + i }, r);
+    patchKeys[r.seedKey] = true;
+  });
+  if (Object.keys(patchRecipes).length) await fbPatch('/recipes', patchRecipes);
+  if (Object.keys(patchKeys).length) await fbPatch('/meta/seededRecipeKeys', patchKeys);
 }
 
 async function seedMealPlanIfMissing() {
-  const existing = await fbGet('/mealplan');
-  if (existing) return;
+  if (await fbGet('/mealplan')) return;
   // Start the week vegetarian & high-protein, then the kid-favourite quick dinners.
-  await fbPut('/mealplan', {
-    label: 'This week',
-    days: {
-      mon: { recipeId:'r0', protein:'veg', cooked:false },
-      tue: { recipeId:'r1', protein:'veg', cooked:false },
-      wed: { recipeId:'r2', protein:'veg', cooked:false },
-      thu: { recipeId:'r3', protein:'veg', cooked:false },
-      fri: { recipeId:'r4', protein:'veg', cooked:false },
-    }
+  // Resolve by name so it works whatever ids the recipes ended up with.
+  const recipes = (await fbGet('/recipes')) || {};
+  const idByName = {};
+  Object.entries(recipes).forEach(([id, r]) => { if (r) idByName[r.name] = id; });
+  const starters = [
+    'Chickpea & spinach coconut curry',
+    'Build-your-own tacos',
+    'Red lentil dal (dal tarka)',
+    'Plant-based or chicken burgers',
+    'Thai red/green curry',
+  ];
+  const days = {};
+  PLAN_DAYS.forEach(([key], i) => {
+    const id = idByName[starters[i]];
+    if (id) days[key] = { recipeId: id, protein: 'veg', cooked: false };
   });
+  await fbPut('/mealplan', { label: 'This week', days });
 }
 
 async function loadRecipes() { allRecipes = (await fbGet('/recipes')) || {}; }
@@ -1334,8 +1414,22 @@ function starsHtml(value, interactive, id) {
 }
 
 function recipeTagsHtml(r) {
-  return (r.tags || []).map(t => '<span class="tag">' + (TAG_LABELS[t] || escapeHtml(t)) + '</span>').join('') +
+  return (r.cuisine ? '<span class="tag cuisine">' + escapeHtml(r.cuisine) + '</span>' : '') +
+    (r.tags || []).map(t => '<span class="tag">' + (TAG_LABELS[t] || escapeHtml(t)) + '</span>').join('') +
     (r.proteinMeat && r.proteinMeat.name ? '<span class="tag meat">🍗 chicken swap</span>' : '');
+}
+
+// A filter is either one of the fixed tag keys or a cuisine name.
+function recipeMatchesFilter(r, f) {
+  if (f === 'all') return true;
+  if (TAG_LABELS[f]) return (r.tags || []).includes(f);
+  return r.cuisine === f;
+}
+function filterChipsHtml(active) {
+  const base = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  const cuisines = [...new Set(Object.values(allRecipes).map(r => r && r.cuisine).filter(Boolean))].sort();
+  const all = base.concat(cuisines.map(c => [c, c]));
+  return all.map(([k, l]) => '<button class="chip ' + (k === active ? 'active' : '') + '" data-f="' + escapeHtml(k) + '">' + escapeHtml(l) + '</button>').join('');
 }
 
 function catOptionsHtml(selected) {
@@ -1482,13 +1576,10 @@ function renderRecipes() {
   setSubViewHeader('📖 Recipes');
   showFab('+', () => openRecipeEditor(null));
   const content = document.getElementById('content');
-  const filters = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
-  let list = Object.entries(allRecipes);
-  if (recipeFilter !== 'all') list = list.filter(([id, r]) => (r.tags || []).includes(recipeFilter));
+  let list = Object.entries(allRecipes).filter(([id, r]) => recipeMatchesFilter(r, recipeFilter));
   list.sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0) || a[1].name.localeCompare(b[1].name));
 
-  const chips = '<div class="filter-chips">' + filters.map(([k, l]) =>
-    '<button class="chip ' + (k === recipeFilter ? 'active' : '') + '" data-f="' + k + '">' + l + '</button>').join('') + '</div>';
+  const chips = '<div class="filter-chips">' + filterChipsHtml(recipeFilter) + '</div>';
   const cards = list.length ? list.map(([id, r]) =>
     '<div class="recipe-card" data-recipe="' + id + '">' +
       '<div class="r-emoji">' + (r.emoji || '🍽️') + '</div>' +
@@ -1575,11 +1666,8 @@ function openRecipePicker(onPick) {
 }
 function closeRecipePicker() { document.getElementById('recipe-picker-modal').classList.add('hidden'); pickerOnPick = null; }
 function renderPickerList() {
-  const filters = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
-  document.getElementById('picker-filters').innerHTML = filters.map(([k, l]) =>
-    '<button class="chip ' + (k === pickerFilter ? 'active' : '') + '" data-f="' + k + '">' + l + '</button>').join('');
-  let list = Object.entries(allRecipes);
-  if (pickerFilter !== 'all') list = list.filter(([id, r]) => (r.tags || []).includes(pickerFilter));
+  document.getElementById('picker-filters').innerHTML = filterChipsHtml(pickerFilter);
+  let list = Object.entries(allRecipes).filter(([id, r]) => recipeMatchesFilter(r, pickerFilter));
   list.sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   document.getElementById('picker-list').innerHTML = list.length ? list.map(([id, r]) =>
     '<div class="recipe-card" data-pick="' + id + '">' +
@@ -1675,6 +1763,9 @@ function openRecipeEditor(id) {
   document.getElementById('recipe-editor-title').textContent = r ? 'Edit recipe' : 'New recipe';
   document.getElementById('re-emoji').value = r ? (r.emoji || '🍽️') : '🍽️';
   document.getElementById('re-name').value = r ? r.name : '';
+  document.getElementById('re-cuisine').value = r ? (r.cuisine || '') : '';
+  const cuisines = [...new Set(Object.values(allRecipes).map(x => x && x.cuisine).filter(Boolean))].sort();
+  document.getElementById('cuisine-suggestions').innerHTML = cuisines.map(c => '<option value="' + escapeHtml(c) + '">').join('');
   document.getElementById('re-time').value = r ? (r.time || '') : '';
   document.getElementById('re-protein-veg').value = r && r.proteinVeg ? r.proteinVeg.name : '';
   document.getElementById('re-protein-veg-cat').innerHTML = catOptionsHtml(r && r.proteinVeg ? r.proteinVeg.cat : 'Pantry');
@@ -1705,6 +1796,7 @@ async function saveRecipe() {
   const recipe = {
     name,
     emoji: document.getElementById('re-emoji').value.trim() || '🍽️',
+    cuisine: document.getElementById('re-cuisine').value.trim(),
     time: parseInt(document.getElementById('re-time').value, 10) || 0,
     tags,
     proteinVeg: vegName ? { name: vegName, cat: document.getElementById('re-protein-veg-cat').value } : null,
@@ -1758,7 +1850,7 @@ async function loadAllLists() {
 async function init() {
   getWhoAmI();
   await seedCroatiaListIfMissing();
-  await seedRecipesIfMissing();
+  await seedRecipes();
   await seedMealPlanIfMissing();
   await loadAllLists();
   await loadRecipes();
