@@ -201,6 +201,76 @@
     max-width: 100%; overflow-wrap: anywhere;
   }
 
+  /* ---- Recipes & weekly dinner plan ---- */
+  .nav-card {
+    background: linear-gradient(135deg,#2c6e49,#3f8b5f); color:white; border-radius:14px;
+    padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:12px; cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,0.12);
+  }
+  .nav-card .emoji { font-size:26px; flex-shrink:0; }
+  .nav-card .info { flex:1; min-width:0; }
+  .nav-card .info h3 { margin:0 0 4px; font-size:16px; }
+  .nav-card .count { font-size:12px; opacity:0.85; }
+  .dash-heading { font-size:12px; color:#888; text-transform:uppercase; letter-spacing:0.04em; margin:16px 2px 8px; }
+  .section-hint { font-size:12.5px; color:#888; margin:2px 2px 14px; }
+
+  .filter-chips { display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none; }
+  .filter-chips::-webkit-scrollbar { display:none; }
+  .chip { flex-shrink:0; border:none; background:white; color:#333; padding:7px 14px; border-radius:18px;
+    font-size:13px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.08); white-space:nowrap; }
+  .chip.active { background:#2c6e49; color:white; }
+
+  .recipe-card { background:white; border-radius:12px; padding:12px 14px; margin-bottom:10px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06); display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .recipe-card .r-emoji { font-size:26px; flex-shrink:0; }
+  .recipe-card .r-info { flex:1; min-width:0; }
+  .recipe-card .r-info h3 { margin:0 0 5px; font-size:15px; }
+  .recipe-meta { font-size:12px; color:#777; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .tag { font-size:10.5px; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:2px 7px; white-space:nowrap; }
+  .tag.meat { background:#fbeae0; color:#b5651d; }
+
+  .stars { display:inline-flex; gap:2px; font-size:14px; color:#dcdcdc; line-height:1; }
+  .stars .star.on { color:#f2b705; }
+  .stars.interactive .star { cursor:pointer; font-size:30px; }
+
+  .day-card { background:white; border-radius:12px; padding:12px 14px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  .day-card .day-name { font-size:11.5px; font-weight:700; color:#2c6e49; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; }
+  .day-card.empty { display:flex; align-items:center; justify-content:space-between; }
+  .day-row { display:flex; align-items:center; gap:12px; }
+  .day-row .r-emoji { font-size:24px; flex-shrink:0; }
+  .day-row .r-info { flex:1; min-width:0; cursor:pointer; }
+  .day-row .r-info h3 { margin:0 0 4px; font-size:15px; }
+  .pick-btn { border:1.5px dashed #b7ccc0; background:#f7faf8; color:#2c6e49; border-radius:10px; padding:8px 14px; font-size:13px; cursor:pointer; }
+  .icon-mini { background:none; border:none; font-size:17px; cursor:pointer; padding:4px; color:#bbb; flex-shrink:0; }
+
+  .protein-toggle { display:inline-flex; border:1px solid #ddd; border-radius:16px; overflow:hidden; margin-top:8px; }
+  .protein-toggle button { border:none; background:white; padding:5px 12px; font-size:12px; cursor:pointer; color:#555; }
+  .protein-toggle button.on { background:#2c6e49; color:white; }
+  .protein-toggle button.on.meat { background:#b5651d; }
+
+  .plan-actions { display:flex; flex-direction:column; gap:8px; margin:16px 0; }
+  .plan-actions button { border:none; border-radius:10px; padding:12px; font-size:14px; cursor:pointer; background:#2c6e49; color:white; }
+  .plan-actions button.secondary { background:#eef3f0; color:#2c6e49; }
+
+  .detail-section { background:white; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  .detail-section h4 { margin:0 0 10px; font-size:12px; color:#2c6e49; text-transform:uppercase; letter-spacing:0.04em; }
+  .detail-section ul.ing { margin:0; }
+  .detail-section ul.ing li { border-bottom:1px solid #f1f1f1; padding:9px 2px; }
+  .detail-section ol { margin:0; padding-left:22px; }
+  .detail-section ol li { display:list-item; padding:5px 0; font-size:14px; }
+  .detail-section ul.ing li:last-child { border-bottom:none; }
+  .detail-actions { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .detail-actions button { flex:1 1 40%; border:none; border-radius:10px; padding:11px; font-size:13.5px; cursor:pointer; background:#eef3f0; color:#2c6e49; }
+  .detail-actions button.danger { background:#fbeaea; color:#c0392b; }
+
+  .modal-box textarea { width:100%; border:1.5px solid #ddd; border-radius:8px; padding:10px 12px; font-size:14px; margin-bottom:10px; font-family:inherit; resize:vertical; }
+  .modal-box select { width:100%; border:1.5px solid #ddd; border-radius:8px; padding:10px 12px; font-size:14px; margin-bottom:10px; }
+  .modal-scroll { max-height:82vh; overflow-y:auto; }
+  .tag-picker { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .tag-picker label { font-size:12.5px; background:#f2f2f2; border-radius:14px; padding:6px 12px; cursor:pointer; }
+  .tag-picker label.on { background:#2c6e49; color:white; }
+  .field-label { font-size:12px; color:#888; margin:2px 2px 4px; }
+
   @media screen and (min-width: 640px) { body { max-width: 700px; } }
 </style>
 </head>
@@ -289,6 +359,65 @@
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="recipe-picker-modal">
+  <div class="modal-box modal-scroll">
+    <h3 id="picker-title">Pick a recipe</h3>
+    <div class="filter-chips" id="picker-filters"></div>
+    <div id="picker-list"></div>
+    <button class="btn-cancel" id="cancel-picker" style="width:100%; margin-top:6px;">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="assign-day-modal">
+  <div class="modal-box">
+    <h3>Add to which day?</h3>
+    <div id="assign-day-options"></div>
+    <button class="btn-cancel" id="cancel-assign-day" style="width:100%; margin-top:6px;">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="grocery-target-modal">
+  <div class="modal-box">
+    <h3>Add to grocery list</h3>
+    <div id="grocery-target-options"></div>
+    <input type="text" id="grocery-target-new" placeholder="Or type a new list name">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-grocery-target">Cancel</button>
+      <button class="btn-create" id="confirm-grocery-new">Create &amp; add</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="recipe-editor-modal">
+  <div class="modal-box modal-scroll">
+    <h3 id="recipe-editor-title">New recipe</h3>
+    <input type="text" id="re-emoji" maxlength="4" placeholder="Emoji (e.g. 🍝)" value="🍽️">
+    <input type="text" id="re-name" placeholder="Recipe name">
+    <input type="number" id="re-time" placeholder="Time to make (minutes)">
+    <div class="field-label">Tags</div>
+    <div class="tag-picker" id="re-tags">
+      <label data-tag="vegetarian"><input type="checkbox" value="vegetarian"> 🌱 Vegetarian</label>
+      <label data-tag="high-protein"><input type="checkbox" value="high-protein"> 💪 High protein</label>
+      <label data-tag="kid-friendly"><input type="checkbox" value="kid-friendly"> 🧒 Kid-friendly</label>
+      <label data-tag="quick"><input type="checkbox" value="quick"> ⚡ Quick</label>
+    </div>
+    <div class="field-label">Veg protein</div>
+    <input type="text" id="re-protein-veg" placeholder="e.g. Chickpeas (2 cans)">
+    <select id="re-protein-veg-cat"></select>
+    <div class="field-label">Meat swap (optional — same recipe, swapped protein)</div>
+    <input type="text" id="re-protein-meat" placeholder="e.g. Chicken breast (400g)">
+    <select id="re-protein-meat-cat"></select>
+    <div class="field-label">Other ingredients — one per line, "Name | Category"</div>
+    <textarea id="re-ingredients" rows="5" placeholder="Pasta | Pantry&#10;Grated cheese | Mejeri&#10;Onion | Veggies"></textarea>
+    <div class="field-label">Steps — one per line</div>
+    <textarea id="re-steps" rows="4" placeholder="Fry the onion&#10;Add sauce and simmer"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-recipe-editor">Cancel</button>
+      <button class="btn-create" id="save-recipe-editor">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const BASE_URL = 'https://ourmemory-7cd11-default-rtdb.europe-west1.firebasedatabase.app';
 const statusEl = document.getElementById('sync-status');
@@ -299,6 +428,11 @@ let itemCounter = 0;
 let activeGroupByList = {}; // remembers which sub-list tab is open per list, survives re-renders
 let lastRenderedListId = null; // tracks whether the last renderListView() call was for this same list
 let searchQuery = ''; // current in-list search text; filters items across every group
+let allRecipes = {};  // recipe database, keyed by recipe id
+let mealPlan = null;  // the current 5-day dinner plan
+let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe
+const GROCERY_CATS = ['Bread','Fruits','Veggies','Køledisk','Frozen stuff','Kød','Asian','Pantry','Baking','Mejeri','Dry snacks','Husholdning','Slik & kaffe','Cereals','Other'];
+const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday']];
 
 function showStatus(msg, ok) {
   statusEl.textContent = msg;
@@ -451,6 +585,7 @@ async function seedCroatiaListIfMissing() {
 
 // ---------- Dashboard ----------
 function renderDashboard() {
+  currentView = 'dashboard';
   document.getElementById('page-title').textContent = 'My Lists';
   document.getElementById('back-btn').classList.add('hidden');
   document.getElementById('edit-list-btn').classList.add('hidden');
@@ -458,19 +593,23 @@ function renderDashboard() {
   document.getElementById('share-list-btn').classList.add('hidden');
   document.getElementById('header-progress-row').style.display = 'none';
   document.getElementById('search-row').classList.add('hidden');
-  document.getElementById('fab-add').textContent = '+';
-  document.getElementById('fab-add').onclick = openNewListModal;
+  showFab('+', openNewListModal);
   updateHeaderHeightVar();
 
   const content = document.getElementById('content');
   const listIds = Object.keys(allLists).sort((a,b) => (allLists[a].order||0) - (allLists[b].order||0));
 
-  if (listIds.length === 0) {
-    content.innerHTML = '<div class="empty-state">No lists yet.<br>Tap + to create your first list.</div>';
-    return;
-  }
+  const plannedCount = mealPlan && mealPlan.days ? Object.keys(mealPlan.days).length : 0;
+  const navHtml =
+    '<div class="nav-card" onclick="location.hash=\'mealplan\'">' +
+      '<div class="emoji">🍽️</div><div class="info"><h3>Weekly dinner plan</h3>' +
+      '<div class="count">' + (plannedCount ? plannedCount + ' dinners planned' : 'Plan 5 days of dinners') + '</div></div></div>' +
+    '<div class="nav-card" onclick="location.hash=\'recipes\'">' +
+      '<div class="emoji">📖</div><div class="info"><h3>Recipes</h3>' +
+      '<div class="count">' + Object.keys(allRecipes).length + ' saved · rate &amp; manage</div></div></div>';
 
-  content.innerHTML = listIds.map(id => {
+  const listsHtml = listIds.length
+    ? listIds.map(id => {
     const list = allLists[id];
     const items = list.items || {};
     const total = Object.keys(items).length;
@@ -488,7 +627,10 @@ function renderDashboard() {
         '<div class="count">' + checked + ' / ' + total + label + '</div>' +
       '</div>' +
     '</div>';
-  }).join('');
+  }).join('')
+    : '<div class="section-hint">No lists yet. Tap ＋ to create one.</div>';
+
+  content.innerHTML = navHtml + '<div class="dash-heading">Lists</div>' + listsHtml;
 }
 
 function escapeHtml(str) {
@@ -522,6 +664,7 @@ function renderListView() {
   const list = allLists[currentListId];
   if (!list) { location.hash = ''; return; }
 
+  currentView = 'list';
   document.getElementById('page-title').textContent = (list.emoji || '') + ' ' + list.name;
   document.getElementById('back-btn').classList.remove('hidden');
   document.getElementById('edit-list-btn').classList.remove('hidden');
@@ -529,8 +672,7 @@ function renderListView() {
   document.getElementById('share-list-btn').classList.remove('hidden');
   document.getElementById('header-progress-row').style.display = 'flex';
   document.getElementById('search-row').classList.remove('hidden');
-  document.getElementById('fab-add').textContent = '✎';
-  document.getElementById('fab-add').onclick = () => document.getElementById('quick-add-input').focus();
+  showFab('✎', () => document.getElementById('quick-add-input').focus());
   updateHeaderHeightVar();
 
   const items = list.items || {};
@@ -1107,12 +1249,500 @@ async function createNewList() {
   location.hash = 'list-' + id;
 }
 
+// ========== Recipes & weekly dinner plan ==========
+
+// Seed recipes: vegetarian + high-protein first, all quick and kid-friendly, and
+// each with a chicken swap so the same recipe works for meat-eating days too.
+const RECIPE_SEED = [
+  { name:'Chickpea & spinach coconut curry', emoji:'🍛', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Chickpeas (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast (400g)',cat:'Kød'},
+    ingredients:[{name:'Coconut milk (1 can)',cat:'Pantry'},{name:'Spinach (frozen)',cat:'Frozen stuff'},{name:'Onion',cat:'Veggies'},{name:'Garlic',cat:'Veggies'},{name:'Mild curry paste',cat:'Pantry'},{name:'Basmati rice',cat:'Pantry'}],
+    steps:['Fry chopped onion & garlic for 3 min.','Stir in curry paste, then pour in coconut milk.','Add chickpeas (or diced chicken) and spinach; simmer 10 min.','Serve over rice.'] },
+  { name:'Black bean & cheese quesadillas', emoji:'🌯', time:15,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Black beans (2 cans)',cat:'Pantry'}, proteinMeat:{name:'Chicken strips (300g)',cat:'Kød'},
+    ingredients:[{name:'Tortilla wraps',cat:'Bread'},{name:'Grated cheese',cat:'Mejeri'},{name:'Sweetcorn (1 can)',cat:'Pantry'},{name:'Bell pepper',cat:'Veggies'}],
+    steps:['Lightly mash beans with corn and diced pepper.','Fill tortillas with the mix and plenty of cheese; fold.','Toast in a dry pan ~2 min per side until golden.','Cut into triangles.'] },
+  { name:'Red lentil bolognese pasta', emoji:'🍝', time:25,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Red lentils (250g)',cat:'Pantry'}, proteinMeat:{name:'Minced chicken or beef (400g)',cat:'Kød'},
+    ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Chopped tomatoes (2 cans)',cat:'Pantry'},{name:'Onion',cat:'Veggies'},{name:'Carrot',cat:'Veggies'},{name:'Garlic',cat:'Veggies'},{name:'Parmesan',cat:'Mejeri'}],
+    steps:['Fry onion, grated carrot and garlic.','Add lentils (or mince) and chopped tomatoes plus a splash of water.','Simmer 15 min until the lentils are soft.','Toss with cooked pasta and top with parmesan.'] },
+  { name:'Plant-based or chicken burgers', emoji:'🍔', time:15,
+    tags:['vegetarian','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Plant-based patties',cat:'Frozen stuff'}, proteinMeat:{name:'Chicken burger patties',cat:'Kød'},
+    ingredients:[{name:'Burger buns',cat:'Bread'},{name:'Cheese slices',cat:'Mejeri'},{name:'Lettuce',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Ketchup',cat:'Pantry'}],
+    steps:['Cook the patties per the pack.','Toast the buns.','Build with cheese, lettuce, tomato and ketchup.','Serve with oven fries if you like.'] },
+  { name:'Quick veggie / chicken pizza', emoji:'🍕', time:20,
+    tags:['vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Extra mozzarella + sweetcorn',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken (200g)',cat:'Kød'},
+    ingredients:[{name:'Pizza bases',cat:'Bread'},{name:'Passata / pizza sauce',cat:'Pantry'},{name:'Mozzarella',cat:'Mejeri'},{name:'Sweetcorn',cat:'Pantry'},{name:'Bell pepper',cat:'Veggies'}],
+    steps:['Spread sauce over the bases.','Top with cheese, corn and peppers (plus chicken if using).','Bake 10–12 min at 220°C.','Slice and serve.'] },
+  { name:'Peanut tofu noodles', emoji:'🍜', time:20,
+    tags:['vegetarian','high-protein','quick'], rating:4,
+    proteinVeg:{name:'Firm tofu (400g)',cat:'Køledisk'}, proteinMeat:{name:'Chicken breast (300g)',cat:'Kød'},
+    ingredients:[{name:'Egg noodles',cat:'Asian'},{name:'Peanut butter',cat:'Pantry'},{name:'Soy sauce',cat:'Asian'},{name:'Edamame',cat:'Frozen stuff'},{name:'Carrot',cat:'Veggies'},{name:'Broccoli',cat:'Veggies'}],
+    steps:['Cook the noodles.','Pan-fry cubed tofu (or chicken) until golden.','Add the veg and stir-fry 3 min.','Whisk peanut butter + soy + a splash of water into a sauce; toss everything together.'] },
+  { name:'Halloumi & chickpea traybake', emoji:'🧆', time:25,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Halloumi (2 blocks)',cat:'Mejeri'}, proteinMeat:{name:'Chicken thighs (500g)',cat:'Kød'},
+    ingredients:[{name:'Chickpeas (2 cans)',cat:'Pantry'},{name:'Cherry tomatoes',cat:'Veggies'},{name:'Courgette',cat:'Veggies'},{name:'Bell pepper',cat:'Veggies'},{name:'Olive oil & paprika',cat:'Pantry'}],
+    steps:['Chop the veg onto a tray and toss with oil and paprika.','Add the chickpeas and roast 15 min.','Add sliced halloumi (or chicken) and roast 8 min more.','Serve with bread or rice.'] },
+  { name:'Egg fried rice with edamame', emoji:'🍚', time:15,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs (4)',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken (200g)',cat:'Kød'},
+    ingredients:[{name:'Cooked / leftover rice',cat:'Pantry'},{name:'Edamame & peas',cat:'Frozen stuff'},{name:'Soy sauce',cat:'Asian'},{name:'Spring onion',cat:'Veggies'},{name:'Carrot',cat:'Veggies'}],
+    steps:['Scramble the eggs and set aside.','Fry diced carrot with peas and edamame 3 min.','Add rice and soy; stir-fry over high heat.','Fold the eggs (or chicken) back in and top with spring onion.'] },
+];
+
+async function seedRecipesIfMissing() {
+  const existing = await fbGet('/recipes');
+  if (existing && Object.keys(existing).length) return;
+  const obj = {};
+  RECIPE_SEED.forEach((r, i) => { obj['r' + i] = Object.assign({ createdAt: Date.now() + i }, r); });
+  await fbPut('/recipes', obj);
+}
+
+async function seedMealPlanIfMissing() {
+  const existing = await fbGet('/mealplan');
+  if (existing) return;
+  // Start the week vegetarian & high-protein, then the kid-favourite quick dinners.
+  await fbPut('/mealplan', {
+    label: 'This week',
+    days: {
+      mon: { recipeId:'r0', protein:'veg', cooked:false },
+      tue: { recipeId:'r1', protein:'veg', cooked:false },
+      wed: { recipeId:'r2', protein:'veg', cooked:false },
+      thu: { recipeId:'r3', protein:'veg', cooked:false },
+      fri: { recipeId:'r4', protein:'veg', cooked:false },
+    }
+  });
+}
+
+async function loadRecipes() { allRecipes = (await fbGet('/recipes')) || {}; }
+async function loadMealPlan() { mealPlan = (await fbGet('/mealplan')) || null; }
+
+// ----- shared bits -----
+const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick' };
+
+function starsHtml(value, interactive, id) {
+  value = Math.round(value || 0);
+  let s = '<span class="stars' + (interactive ? ' interactive' : '') + '"' + (id ? ' data-recipe-id="' + id + '"' : '') + '>';
+  for (let n = 1; n <= 5; n++) s += '<span class="star' + (n <= value ? ' on' : '') + '" data-val="' + n + '">★</span>';
+  return s + '</span>';
+}
+
+function recipeTagsHtml(r) {
+  return (r.tags || []).map(t => '<span class="tag">' + (TAG_LABELS[t] || escapeHtml(t)) + '</span>').join('') +
+    (r.proteinMeat && r.proteinMeat.name ? '<span class="tag meat">🍗 chicken swap</span>' : '');
+}
+
+function catOptionsHtml(selected) {
+  return GROCERY_CATS.map(c => '<option value="' + escapeHtml(c) + '"' + (c === selected ? ' selected' : '') + '>' + escapeHtml(c) + '</option>').join('');
+}
+
+// Ingredients for a recipe given the chosen protein ('veg' | 'meat').
+function recipeIngredients(r, protein) {
+  const out = [];
+  const p = protein === 'meat' ? r.proteinMeat : r.proteinVeg;
+  if (p && p.name) out.push(p);
+  (r.ingredients || []).forEach(i => out.push(i));
+  return out;
+}
+
+function setSubViewHeader(title) {
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('back-btn').classList.remove('hidden');
+  ['edit-list-btn','delete-list-btn','share-list-btn'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('header-progress-row').style.display = 'none';
+  document.getElementById('search-row').classList.add('hidden');
+  updateHeaderHeightVar();
+}
+function showFab(char, onclick) {
+  const fab = document.getElementById('fab-add');
+  if (!char) { fab.style.display = 'none'; return; }
+  fab.style.display = 'flex';
+  fab.textContent = char;
+  fab.onclick = onclick;
+}
+
+function goBack() {
+  if (currentView === 'recipe') location.hash = 'recipes';
+  else location.hash = '';
+}
+
+// ----- Weekly dinner plan view -----
+function renderMealPlan() {
+  currentView = 'mealplan';
+  setSubViewHeader('🍽️ Weekly dinner plan');
+  showFab(null);
+  const content = document.getElementById('content');
+  const plan = mealPlan || { days: {} };
+  const days = plan.days || {};
+
+  const dayCards = PLAN_DAYS.map(([key, label]) => {
+    const slot = days[key];
+    const r = slot && allRecipes[slot.recipeId];
+    if (!r) {
+      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + '</div>' +
+        '<button class="pick-btn" data-pick-day="' + key + '">＋ Pick a recipe</button></div>';
+    }
+    const protein = slot.protein || 'veg';
+    const toggle = (r.proteinMeat && r.proteinMeat.name)
+      ? '<div class="protein-toggle" data-day="' + key + '">' +
+          '<button class="' + (protein === 'veg' ? 'on' : '') + '" data-protein="veg">🌱 Veg</button>' +
+          '<button class="meat ' + (protein === 'meat' ? 'on' : '') + '" data-protein="meat">🍗 Chicken</button>' +
+        '</div>'
+      : '';
+    return '<div class="day-card">' +
+      '<div class="day-name">' + label + '</div>' +
+      '<div class="day-row">' +
+        '<div class="r-emoji">' + (r.emoji || '🍽️') + '</div>' +
+        '<div class="r-info" data-open-recipe="' + slot.recipeId + '">' +
+          '<h3>' + escapeHtml(r.name) + '</h3>' +
+          '<div class="recipe-meta">⏱ ' + (r.time || '?') + ' min · ' + starsHtml(r.rating, false) + '</div>' +
+        '</div>' +
+        '<button class="icon-mini" data-clear-day="' + key + '" title="Remove">✕</button>' +
+      '</div>' + toggle +
+    '</div>';
+  }).join('');
+
+  content.innerHTML =
+    '<div class="section-hint">Tap a meal to see the recipe, or use the buttons below to plan the week and shop for it.</div>' +
+    dayCards +
+    '<div class="plan-actions">' +
+      '<button class="secondary" id="plan-fill-btn">✨ Suggest a fresh week</button>' +
+      '<button id="plan-grocery-btn">🛒 Add all ingredients to grocery list</button>' +
+    '</div>';
+
+  content.querySelectorAll('[data-pick-day]').forEach(b => b.addEventListener('click', () => openRecipePicker(id => assignRecipeToDay(b.dataset.pickDay, id))));
+  content.querySelectorAll('[data-open-recipe]').forEach(b => b.addEventListener('click', () => { location.hash = 'recipe-' + b.dataset.openRecipe; }));
+  content.querySelectorAll('[data-clear-day]').forEach(b => b.addEventListener('click', () => clearPlanDay(b.dataset.clearDay)));
+  content.querySelectorAll('.protein-toggle').forEach(t => t.querySelectorAll('button').forEach(btn =>
+    btn.addEventListener('click', () => setDayProtein(t.dataset.day, btn.dataset.protein))));
+  document.getElementById('plan-fill-btn').addEventListener('click', suggestFreshWeek);
+  document.getElementById('plan-grocery-btn').addEventListener('click', () => {
+    const all = [];
+    PLAN_DAYS.forEach(([key]) => {
+      const slot = days[key]; const r = slot && allRecipes[slot.recipeId];
+      if (r) recipeIngredients(r, slot.protein || 'veg').forEach(i => all.push(i));
+    });
+    if (!all.length) { showStatus('Plan is empty', true); return; }
+    openGroceryTarget(all, 'the whole week');
+  });
+}
+
+async function savePlan() { await fbPut('/mealplan', mealPlan); }
+
+async function assignRecipeToDay(dayKey, recipeId) {
+  if (!mealPlan) mealPlan = { label: 'This week', days: {} };
+  if (!mealPlan.days) mealPlan.days = {};
+  mealPlan.days[dayKey] = { recipeId, protein: 'veg', cooked: false };
+  closeRecipePicker();
+  renderMealPlan();
+  showStatus('Saving…');
+  await savePlan();
+  showStatus('✓ Added', true);
+}
+async function clearPlanDay(dayKey) {
+  if (!mealPlan || !mealPlan.days) return;
+  delete mealPlan.days[dayKey];
+  renderMealPlan();
+  await savePlan();
+  showStatus('✓ Removed', true);
+}
+async function setDayProtein(dayKey, protein) {
+  if (!mealPlan || !mealPlan.days || !mealPlan.days[dayKey]) return;
+  mealPlan.days[dayKey].protein = protein;
+  renderMealPlan();
+  await savePlan();
+  showStatus('✓ Saved', true);
+}
+async function suggestFreshWeek() {
+  // Prefer quick, kid-friendly, well-rated recipes; keep the first days vegetarian.
+  const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
+  const veg = ranked.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
+  const ordered = veg.concat(ranked.filter(([id]) => !veg.some(([vid]) => vid === id)));
+  const chosen = ordered.slice(0, 5);
+  if (chosen.length < 5) { showStatus('Add more recipes first', true); return; }
+  mealPlan = mealPlan || { label: 'This week', days: {} };
+  mealPlan.days = {};
+  PLAN_DAYS.forEach(([key], i) => { mealPlan.days[key] = { recipeId: chosen[i][0], protein: 'veg', cooked: false }; });
+  renderMealPlan();
+  showStatus('Saving…');
+  await savePlan();
+  showStatus('✓ New week planned', true);
+}
+
+// ----- Recipes list view -----
+let recipeFilter = 'all';
+function renderRecipes() {
+  currentView = 'recipes';
+  setSubViewHeader('📖 Recipes');
+  showFab('+', () => openRecipeEditor(null));
+  const content = document.getElementById('content');
+  const filters = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  let list = Object.entries(allRecipes);
+  if (recipeFilter !== 'all') list = list.filter(([id, r]) => (r.tags || []).includes(recipeFilter));
+  list.sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0) || a[1].name.localeCompare(b[1].name));
+
+  const chips = '<div class="filter-chips">' + filters.map(([k, l]) =>
+    '<button class="chip ' + (k === recipeFilter ? 'active' : '') + '" data-f="' + k + '">' + l + '</button>').join('') + '</div>';
+  const cards = list.length ? list.map(([id, r]) =>
+    '<div class="recipe-card" data-recipe="' + id + '">' +
+      '<div class="r-emoji">' + (r.emoji || '🍽️') + '</div>' +
+      '<div class="r-info"><h3>' + escapeHtml(r.name) + '</h3>' +
+        '<div class="recipe-meta">' + starsHtml(r.rating, false) + '<span>⏱ ' + (r.time || '?') + ' min</span>' + recipeTagsHtml(r) + '</div>' +
+      '</div></div>').join('')
+    : '<div class="section-hint">No recipes match this filter.</div>';
+
+  content.innerHTML = '<div class="section-hint">Your saved dinners — tap one to view, rate, or shop for it. Tap ＋ to add your own.</div>' + chips + cards;
+  content.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { recipeFilter = c.dataset.f; renderRecipes(); }));
+  content.querySelectorAll('.recipe-card').forEach(c => c.addEventListener('click', () => { location.hash = 'recipe-' + c.dataset.recipe; }));
+}
+
+// ----- Single recipe detail -----
+let detailProtein = 'veg';
+function renderRecipeDetail(id) {
+  const r = allRecipes[id];
+  if (!r) { location.hash = 'recipes'; return; }
+  currentView = 'recipe';
+  setSubViewHeader((r.emoji || '🍽️') + ' ' + r.name);
+  showFab(null);
+  if (!(r.proteinMeat && r.proteinMeat.name)) detailProtein = 'veg';
+
+  const proteinToggle = (r.proteinMeat && r.proteinMeat.name)
+    ? '<div class="protein-toggle" id="detail-protein">' +
+        '<button class="' + (detailProtein === 'veg' ? 'on' : '') + '" data-protein="veg">🌱 Veg</button>' +
+        '<button class="meat ' + (detailProtein === 'meat' ? 'on' : '') + '" data-protein="meat">🍗 Chicken</button>' +
+      '</div>'
+    : '';
+
+  const ings = recipeIngredients(r, detailProtein);
+  const content = document.getElementById('content');
+  content.innerHTML =
+    '<div class="detail-section">' +
+      '<div class="recipe-meta" style="margin-bottom:8px;">⏱ ' + (r.time || '?') + ' min ' + recipeTagsHtml(r) + '</div>' +
+      '<div class="field-label" style="margin:0 0 4px;">Tap to rate</div>' + starsHtml(r.rating, true, id) +
+      proteinToggle +
+    '</div>' +
+    '<div class="detail-actions">' +
+      '<button id="rd-grocery">🛒 Add to grocery list</button>' +
+      '<button id="rd-plan">📅 Add to a day</button>' +
+      '<button id="rd-edit">✎ Edit</button>' +
+      '<button class="danger" id="rd-delete">🗑 Delete</button>' +
+    '</div>' +
+    '<div class="detail-section"><h4>Ingredients</h4><ul class="ing">' +
+      ings.map(i => '<li>' + escapeHtml(i.name) + ' <span class="tag">' + escapeHtml(i.cat || 'Other') + '</span></li>').join('') +
+    '</ul></div>' +
+    '<div class="detail-section"><h4>Steps</h4><ol>' +
+      (r.steps || []).map(s => '<li>' + escapeHtml(s) + '</li>').join('') +
+    '</ol></div>';
+
+  content.querySelectorAll('.stars.interactive .star').forEach(st =>
+    st.addEventListener('click', () => setRecipeRating(id, parseInt(st.dataset.val, 10))));
+  const dp = document.getElementById('detail-protein');
+  if (dp) dp.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { detailProtein = b.dataset.protein; renderRecipeDetail(id); }));
+  document.getElementById('rd-grocery').addEventListener('click', () => openGroceryTarget(recipeIngredients(r, detailProtein), r.name));
+  document.getElementById('rd-plan').addEventListener('click', () => openAssignDay(id));
+  document.getElementById('rd-edit').addEventListener('click', () => openRecipeEditor(id));
+  document.getElementById('rd-delete').addEventListener('click', () => deleteRecipe(id));
+}
+
+async function setRecipeRating(id, val) {
+  const r = allRecipes[id]; if (!r) return;
+  r.rating = val;
+  renderRecipeDetail(id);
+  await fbPatch('/recipes/' + id, { rating: val });
+  showStatus('✓ Rated', true);
+}
+async function deleteRecipe(id) {
+  const r = allRecipes[id]; if (!r) return;
+  if (!confirm('Delete recipe "' + r.name + '"?')) return;
+  delete allRecipes[id];
+  await fbDelete('/recipes/' + id);
+  location.hash = 'recipes';
+  showStatus('✓ Deleted', true);
+}
+
+// ----- Recipe picker (for planning) -----
+let pickerOnPick = null, pickerFilter = 'all';
+function openRecipePicker(onPick) {
+  pickerOnPick = onPick; pickerFilter = 'all';
+  renderPickerList();
+  document.getElementById('recipe-picker-modal').classList.remove('hidden');
+}
+function closeRecipePicker() { document.getElementById('recipe-picker-modal').classList.add('hidden'); pickerOnPick = null; }
+function renderPickerList() {
+  const filters = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  document.getElementById('picker-filters').innerHTML = filters.map(([k, l]) =>
+    '<button class="chip ' + (k === pickerFilter ? 'active' : '') + '" data-f="' + k + '">' + l + '</button>').join('');
+  let list = Object.entries(allRecipes);
+  if (pickerFilter !== 'all') list = list.filter(([id, r]) => (r.tags || []).includes(pickerFilter));
+  list.sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
+  document.getElementById('picker-list').innerHTML = list.length ? list.map(([id, r]) =>
+    '<div class="recipe-card" data-pick="' + id + '">' +
+      '<div class="r-emoji">' + (r.emoji || '🍽️') + '</div>' +
+      '<div class="r-info"><h3>' + escapeHtml(r.name) + '</h3>' +
+        '<div class="recipe-meta">' + starsHtml(r.rating, false) + '<span>⏱ ' + (r.time || '?') + ' min</span>' + recipeTagsHtml(r) + '</div>' +
+      '</div></div>').join('') : '<div class="section-hint">No recipes match.</div>';
+  document.getElementById('picker-filters').querySelectorAll('.chip').forEach(c =>
+    c.addEventListener('click', () => { pickerFilter = c.dataset.f; renderPickerList(); }));
+  document.getElementById('picker-list').querySelectorAll('[data-pick]').forEach(c =>
+    c.addEventListener('click', () => { if (pickerOnPick) pickerOnPick(c.dataset.pick); }));
+}
+
+// ----- Assign a recipe to a plan day (from the detail view) -----
+let assignPendingRecipe = null;
+function openAssignDay(recipeId) {
+  assignPendingRecipe = recipeId;
+  const days = (mealPlan && mealPlan.days) || {};
+  document.getElementById('assign-day-options').innerHTML = PLAN_DAYS.map(([key, label]) => {
+    const slot = days[key]; const cur = slot && allRecipes[slot.recipeId];
+    return '<button class="move-list-option" data-day="' + key + '"><span>📅</span><span>' + label +
+      (cur ? ' — <span style="color:#888;">' + escapeHtml(cur.name) + '</span>' : '') + '</span></button>';
+  }).join('');
+  document.getElementById('assign-day-options').querySelectorAll('[data-day]').forEach(b =>
+    b.addEventListener('click', () => {
+      closeAssignDay();
+      assignRecipeToDay(b.dataset.day, assignPendingRecipe);
+    }));
+  document.getElementById('assign-day-modal').classList.remove('hidden');
+}
+function closeAssignDay() { document.getElementById('assign-day-modal').classList.add('hidden'); }
+
+// ----- Add ingredients to a grocery list -----
+let pendingGroceryIngs = null;
+function openGroceryTarget(ings, sourceName) {
+  pendingGroceryIngs = ings;
+  const optionsEl = document.getElementById('grocery-target-options');
+  const lists = Object.entries(allLists).filter(([id, l]) => l.type !== 'travel')
+    .sort((a, b) => (a[1].order || 0) - (b[1].order || 0));
+  optionsEl.innerHTML = lists.length
+    ? lists.map(([id, l]) => '<button class="move-list-option" data-target="' + id + '"><span>' + (l.emoji || '📋') + '</span><span>' + escapeHtml(l.name) + '</span></button>').join('')
+    : '<div class="move-list-empty">No shopping lists yet — create one below.</div>';
+  optionsEl.querySelectorAll('[data-target]').forEach(b =>
+    b.addEventListener('click', () => doAddToGrocery(b.dataset.target)));
+  document.getElementById('grocery-target-new').value = '';
+  document.getElementById('grocery-target-modal').classList.remove('hidden');
+}
+function closeGroceryTarget() { document.getElementById('grocery-target-modal').classList.add('hidden'); pendingGroceryIngs = null; }
+
+async function addIngredientsToList(ings, targetListId) {
+  const list = allLists[targetListId]; if (!list) return 0;
+  const items = list.items || {};
+  const existing = new Set(Object.values(items).map(i => (i.text || '').toLowerCase().trim()));
+  let maxOrder = Object.values(items).reduce((m, i) => Math.max(m, i.order || 0), 0);
+  const patch = {}; let added = 0;
+  ings.forEach((ing, idx) => {
+    const key = (ing.name || '').toLowerCase().trim();
+    if (!key || existing.has(key)) return;
+    existing.add(key);
+    maxOrder++;
+    const newId = 'i' + Date.now() + '_' + idx + Math.floor(Math.random() * 1000);
+    const it = { text: ing.name, group: ing.cat || 'Other', checked: false, order: maxOrder };
+    items[newId] = it; patch[newId] = it; added++;
+  });
+  list.items = items;
+  if (added) await fbPatch('/lists/' + targetListId + '/items', patch);
+  return added;
+}
+async function doAddToGrocery(targetListId) {
+  const ings = pendingGroceryIngs || [];
+  const list = allLists[targetListId];
+  closeGroceryTarget();
+  showStatus('Adding…');
+  const added = await addIngredientsToList(ings, targetListId);
+  showStatus(added ? ('✓ Added ' + added + ' to ' + list.name) : 'Already on the list', true);
+}
+async function addToNewGroceryList() {
+  const name = document.getElementById('grocery-target-new').value.trim();
+  if (!name || !pendingGroceryIngs) return;
+  const id = 'l' + Date.now();
+  const maxOrder = Object.values(allLists).reduce((m, l) => Math.max(m, l.order || 0), 0);
+  const newList = { name, emoji: '🛒', type: 'simple', order: maxOrder + 1, items: {} };
+  allLists[id] = newList;
+  await fbPut('/lists/' + id, newList);
+  await doAddToGrocery(id);
+}
+
+// ----- Recipe editor (add / edit) -----
+let editingRecipeId = null;
+function openRecipeEditor(id) {
+  editingRecipeId = id;
+  const r = id ? allRecipes[id] : null;
+  document.getElementById('recipe-editor-title').textContent = r ? 'Edit recipe' : 'New recipe';
+  document.getElementById('re-emoji').value = r ? (r.emoji || '🍽️') : '🍽️';
+  document.getElementById('re-name').value = r ? r.name : '';
+  document.getElementById('re-time').value = r ? (r.time || '') : '';
+  document.getElementById('re-protein-veg').value = r && r.proteinVeg ? r.proteinVeg.name : '';
+  document.getElementById('re-protein-veg-cat').innerHTML = catOptionsHtml(r && r.proteinVeg ? r.proteinVeg.cat : 'Pantry');
+  document.getElementById('re-protein-meat').value = r && r.proteinMeat ? r.proteinMeat.name : '';
+  document.getElementById('re-protein-meat-cat').innerHTML = catOptionsHtml(r && r.proteinMeat ? r.proteinMeat.cat : 'Kød');
+  document.getElementById('re-ingredients').value = r ? (r.ingredients || []).map(i => i.name + ' | ' + (i.cat || 'Other')).join('\n') : '';
+  document.getElementById('re-steps').value = r ? (r.steps || []).join('\n') : '';
+  document.querySelectorAll('#re-tags label').forEach(lbl => {
+    const on = r ? (r.tags || []).includes(lbl.dataset.tag) : false;
+    lbl.classList.toggle('on', on);
+    lbl.querySelector('input').checked = on;
+  });
+  document.getElementById('recipe-editor-modal').classList.remove('hidden');
+}
+function closeRecipeEditor() { document.getElementById('recipe-editor-modal').classList.add('hidden'); editingRecipeId = null; }
+function parseIngredientLines(text) {
+  return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const [name, cat] = l.split('|');
+    return { name: (name || '').trim(), cat: (cat || 'Other').trim() };
+  }).filter(i => i.name);
+}
+async function saveRecipe() {
+  const name = document.getElementById('re-name').value.trim();
+  if (!name) { showStatus('Name required', true); return; }
+  const tags = [...document.querySelectorAll('#re-tags input:checked')].map(i => i.value);
+  const vegName = document.getElementById('re-protein-veg').value.trim();
+  const meatName = document.getElementById('re-protein-meat').value.trim();
+  const recipe = {
+    name,
+    emoji: document.getElementById('re-emoji').value.trim() || '🍽️',
+    time: parseInt(document.getElementById('re-time').value, 10) || 0,
+    tags,
+    proteinVeg: vegName ? { name: vegName, cat: document.getElementById('re-protein-veg-cat').value } : null,
+    proteinMeat: meatName ? { name: meatName, cat: document.getElementById('re-protein-meat-cat').value } : null,
+    ingredients: parseIngredientLines(document.getElementById('re-ingredients').value),
+    steps: document.getElementById('re-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
+  };
+  const id = editingRecipeId || ('r' + Date.now());
+  if (editingRecipeId) {
+    recipe.rating = allRecipes[id].rating || 0;
+    recipe.createdAt = allRecipes[id].createdAt || Date.now();
+  } else {
+    recipe.rating = 0; recipe.createdAt = Date.now();
+  }
+  allRecipes[id] = recipe;
+  closeRecipeEditor();
+  showStatus('Saving…');
+  await fbPut('/recipes/' + id, recipe);
+  showStatus('✓ Saved', true);
+  location.hash = 'recipe-' + id;
+  if (currentView === 'recipe') renderRecipeDetail(id);
+}
+
 // ---------- Routing ----------
 function handleRoute() {
   const hash = location.hash.replace('#', '');
   if (hash.startsWith('list-')) {
     currentListId = hash.replace('list-', '');
     if (allLists[currentListId]) renderListView(); else renderDashboard();
+  } else if (hash === 'mealplan') {
+    currentListId = null;
+    renderMealPlan();
+  } else if (hash === 'recipes') {
+    currentListId = null;
+    renderRecipes();
+  } else if (hash.startsWith('recipe-')) {
+    currentListId = null;
+    renderRecipeDetail(hash.replace('recipe-', ''));
   } else {
     currentListId = null;
     renderDashboard();
@@ -1128,11 +1758,15 @@ async function loadAllLists() {
 async function init() {
   getWhoAmI();
   await seedCroatiaListIfMissing();
+  await seedRecipesIfMissing();
+  await seedMealPlanIfMissing();
   await loadAllLists();
+  await loadRecipes();
+  await loadMealPlan();
   handleRoute();
 
   window.addEventListener('hashchange', handleRoute);
-  document.getElementById('back-btn').addEventListener('click', () => { location.hash = ''; });
+  document.getElementById('back-btn').addEventListener('click', goBack);
   document.getElementById('edit-list-btn').addEventListener('click', openEditListModal);
   document.getElementById('delete-list-btn').addEventListener('click', deleteCurrentList);
   document.getElementById('share-list-btn').addEventListener('click', shareCurrentList);
@@ -1181,13 +1815,28 @@ async function init() {
     if (e.key === 'Enter') moveItemToNewList();
   });
 
+  // Recipes & meal-plan modals
+  document.getElementById('cancel-picker').addEventListener('click', closeRecipePicker);
+  document.getElementById('cancel-assign-day').addEventListener('click', closeAssignDay);
+  document.getElementById('cancel-grocery-target').addEventListener('click', closeGroceryTarget);
+  document.getElementById('confirm-grocery-new').addEventListener('click', addToNewGroceryList);
+  document.getElementById('cancel-recipe-editor').addEventListener('click', closeRecipeEditor);
+  document.getElementById('save-recipe-editor').addEventListener('click', saveRecipe);
+  document.querySelectorAll('#re-tags label').forEach(lbl => lbl.addEventListener('click', () => {
+    setTimeout(() => lbl.classList.toggle('on', lbl.querySelector('input').checked), 0);
+  }));
+
   setInterval(async () => {
     const activeInput = document.getElementById('quick-add-input');
     const formHasFocus = document.activeElement && document.activeElement.closest && document.activeElement.closest('#quick-add-form');
     const isTyping = (activeInput && activeInput.value.trim() !== '') || formHasFocus;
-    if (isTyping) return; // don't touch the DOM at all while the user is composing an item
-    const data = await fbGet('/lists');
-    allLists = data || {};
+    const modalOpen = document.querySelector('.modal-overlay:not(.hidden)');
+    if (isTyping || modalOpen) return; // don't touch the DOM while composing or with a modal open
+    allLists = (await fbGet('/lists')) || {};
+    if (currentView === 'mealplan' || currentView === 'recipes' || currentView === 'recipe') {
+      allRecipes = (await fbGet('/recipes')) || {};
+      mealPlan = (await fbGet('/mealplan')) || null;
+    }
     handleRoute();
   }, 6000);
 }
