@@ -407,6 +407,7 @@
       <label data-tag="vegetarian"><input type="checkbox" value="vegetarian"> 🌱 Vegetarian</label>
       <label data-tag="high-protein"><input type="checkbox" value="high-protein"> 💪 High protein</label>
       <label data-tag="kid-friendly"><input type="checkbox" value="kid-friendly"> 🧒 Kid-friendly</label>
+      <label data-tag="toddler"><input type="checkbox" value="toddler"> 👶 Toddler</label>
       <label data-tag="quick"><input type="checkbox" value="quick"> ⚡ Quick</label>
     </div>
     <div class="field-label">Veg protein</div>
@@ -1357,7 +1358,7 @@ const RECIPE_SEED = [
     ingredients:[{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Courgette / squash',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Olive oil & paprika',cat:'Pantry'}],
     steps:['Chop the veg onto a tray and toss with oil and paprika.','Add the chickpeas and roast 15 min.','Add sliced halloumi (or chicken) and roast 8 min more.','Serve with bread or rice.'] },
   { seedKey:'egg-fried-rice', cuisine:'Chinese', name:'Egg fried rice with edamame', emoji:'🍚', time:15,
-    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    tags:['toddler','vegetarian','high-protein','kid-friendly','quick'], rating:4,
     proteinVeg:{name:'Eggs / æg (4)',cat:'Mejeri'}, proteinMeat:{name:'Cooked chicken / kylling (200g)',cat:'Kød'},
     ingredients:[{name:'Cooked / leftover rice',cat:'Pantry'},{name:'Edamame & peas / ærter',cat:'Frozen stuff'},{name:'Soy sauce / soja',cat:'Asian'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}],
     steps:['Scramble the eggs and set aside.','Fry diced carrot with peas and edamame 3 min.','Add rice and soy; stir-fry over high heat.','Fold the eggs (or chicken) back in and top with spring onion.'] },
@@ -1460,7 +1461,7 @@ const RECIPE_SEED = [
     ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Curry / karry',cat:'Pantry'},{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Rice / ris',cat:'Pantry'}],
     steps:['Brown the chicken (or drain the chickpeas) and place in an oven dish with thinly sliced potatoes and pepper.','Mix coconut milk with curry and pour over.','Bake 20 min at 220°C until the potatoes are tender.','Serve with rice.'] },
   { seedKey:'pesto-pasta', cuisine:'Italian', source:'Inspired by Spis Bedre', sourceUrl:'https://spisbedre.dk/temaer/familiefavoritter-bornevenlige-opskrifter', name:'Cremet kylling- og pestopasta', emoji:'🍝', time:20,
-    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    tags:['toddler','vegetarian','high-protein','kid-friendly','quick'], rating:5,
     proteinVeg:{name:'Chickpeas / kikærter (1 can)',cat:'Pantry'}, proteinMeat:{name:'Chicken breast / kylling (400g)',cat:'Kød'},
     ingredients:[{name:'Pasta',cat:'Pantry'},{name:'Green pesto / pesto',cat:'Pantry'},{name:'Cream or cream cheese / fløde el. flødeost',cat:'Mejeri'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Spinach / spinat',cat:'Veggies'},{name:'Parmesan',cat:'Mejeri'}],
     steps:['Cook the pasta.','Fry the chicken (or warm the chickpeas), then add tomatoes and spinach.','Stir in pesto and cream to a sauce.','Toss with the pasta and top with parmesan.'] },
@@ -1475,7 +1476,7 @@ const RECIPE_SEED = [
     ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Cream / fløde',cat:'Mejeri'},{name:'Bread / brød',cat:'Bread'},{name:'Stock / bouillon',cat:'Pantry'}],
     steps:['Fry the onion and garlic.','Add tomatoes, beans and stock; simmer 10 min.','Blend smooth and stir in a splash of cream.','Serve with warm bread and cheese.'] },
   { seedKey:'fiskefingre', cuisine:'Danish', source:'Family favourite', name:'Fiskefingre med kartoffelmos', emoji:'🐟', time:20,
-    tags:['kid-friendly','quick'], rating:4,
+    tags:['toddler','kid-friendly','quick'], rating:4,
     proteinVeg:{name:'Veggie nuggets / grøntsagsnuggets',cat:'Frozen stuff'}, proteinMeat:{name:'Fish fingers / fiskefingre (frozen)',cat:'Frozen stuff'},
     ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Milk & butter / mælk & smør',cat:'Mejeri'},{name:'Peas / ærter',cat:'Frozen stuff'},{name:'Remoulade or ketchup',cat:'Pantry'},{name:'Lemon / citron',cat:'Fruits'}],
     steps:['Bake the fish fingers per the pack.','Boil the potatoes and mash with milk and butter.','Warm the peas.','Serve with remoulade and a wedge of lemon.'] },
@@ -1566,12 +1567,12 @@ const RECIPE_SEED = [
     ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Mustard seeds & turmeric / sennepsfrø & gurkemeje',cat:'Pantry'},{name:'Coconut chutney (ready) / kokoschutney',cat:'Pantry'}],
     steps:['Boil and lightly mash potatoes; temper with mustard seeds, onion and turmeric.','Spread dosa batter thin on a hot pan; crisp 2–3 min.','Add a spoon of potato masala and fold.','Serve with coconut chutney.'] },
   { seedKey:'idli', cuisine:'South Indian', source:'South Indian classic', name:'Idli with sambar (ready batter)', emoji:'🍚', time:25,
-    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    tags:['toddler','vegetarian','high-protein','kid-friendly','quick'], rating:4,
     proteinVeg:{name:'Ready idli batter / idlibatter',cat:'Køledisk'}, proteinMeat:null,
     ingredients:[{name:'Sambar mix / sambar',cat:'Pantry'},{name:'Carrot & beans / gulerod & bønner',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Coconut chutney / kokoschutney',cat:'Pantry'}],
     steps:['Steam the idli batter in an idli mould ~10 min.','Simmer the sambar mix with chopped veg until soft.','Serve the idlis hot with sambar.','Coconut chutney on the side.'] },
   { seedKey:'curd-rice', cuisine:'South Indian', source:'South Indian classic', name:'Curd rice (dahi rice)', emoji:'🍚', time:15,
-    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    tags:['toddler','vegetarian','high-protein','kid-friendly','quick'], rating:4,
     proteinVeg:{name:'Yoghurt / yoghurt naturel',cat:'Mejeri'}, proteinMeat:null,
     ingredients:[{name:'Cooked rice / ris',cat:'Pantry'},{name:'Cucumber & carrot / agurk & gulerod',cat:'Veggies'},{name:'Mustard seeds / sennepsfrø',cat:'Pantry'},{name:'Cashews (optional) / cashewnødder',cat:'Dry snacks'}],
     steps:['Mix cooled rice with plenty of yoghurt and a little salt.','Stir in grated cucumber and carrot.','Temper mustard seeds in a little oil and pour over.','Serve chilled — also a lovely next-day madpakke.'] },
@@ -1597,6 +1598,50 @@ const RECIPE_SEED = [
     proteinVeg:{name:'Firm tofu or soya mince / tofu',cat:'Køledisk'}, proteinMeat:{name:'Minced chicken (400g) / hakket kylling',cat:'Kød'},
     ingredients:[{name:'Jasmine rice / jasminris',cat:'Pantry'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Thai basil / thaibasilikum',cat:'Veggies'},{name:'Soy + oyster sauce / soja & østerssauce',cat:'Asian'},{name:'Green beans / grønne bønner',cat:'Veggies'}],
     steps:['Fry the garlic, then the minced chicken (or tofu) until browned.','Add the beans and the sauces; stir-fry 3 min.','Toss through a big handful of Thai basil.','Serve over jasmine rice (add a fried egg if you like).'] },
+
+  // ----- Toddler-friendly (2–3 yrs): easy to self-feed, soft or finger food, mild
+  //        (a little spice is fine), the things he loves — rice, curry, chicken,
+  //        nuggets, pasta. All chicken/veg/fish and <=30 min. -----
+  { seedKey:'chicken-nuggets', cuisine:'Family', source:'Family favourite', name:'Homemade chicken nuggets', emoji:'🍗', time:25,
+    tags:['toddler','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Halloumi or chickpea nuggets / halloumi',cat:'Mejeri'}, proteinMeat:{name:'Chicken breast (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Breadcrumbs / rasp',cat:'Baking'},{name:'Egg / æg',cat:'Mejeri'},{name:'Flour / mel',cat:'Baking'},{name:'Mild paprika / paprika',cat:'Pantry'},{name:'Potato wedges / kartofler',cat:'Veggies'}],
+    steps:['Cut chicken (or halloumi) into finger-size strips.','Coat in flour, then beaten egg, then breadcrumbs with a little paprika.','Bake 15–18 min at 220°C until golden, turning once.','Serve with soft potato wedges — easy to pick up.'] },
+  { seedKey:'khichdi', cuisine:'Indian', source:'Indian classic', name:'Moong dal khichdi (soft rice & lentils)', emoji:'🍚', time:25,
+    tags:['toddler','vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Moong dal / gule flækkede ærter',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Rice / ris',cat:'Pantry'},{name:'Carrot & peas / gulerod & ærter',cat:'Frozen stuff'},{name:'Turmeric & cumin / gurkemeje & spidskommen',cat:'Pantry'},{name:'Butter or ghee / smør',cat:'Mejeri'}],
+    steps:['Rinse rice and moong dal together.','Add diced carrot, peas, turmeric and a little cumin with plenty of water.','Simmer ~15 min until very soft and porridge-like.','Stir in a little butter/ghee; cool slightly before serving.'] },
+  { seedKey:'mac-cheese', cuisine:'American', source:'Family favourite', name:'Creamy mac and cheese', emoji:'🧀', time:20,
+    tags:['toddler','vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Cheddar cheese / ost',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Macaroni / makaroni',cat:'Pantry'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Butter & flour / smør & mel',cat:'Mejeri'},{name:'Sweetcorn or peas (optional) / majs',cat:'Pantry'}],
+    steps:['Cook the macaroni until soft.','Melt butter, stir in flour, then milk, then grated cheese for a smooth sauce.','Toss the pasta in the sauce (add corn/peas if you like).','Cool to warm — soft and easy to eat.'] },
+  { seedKey:'mild-korma', cuisine:'Indian', source:'Indian classic', name:'Mild creamy korma with rice', emoji:'🍛', time:25,
+    tags:['toddler','vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Paneer or chickpeas / paneer',cat:'Mejeri'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Coconut milk or cream / kokosmælk',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Mild curry powder / karry',cat:'Pantry'},{name:'Ground almonds (optional) / mandelmel',cat:'Baking'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Soften onion, stir in a little mild curry powder.','Add coconut milk/cream and simmer.','Add small pieces of chicken (or paneer/chickpeas); cook until tender.','Serve over soft rice — a tiny pinch of spice is fine.'] },
+  { seedKey:'mini-meatballs', cuisine:'Family', source:'Family favourite', name:'Soft mini chicken meatballs with pasta', emoji:'🍝', time:25,
+    tags:['toddler','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Meat-free mini balls / vegetarboller',cat:'Frozen stuff'}, proteinMeat:{name:'Minced chicken (400g) / hakket kylling',cat:'Kød'},
+    ingredients:[{name:'Small pasta / pasta',cat:'Pantry'},{name:'Passata / tomatsauce',cat:'Pantry'},{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Grated carrot / gulerod',cat:'Veggies'}],
+    steps:['Mix minced chicken with grated carrot; roll tiny soft meatballs.','Fry gently, then simmer in passata ~8 min until cooked through.','Cook small pasta until soft.','Toss together and top with cheese — bite-size and easy to pick up.'] },
+  { seedKey:'hidden-veg-pasta', cuisine:'Italian', source:'Family favourite', name:'Hidden-veg tomato pasta', emoji:'🍝', time:20,
+    tags:['toddler','vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Grated cheese / revet ost',cat:'Mejeri'}, proteinMeat:{name:'Chicken (300g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Small pasta / pasta',cat:'Pantry'},{name:'Passata / flåede tomater',cat:'Pantry'},{name:'Carrot & courgette / gulerod & squash',cat:'Veggies'},{name:'Onion & garlic / løg & hvidløg',cat:'Veggies'}],
+    steps:['Soften onion, garlic, grated carrot and courgette.','Add passata; simmer 8 min, then blend smooth (hidden veg).','Cook small pasta until soft.','Toss with the sauce and plenty of cheese.'] },
+  { seedKey:'egg-bites', cuisine:'Family', source:'Family favourite', name:'Cheesy egg & veg muffin bites', emoji:'🥚', time:25,
+    tags:['toddler','vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Eggs (5) / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Grated cheese / revet ost',cat:'Mejeri'},{name:'Sweetcorn & peas / majs & ærter',cat:'Frozen stuff'},{name:'Bell pepper (finely diced) / peberfrugt',cat:'Veggies'},{name:'Milk / mælk',cat:'Mejeri'}],
+    steps:['Whisk eggs with a splash of milk and the cheese.','Stir in finely chopped veg.','Pour into a greased muffin tin.','Bake ~15 min at 190°C until set — soft finger-food bites.'] },
+  { seedKey:'one-pot-chicken-rice', cuisine:'Family', source:'Family favourite', name:'One-pot mild chicken & rice', emoji:'🍚', time:30,
+    tags:['toddler','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Chickpeas / kikærter',cat:'Pantry'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Rice / ris',cat:'Pantry'},{name:'Carrot, peas & corn / gulerod',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Mild stock & turmeric / bouillon',cat:'Pantry'}],
+    steps:['Soften onion, add small chicken pieces (or chickpeas).','Stir in rice, veg, turmeric and stock.','Cover and simmer ~15 min until the rice is soft.','Rest 5 min — soft, mild and easy to spoon.'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1642,7 +1687,7 @@ async function loadRecipes() { allRecipes = (await fbGet('/recipes')) || {}; }
 async function loadMealPlan() { mealPlan = (await fbGet('/mealplan')) || null; }
 
 // ----- shared bits -----
-const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick' };
+const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick', toddler:'👶 toddler' };
 
 function starsHtml(value, interactive, id) {
   value = Math.round(value || 0);
@@ -1684,7 +1729,7 @@ function recipeMatchesFilter(r, f) {
   return r.cuisine === f;
 }
 function filterChipsHtml(active) {
-  const base = [['all','All'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  const base = [['all','All'],['toddler','👶 Toddler'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
   const cuisines = [...new Set(Object.values(allRecipes).map(r => r && r.cuisine).filter(Boolean))].sort();
   const all = base.concat(cuisines.map(c => [c, c]));
   return all.map(([k, l]) => '<button class="chip ' + (k === active ? 'active' : '') + '" data-f="' + escapeHtml(k) + '">' + escapeHtml(l) + '</button>').join('');
