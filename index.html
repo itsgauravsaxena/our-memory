@@ -409,6 +409,7 @@
       <label data-tag="kid-friendly"><input type="checkbox" value="kid-friendly"> 🧒 Kid-friendly</label>
       <label data-tag="toddler"><input type="checkbox" value="toddler"> 👶 Toddler</label>
       <label data-tag="weekend"><input type="checkbox" value="weekend"> 🍲 Weekend</label>
+      <label data-tag="breakfast"><input type="checkbox" value="breakfast"> 🍳 Breakfast</label>
       <label data-tag="quick"><input type="checkbox" value="quick"> ⚡ Quick</label>
     </div>
     <div class="field-label">Veg protein</div>
@@ -481,7 +482,8 @@ let activeGroupByList = {}; // remembers which sub-list tab is open per list, su
 let lastRenderedListId = null; // tracks whether the last renderListView() call was for this same list
 let searchQuery = ''; // current in-list search text; filters items across every group
 let allRecipes = {};  // recipe database, keyed by recipe id
-let mealPlan = null;  // the current 5-day dinner plan
+let mealPlan = null;  // the current 7-day dinner plan
+let breakfastPlan = null; // the current 7-day breakfast plan
 let allMadpakker = {}; // madpakke (lunchbox) idea database
 let madpakkePlan = null; // the current 5-day madpakke plan
 let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe | madpakke | madpakke-detail
@@ -662,6 +664,9 @@ function renderDashboard() {
 
   const plannedCount = mealPlan && mealPlan.days ? Object.keys(mealPlan.days).length : 0;
   const navHtml =
+    '<div class="nav-card" onclick="location.hash=\'breakfast\'">' +
+      '<div class="emoji">🍳</div><div class="info"><h3>Breakfast plan</h3>' +
+      '<div class="count">Quick weekdays · special weekends</div></div></div>' +
     '<div class="nav-card" onclick="location.hash=\'mealplan\'">' +
       '<div class="emoji">🍽️</div><div class="info"><h3>Weekly dinner plan</h3>' +
       '<div class="count">' + (plannedCount ? plannedCount + ' dinners planned' : 'Plan 5 days of dinners') + '</div></div></div>' +
@@ -1677,6 +1682,61 @@ const RECIPE_SEED = [
     proteinVeg:{name:'Chickpeas or paneer / kikærter',cat:'Pantry'}, proteinMeat:{name:'White fish, salmon or chicken (500g) / fisk el. kylling',cat:'Køledisk'},
     ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Curry leaves & mustard seeds / karryblade & sennepsfrø',cat:'Pantry'},{name:'Tamarind or lime / lime',cat:'Fruits'},{name:'Basmati rice / ris',cat:'Pantry'}],
     steps:['Temper mustard seeds and curry leaves; soften the onion.','Add tomatoes and spices, then the coconut milk; simmer 10 min.','Slip in the fish (or chickpeas) and simmer gently ~8 min.','Finish with tamarind or lime; serve with rice.'] },
+
+  // ===== BREAKFASTS =====
+  // Weekday: quick, mostly no-cook / assemble. All vegetarian.
+  { seedKey:'overnight-oats', cuisine:'Breakfast', source:'Family favourite', name:'Overnight soaked oats', emoji:'🥣', time:5,
+    tags:['breakfast','vegetarian','high-protein','kid-friendly','toddler','quick'], rating:5,
+    proteinVeg:{name:'Rolled oats / havregryn',cat:'Cereals'}, proteinMeat:null,
+    ingredients:[{name:'Milk or yoghurt / mælk el. yoghurt',cat:'Mejeri'},{name:'Banana or berries / banan el. bær',cat:'Fruits'},{name:'Peanut butter or honey / peanutbutter',cat:'Pantry'},{name:'Chia seeds (optional) / chiafrø',cat:'Pantry'}],
+    steps:['The night before, stir oats with milk/yoghurt (and chia).','Refrigerate overnight.','In the morning, top with banana or berries.','Add a drizzle of peanut butter or honey.'] },
+  { seedKey:'chia-pudding', cuisine:'Breakfast', source:'Family favourite', name:'Chia grød (chia pudding)', emoji:'🍮', time:5,
+    tags:['breakfast','vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Chia seeds / chiafrø',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Milk / mælk',cat:'Mejeri'},{name:'Berries or mango / bær el. mango',cat:'Fruits'},{name:'Honey or maple / honning',cat:'Pantry'}],
+    steps:['Stir chia into milk (about 1:4) the night before.','Refrigerate overnight until set.','Top with fruit in the morning.','Sweeten lightly with honey.'] },
+  { seedKey:'nutella-toast', cuisine:'Breakfast', source:'Family favourite', name:'Toast with Nutella or cheese', emoji:'🍞', time:5,
+    tags:['breakfast','vegetarian','kid-friendly','toddler','quick'], rating:4,
+    proteinVeg:{name:'Cheese / ost',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Bread / brød',cat:'Bread'},{name:'Nutella / Nutella',cat:'Slik & kaffe'},{name:'Cucumber (with cheese) / agurk',cat:'Veggies'}],
+    steps:['Toast the bread.','Spread with Nutella, or top with cheese.','Add cucumber slices on the cheese version.','Cut into fingers for little hands.'] },
+  { seedKey:'yoghurt-muesli', cuisine:'Breakfast', source:'Family favourite', name:'Yoghurt with muesli & fruit', emoji:'🥣', time:5,
+    tags:['breakfast','vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Yoghurt or skyr / yoghurt',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Muesli / mysli',cat:'Cereals'},{name:'Fresh fruit / frugt',cat:'Fruits'},{name:'Honey (optional) / honning',cat:'Pantry'}],
+    steps:['Spoon yoghurt or skyr into a bowl.','Top with muesli and chopped fruit.','Drizzle with a little honey.','Done in a minute.'] },
+  { seedKey:'eggs-rugbrod', cuisine:'Breakfast', source:'Family favourite', name:'Boiled eggs & rugbrød', emoji:'🥚', time:10,
+    tags:['breakfast','vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Rye bread / rugbrød',cat:'Bread'},{name:'Cheese / ost',cat:'Mejeri'},{name:'Cucumber & tomato / agurk & tomat',cat:'Veggies'}],
+    steps:['Boil the eggs to your liking (6–8 min).','Butter the rye bread and add cheese.','Serve with sliced egg, cucumber and tomato.'] },
+  { seedKey:'berry-smoothie', cuisine:'Breakfast', source:'Family favourite', name:'Banana & berry smoothie', emoji:'🥤', time:5,
+    tags:['breakfast','vegetarian','kid-friendly','toddler','quick'], rating:5,
+    proteinVeg:{name:'Yoghurt or milk / yoghurt',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Banana / banan',cat:'Fruits'},{name:'Frozen berries / frosne bær',cat:'Frozen stuff'},{name:'Oats / havregryn',cat:'Cereals'},{name:'Peanut butter (optional) / peanutbutter',cat:'Pantry'}],
+    steps:['Add yoghurt/milk, banana, berries and oats to a blender.','Add a spoon of peanut butter if you like.','Blend until smooth.','Pour and serve (great in a straw cup for the little one).'] },
+
+  // Weekend: something special, worth the extra time. All vegetarian.
+  { seedKey:'homemade-boller', cuisine:'Breakfast', source:'Family favourite', name:'Homemade breakfast buns (boller)', emoji:'🥖', time:40,
+    tags:['breakfast','weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Egg (in the dough) / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Flour / hvedemel',cat:'Baking'},{name:'Yeast / gær',cat:'Baking'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Butter / smør',cat:'Mejeri'},{name:'Jam & cheese to serve / marmelade',cat:'Slik & kaffe'}],
+    steps:['Warm milk, dissolve yeast, then mix in flour, egg and soft butter.','Knead to a smooth dough and let rise ~1 hr (start early / the night before).','Shape into buns and bake 12–15 min at 220°C.','Serve warm with butter, cheese and jam.'] },
+  { seedKey:'fluffy-pancakes', cuisine:'Breakfast', source:'Family favourite', name:'Fluffy pancakes', emoji:'🥞', time:25,
+    tags:['breakfast','weekend','vegetarian','kid-friendly','toddler'], rating:5,
+    proteinVeg:{name:'Eggs / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Flour / hvedemel',cat:'Baking'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Baking powder / bagepulver',cat:'Baking'},{name:'Berries or syrup / bær el. sirup',cat:'Fruits'}],
+    steps:['Whisk flour, baking powder, eggs and milk into a thick batter.','Cook small pancakes on a buttered pan until bubbly, then flip.','Stack and top with berries or a little syrup.','Soft strips are easy for the toddler to hold.'] },
+  { seedKey:'weekend-omelette', cuisine:'Breakfast', source:'Family favourite', name:'Weekend omelette with cheese & veg', emoji:'🍳', time:15,
+    tags:['breakfast','weekend','vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Eggs / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Cheese / ost',cat:'Mejeri'},{name:'Bell pepper, tomato, spinach / peberfrugt',cat:'Veggies'},{name:'Bread to serve / brød',cat:'Bread'}],
+    steps:['Whisk the eggs with a splash of milk.','Soften chopped veg in a pan, pour in the eggs.','Add cheese, fold when just set.','Serve with bread.'] },
+  { seedKey:'french-toast', cuisine:'Breakfast', source:'Family favourite', name:'French toast (arme riddere)', emoji:'🍞', time:20,
+    tags:['breakfast','weekend','vegetarian','kid-friendly','toddler'], rating:5,
+    proteinVeg:{name:'Eggs / æg',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Bread / brød',cat:'Bread'},{name:'Milk / mælk',cat:'Mejeri'},{name:'Cinnamon & sugar / kanel & sukker',cat:'Pantry'},{name:'Berries / bær',cat:'Fruits'}],
+    steps:['Whisk eggs with milk and a little cinnamon.','Dip bread slices and fry in butter until golden both sides.','Dust with cinnamon sugar.','Serve with berries.'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1724,7 +1784,7 @@ async function loadRecipes() { allRecipes = (await fbGet('/recipes')) || {}; }
 async function loadMealPlan() { mealPlan = (await fbGet('/mealplan')) || null; }
 
 // ----- shared bits -----
-const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick', toddler:'👶 toddler', weekend:'🍲 weekend' };
+const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick', toddler:'👶 toddler', weekend:'🍲 weekend', breakfast:'🍳 breakfast' };
 const WEEKEND_DAYS = ['sat', 'sun']; // dinner days that allow longer, special dishes
 
 function starsHtml(value, interactive, id) {
@@ -1767,7 +1827,7 @@ function recipeMatchesFilter(r, f) {
   return r.cuisine === f;
 }
 function filterChipsHtml(active) {
-  const base = [['all','All'],['toddler','👶 Toddler'],['weekend','🍲 Weekend'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  const base = [['all','All'],['breakfast','🍳 Breakfast'],['toddler','👶 Toddler'],['weekend','🍲 Weekend'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
   const cuisines = [...new Set(Object.values(allRecipes).map(r => r && r.cuisine).filter(Boolean))].sort();
   const all = base.concat(cuisines.map(c => [c, c]));
   return all.map(([k, l]) => '<button class="chip ' + (k === active ? 'active' : '') + '" data-f="' + escapeHtml(k) + '">' + escapeHtml(l) + '</button>').join('');
@@ -1861,7 +1921,7 @@ function renderMealPlan() {
       '<button id="plan-grocery-btn">🛒 Add all ingredients to grocery list</button>' +
     '</div>';
 
-  content.querySelectorAll('[data-pick-day]').forEach(b => b.addEventListener('click', () => openRecipePicker(id => assignRecipeToDay(b.dataset.pickDay, id))));
+  content.querySelectorAll('[data-pick-day]').forEach(b => b.addEventListener('click', () => openRecipePicker(id => assignRecipeToDay(b.dataset.pickDay, id), r => !(r.tags || []).includes('breakfast'))));
   content.querySelectorAll('[data-open-recipe]').forEach(b => b.addEventListener('click', () => { location.hash = 'recipe-' + b.dataset.openRecipe; }));
   content.querySelectorAll('[data-clear-day]').forEach(b => b.addEventListener('click', () => clearPlanDay(b.dataset.clearDay)));
   content.querySelectorAll('.protein-toggle').forEach(t => t.querySelectorAll('button').forEach(btn =>
@@ -1907,7 +1967,7 @@ async function setDayProtein(dayKey, protein) {
 async function suggestFreshWeek() {
   // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
-  const all = Object.entries(allRecipes);
+  const all = Object.entries(allRecipes).filter(([id, r]) => !(r.tags || []).includes('breakfast')); // dinners only
   const quick = all.filter(([id, r]) => (r.time || 0) <= 30);        // weekday pool (quick)
   const vegQuick = quick.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
   const festiveQuick = quick.filter(([id, r]) => isFestive(r));
@@ -2028,16 +2088,16 @@ async function deleteRecipe(id) {
 }
 
 // ----- Recipe picker (for planning) -----
-let pickerOnPick = null, pickerFilter = 'all';
-function openRecipePicker(onPick) {
-  pickerOnPick = onPick; pickerFilter = 'all';
+let pickerOnPick = null, pickerFilter = 'all', pickerBaseFilter = null;
+function openRecipePicker(onPick, baseFilter) {
+  pickerOnPick = onPick; pickerFilter = 'all'; pickerBaseFilter = baseFilter || null;
   renderPickerList();
   document.getElementById('recipe-picker-modal').classList.remove('hidden');
 }
-function closeRecipePicker() { document.getElementById('recipe-picker-modal').classList.add('hidden'); pickerOnPick = null; }
+function closeRecipePicker() { document.getElementById('recipe-picker-modal').classList.add('hidden'); pickerOnPick = null; pickerBaseFilter = null; }
 function renderPickerList() {
   document.getElementById('picker-filters').innerHTML = filterChipsHtml(pickerFilter);
-  let list = Object.entries(allRecipes).filter(([id, r]) => recipeMatchesFilter(r, pickerFilter));
+  let list = Object.entries(allRecipes).filter(([id, r]) => (!pickerBaseFilter || pickerBaseFilter(r)) && recipeMatchesFilter(r, pickerFilter));
   list.sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   document.getElementById('picker-list').innerHTML = list.length ? list.map(([id, r]) =>
     '<div class="recipe-card" data-pick="' + id + '">' +
@@ -2564,12 +2624,116 @@ async function saveMadpakke() {
   if (currentView === 'madpakke-detail') renderMadpakkeDetail(id);
 }
 
+// ========== Breakfast plan ==========
+async function seedBreakfastPlanIfMissing() {
+  if (await fbGet('/breakfastplan')) return;
+  const recipes = (await fbGet('/recipes')) || {};
+  const idByName = {};
+  Object.entries(recipes).forEach(([id, r]) => { if (r) idByName[r.name] = id; });
+  const starters = ['Overnight soaked oats','Boiled eggs & rugbrød','Chia grød (chia pudding)','Yoghurt with muesli & fruit','Toast with Nutella or cheese','Homemade breakfast buns (boller)','Fluffy pancakes'];
+  const days = {};
+  PLAN_DAYS.forEach(([key], i) => { const id = idByName[starters[i]]; if (id) days[key] = { recipeId: id }; });
+  await fbPut('/breakfastplan', { days });
+}
+async function loadBreakfastPlan() { breakfastPlan = (await fbGet('/breakfastplan')) || null; }
+async function saveBreakfastPlan() { await fbPut('/breakfastplan', breakfastPlan); }
+
+function renderBreakfast() {
+  currentView = 'breakfast';
+  setSubViewHeader('🍳 Breakfast');
+  showFab(null);
+  const content = document.getElementById('content');
+  const plan = breakfastPlan || { days: {} };
+  const days = plan.days || {};
+
+  const dayCards = PLAN_DAYS.map(([key, label]) => {
+    const badge = WEEKEND_DAYS.includes(key) ? ' <span class="festive-badge">🍲 weekend</span>' : '';
+    const slot = days[key];
+    const r = slot && allRecipes[slot.recipeId];
+    if (!r) {
+      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + badge + '</div>' +
+        '<button class="pick-btn" data-pick-day="' + key + '">＋ Pick breakfast</button></div>';
+    }
+    return '<div class="day-card">' +
+      '<div class="day-name">' + label + badge + '</div>' +
+      '<div class="day-row">' +
+        '<div class="r-emoji">' + (r.emoji || '🍳') + '</div>' +
+        '<div class="r-info" data-open-recipe="' + slot.recipeId + '">' +
+          '<h3>' + escapeHtml(r.name) + '</h3>' +
+          '<div class="recipe-meta">⏱ ' + (r.time || '?') + ' min · ' + starsHtml(r.rating, false) + '</div>' +
+        '</div>' +
+        '<button class="icon-mini" data-clear-day="' + key + '" title="Remove">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  content.innerHTML =
+    '<div class="section-hint">Quick breakfasts on weekdays (soaked oats, chia grød, toast), something special at weekends (buns, pancakes, omelette).</div>' +
+    dayCards +
+    '<div class="plan-actions">' +
+      '<button class="secondary" id="bf-fill-btn">✨ Suggest a week</button>' +
+      '<button id="bf-grocery-btn">🛒 Add the week to grocery list</button>' +
+    '</div>';
+
+  content.querySelectorAll('[data-pick-day]').forEach(b => b.addEventListener('click', () => openRecipePicker(id => assignBreakfastToDay(b.dataset.pickDay, id), r => (r.tags || []).includes('breakfast'))));
+  content.querySelectorAll('[data-open-recipe]').forEach(b => b.addEventListener('click', () => { location.hash = 'recipe-' + b.dataset.openRecipe; }));
+  content.querySelectorAll('[data-clear-day]').forEach(b => b.addEventListener('click', () => clearBreakfastDay(b.dataset.clearDay)));
+  document.getElementById('bf-fill-btn').addEventListener('click', suggestBreakfastWeek);
+  document.getElementById('bf-grocery-btn').addEventListener('click', () => {
+    const all = [];
+    PLAN_DAYS.forEach(([key]) => { const slot = days[key]; const r = slot && allRecipes[slot.recipeId]; if (r) recipeIngredients(r, 'veg').forEach(i => all.push(i)); });
+    if (!all.length) { showStatus('Plan is empty', true); return; }
+    openGroceryTarget(all, 'the breakfast week');
+  });
+}
+
+async function assignBreakfastToDay(dayKey, recipeId) {
+  if (!breakfastPlan) breakfastPlan = { days: {} };
+  if (!breakfastPlan.days) breakfastPlan.days = {};
+  breakfastPlan.days[dayKey] = { recipeId };
+  closeRecipePicker();
+  renderBreakfast();
+  showStatus('Saving…');
+  await saveBreakfastPlan();
+  showStatus('✓ Added', true);
+}
+async function clearBreakfastDay(dayKey) {
+  if (!breakfastPlan || !breakfastPlan.days) return;
+  delete breakfastPlan.days[dayKey];
+  renderBreakfast();
+  await saveBreakfastPlan();
+  showStatus('✓ Removed', true);
+}
+async function suggestBreakfastWeek() {
+  const bf = Object.entries(allRecipes).filter(([id, r]) => (r.tags || []).includes('breakfast'));
+  const bfWeekend = bf.filter(([id, r]) => (r.tags || []).includes('weekend'));
+  const bfWeekday = bf.filter(([id, r]) => !(r.tags || []).includes('weekend'));
+  if (bf.length < 3) { showStatus('Add more breakfasts first', true); return; }
+  breakfastPlan = breakfastPlan || { days: {} };
+  breakfastPlan.days = {};
+  const used = new Set();
+  const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(pool)[0] || bf[0];
+  PLAN_DAYS.forEach(([key]) => {
+    const pool = WEEKEND_DAYS.includes(key) ? (bfWeekend.length ? bfWeekend : bf) : (bfWeekday.length ? bfWeekday : bf);
+    const pick = pickFrom(pool);
+    used.add(pick[0]);
+    breakfastPlan.days[key] = { recipeId: pick[0] };
+  });
+  renderBreakfast();
+  showStatus('Saving…');
+  await saveBreakfastPlan();
+  showStatus('✓ Week planned', true);
+}
+
 // ---------- Routing ----------
 function handleRoute() {
   const hash = location.hash.replace('#', '');
   if (hash.startsWith('list-')) {
     currentListId = hash.replace('list-', '');
     if (allLists[currentListId]) renderListView(); else renderDashboard();
+  } else if (hash === 'breakfast') {
+    currentListId = null;
+    renderBreakfast();
   } else if (hash === 'mealplan') {
     currentListId = null;
     renderMealPlan();
@@ -2604,11 +2768,13 @@ async function init() {
   await seedMealPlanIfMissing();
   await seedMadpakker();
   await seedMadpakkePlanIfMissing();
+  await seedBreakfastPlanIfMissing();
   await loadAllLists();
   await loadRecipes();
   await loadMealPlan();
   await loadMadpakker();
   await loadMadpakkePlan();
+  await loadBreakfastPlan();
   handleRoute();
 
   window.addEventListener('hashchange', handleRoute);
@@ -2684,9 +2850,10 @@ async function init() {
     const modalOpen = document.querySelector('.modal-overlay:not(.hidden)');
     if (isTyping || modalOpen) return; // don't touch the DOM while composing or with a modal open
     allLists = (await fbGet('/lists')) || {};
-    if (currentView === 'mealplan' || currentView === 'recipes' || currentView === 'recipe') {
+    if (currentView === 'mealplan' || currentView === 'recipes' || currentView === 'recipe' || currentView === 'breakfast') {
       allRecipes = (await fbGet('/recipes')) || {};
       mealPlan = (await fbGet('/mealplan')) || null;
+      breakfastPlan = (await fbGet('/breakfastplan')) || null;
     }
     if (currentView === 'madpakke' || currentView === 'madpakke-detail') {
       allMadpakker = (await fbGet('/madpakker')) || {};
