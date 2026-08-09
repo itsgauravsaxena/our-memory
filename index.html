@@ -1683,6 +1683,48 @@ const RECIPE_SEED = [
     ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Curry leaves & mustard seeds / karryblade & sennepsfrø',cat:'Pantry'},{name:'Tamarind or lime / lime',cat:'Fruits'},{name:'Basmati rice / ris',cat:'Pantry'}],
     steps:['Temper mustard seeds and curry leaves; soften the onion.','Add tomatoes and spices, then the coconut milk; simmer 10 min.','Slip in the fish (or chickpeas) and simmer gently ~8 min.','Finish with tamarind or lime; serve with rice.'] },
 
+  // ----- Weekend Indian street food & chaat (vegetarian; a fun weekend spread) -----
+  { seedKey:'aloo-paratha', cuisine:'Indian', source:'Indian classic', name:'Aloo paratha (stuffed flatbread)', emoji:'🫓', time:40,
+    tags:['weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Potatoes / kartofler',cat:'Veggies'}, proteinMeat:null,
+    ingredients:[{name:'Wheat flour (atta) / fuldkornshvedemel',cat:'Baking'},{name:'Onion & coriander / løg & koriander',cat:'Veggies'},{name:'Cumin & mild chilli / spidskommen',cat:'Pantry'},{name:'Yoghurt & pickle to serve / yoghurt',cat:'Mejeri'},{name:'Butter or ghee / smør',cat:'Mejeri'}],
+    steps:['Make a soft dough with atta and water; rest 15 min.','Mash boiled potatoes with onion, coriander and spices.','Stuff the dough with the potato and roll gently.','Fry on a hot pan with a little ghee until golden; serve with yoghurt and pickle.'] },
+  { seedKey:'gatte-ki-sabji', cuisine:'Indian', source:'Indian classic', name:'Gatte ki sabji', emoji:'🍛', time:40,
+    tags:['weekend','vegetarian','high-protein'], rating:4,
+    proteinVeg:{name:'Gram flour (besan) / besan',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Yoghurt / yoghurt',cat:'Mejeri'},{name:'Onion / løg',cat:'Veggies'},{name:'Turmeric, coriander, chilli / gurkemeje',cat:'Pantry'},{name:'Basmati rice or roti / ris',cat:'Pantry'}],
+    steps:['Knead besan with spices and a little oil; roll into logs, boil, then slice into gatte.','Whisk yoghurt with turmeric and chilli.','Temper spices, add the yoghurt gravy and simmer.','Add the gatte and simmer 5 min; serve with rice or roti.'] },
+  { seedKey:'pani-puri', cuisine:'Indian', source:'Indian classic', name:'Pani puri (golgappa)', emoji:'🥟', time:30,
+    tags:['weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Chickpeas & potato / kikærter & kartofler',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Ready puri shells / puri',cat:'Pantry'},{name:'Mint, coriander & tamarind (pani) / mynte',cat:'Veggies'},{name:'Cumin & chaat masala / chaat masala',cat:'Pantry'},{name:'Onion (optional) / løg',cat:'Veggies'}],
+    steps:['Boil and dice potato; mix with chickpeas and a little chaat masala.','Blend mint, coriander, tamarind, cumin and water into a spicy-tangy pani.','Crack each puri and add the filling.','Dip in the pani and eat straight away — fun at the table.'] },
+  { seedKey:'aloo-tikki', cuisine:'Indian', source:'Indian classic', name:'Aloo tikki chaat', emoji:'🥔', time:30,
+    tags:['weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Potatoes & peas / kartofler & ærter',cat:'Veggies'}, proteinMeat:null,
+    ingredients:[{name:'Breadcrumbs or semolina / rasp',cat:'Baking'},{name:'Cumin & chaat masala / chaat masala',cat:'Pantry'},{name:'Yoghurt & tamarind chutney / yoghurt',cat:'Mejeri'},{name:'Chickpeas (for chole topping) / kikærter',cat:'Pantry'}],
+    steps:['Mash boiled potato with peas, spices and a little breadcrumb.','Shape into patties and shallow-fry until crisp.','Top with yoghurt, tamarind chutney and chaat masala (add chole for tikki chole).','Serve hot.'] },
+  { seedKey:'pav-bhaji', cuisine:'Indian', source:'Indian classic', name:'Pav bhaji', emoji:'🍞', time:40,
+    tags:['weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Mixed veg & potato / grøntsager & kartofler',cat:'Veggies'}, proteinMeat:null,
+    ingredients:[{name:'Soft rolls (pav) / pav el. boller',cat:'Bread'},{name:'Chopped tomatoes / flåede tomater',cat:'Pantry'},{name:'Peas, capsicum, cauliflower / ærter',cat:'Frozen stuff'},{name:'Pav bhaji masala & butter / pav bhaji masala',cat:'Pantry'},{name:'Onion & lemon / løg & citron',cat:'Veggies'}],
+    steps:['Boil and mash potato with mixed veg and peas.','Cook tomatoes with pav bhaji masala and butter, then add the mashed veg.','Simmer to a rich bhaji.','Toast the pav in butter; serve with chopped onion and lemon.'] },
+  { seedKey:'vada-pav', cuisine:'Indian', source:'Indian classic', name:'Vada pav', emoji:'🍔', time:35,
+    tags:['weekend','vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Potatoes / kartofler',cat:'Veggies'}, proteinMeat:null,
+    ingredients:[{name:'Soft buns (pav) / boller',cat:'Bread'},{name:'Gram flour (besan) batter / besan',cat:'Pantry'},{name:'Garlic chutney / hvidløgschutney',cat:'Pantry'},{name:'Mustard seeds & turmeric / sennepsfrø',cat:'Pantry'}],
+    steps:['Mash boiled potato with tempered mustard seeds, garlic and turmeric; shape into balls.','Dip in a besan batter and fry until golden (vada).','Spread garlic chutney inside the buns.','Pop a vada in each bun — Mumbai style.'] },
+  { seedKey:'dhokla', cuisine:'Indian', source:'Indian classic', name:'Dhokla (steamed savoury cake)', emoji:'🟡', time:30,
+    tags:['weekend','vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Gram flour (besan) / besan',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Yoghurt / yoghurt',cat:'Mejeri'},{name:'Eno or baking soda / bagepulver',cat:'Baking'},{name:'Mustard seeds & curry leaves / sennepsfrø',cat:'Pantry'},{name:'Green chutney to serve / chutney',cat:'Pantry'}],
+    steps:['Whisk besan with yoghurt and water; stir in eno and pour into a tin.','Steam ~12 min until spongy; cool and cut into squares.','Temper mustard seeds and curry leaves and pour over.','Serve with green chutney.'] },
+  { seedKey:'bhel-puri', cuisine:'Indian', source:'Indian classic', name:'Bhel puri (puffed rice chaat)', emoji:'🥗', time:15,
+    tags:['weekend','vegetarian','kid-friendly'], rating:4,
+    proteinVeg:{name:'Puffed rice & sev / puffet ris & sev',cat:'Dry snacks'}, proteinMeat:null,
+    ingredients:[{name:'Onion, tomato & boiled potato / løg & tomat',cat:'Veggies'},{name:'Tamarind & mint chutney / tamarind',cat:'Pantry'},{name:'Chaat masala / chaat masala',cat:'Pantry'},{name:'Coriander / koriander',cat:'Veggies'}],
+    steps:['Mix puffed rice and sev with chopped onion, tomato and boiled potato.','Add tamarind and mint chutneys and chaat masala.','Toss quickly so it stays crunchy.','Top with coriander and eat immediately.'] },
+
   // ===== BREAKFASTS =====
   // Weekday: quick, mostly no-cook / assemble. All vegetarian.
   { seedKey:'overnight-oats', cuisine:'Breakfast', source:'Family favourite', name:'Overnight soaked oats', emoji:'🥣', time:5,
@@ -1812,6 +1854,7 @@ const SPECIALTY_ITEMS = [
   { kw:['rice paper','rispapir'], store:'Asian store' },
   { kw:['thai basil','thaibasilik'], store:'Asian store' },
   { kw:['hoisin'], store:'Asian store' },
+  { kw:['chaat masala','pav bhaji masala','sev','puri','golgappa','atta'], store:'Indian/Asian store' },
 ];
 function recipeStoreHint(r) {
   const blob = JSON.stringify([r.proteinVeg, r.proteinMeat, r.ingredients || []]).toLowerCase();
@@ -1968,7 +2011,7 @@ async function suggestFreshWeek() {
   // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   const all = Object.entries(allRecipes).filter(([id, r]) => !(r.tags || []).includes('breakfast')); // dinners only
-  const quick = all.filter(([id, r]) => (r.time || 0) <= 30);        // weekday pool (quick)
+  const quick = all.filter(([id, r]) => (r.time || 0) <= 30 && !(r.tags || []).includes('weekend')); // weekday pool: quick, non-weekend
   const vegQuick = quick.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
   const festiveQuick = quick.filter(([id, r]) => isFestive(r));
   const weekendList = all.filter(([id, r]) => (r.tags || []).includes('weekend')); // longer, special
