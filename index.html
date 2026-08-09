@@ -975,9 +975,13 @@ async function toggleItem(itemId, stage, value) {
 }
 
 async function deleteItem(itemId) {
-  if (!confirm('Delete this item?')) return;
-  const removed = allLists[currentListId].items[itemId];
-  delete allLists[currentListId].items[itemId];
+  const list = allLists[currentListId];
+  if (!list) return;
+  // Grocery/shopping (simple) lists delete straight away — no "are you sure?".
+  // Travel lists keep the confirm so items aren't lost by accident mid-trip.
+  if (list.type === 'travel' && !confirm('Delete this item?')) return;
+  const removed = list.items[itemId];
+  delete list.items[itemId];
   renderListView();
   await fbDelete('/lists/' + currentListId + '/items/' + itemId);
   showStatus('✓ Deleted', true);
