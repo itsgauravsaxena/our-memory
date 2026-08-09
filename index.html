@@ -491,7 +491,8 @@ const FESTIVE_DAY = 'fri';   // Friday dinner is always a fun/festive one (freda
 const FESTIVE_RECIPES = new Set(['tacos','pizza','burgers','black-bean-quesadilla','bao','banh-mi','pad-thai','summer-rolls','gyoza','butter-chicken-chana','kokoskarry-fad','tikka-wraps','veg-pulao','pad-krapow','thai-curry']);
 function isFestive(r) { return !!(r && (r.festive || (r.seedKey && FESTIVE_RECIPES.has(r.seedKey)))); }
 const GROCERY_CATS = ['Bread','Fruits','Veggies','Køledisk','Frozen stuff','Kød','Asian','Pantry','Baking','Mejeri','Dry snacks','Husholdning','Slik & kaffe','Cereals','Other'];
-const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday']];
+const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday'],['sat','Saturday'],['sun','Sunday']]; // dinner plan: full week
+const MADPAKKE_DAYS = PLAN_DAYS.slice(0, 5); // madpakke: school days only (Mon–Fri)
 
 function showStatus(msg, ok) {
   statusEl.textContent = msg;
@@ -1670,10 +1671,12 @@ async function seedMealPlanIfMissing() {
   Object.entries(recipes).forEach(([id, r]) => { if (r) idByName[r.name] = id; });
   const starters = [
     'Chickpea & spinach coconut curry',
-    'Build-your-own tacos',
     'Red lentil dal (dal tarka)',
-    'Plant-based or chicken burgers',
+    'Butter chicken / chana masala',
     'Thai red/green curry',
+    'Build-your-own tacos',
+    'Quick veggie / chicken pizza',
+    'One-pot mild chicken & rice',
   ];
   const days = {};
   PLAN_DAYS.forEach(([key], i) => {
@@ -2278,7 +2281,7 @@ async function seedMadpakkePlanIfMissing() {
   Object.entries(all).forEach(([id, m]) => { if (m) idByName[m.name] = id; });
   const starters = ['Focaccia & frikadelle box','Rugbrød open-sandwich box','Pizzasnegle box','Chicken & hummus wrap box','Pølsehorn box'];
   const days = {};
-  PLAN_DAYS.forEach(([key], i) => { const id = idByName[starters[i]]; if (id) days[key] = { madpakkeId: id, packed: false }; });
+  MADPAKKE_DAYS.forEach(([key], i) => { const id = idByName[starters[i]]; if (id) days[key] = { madpakkeId: id, packed: false }; });
   await fbPut('/madpakkeplan', { days });
 }
 async function loadMadpakker() { allMadpakker = (await fbGet('/madpakker')) || {}; }
@@ -2300,7 +2303,7 @@ function renderMadpakke() {
   const plan = madpakkePlan || { days: {} };
   const days = plan.days || {};
 
-  const dayCards = PLAN_DAYS.map(([key, label]) => {
+  const dayCards = MADPAKKE_DAYS.map(([key, label]) => {
     const badge = key === MEAT_FREE_DAY ? ' <span class="meat-free-badge">🌱 meat-free</span>' : '';
     const slot = days[key];
     const m = slot && allMadpakker[slot.madpakkeId];
@@ -2348,7 +2351,7 @@ function renderMadpakke() {
   document.getElementById('mp-fill-btn').addEventListener('click', suggestMadpakkeWeek);
   document.getElementById('mp-grocery-btn').addEventListener('click', () => {
     const all = [];
-    PLAN_DAYS.forEach(([key]) => { const slot = days[key]; const m = slot && allMadpakker[slot.madpakkeId]; if (m) madpakkeItems(m).forEach(i => all.push(i)); });
+    MADPAKKE_DAYS.forEach(([key]) => { const slot = days[key]; const m = slot && allMadpakker[slot.madpakkeId]; if (m) madpakkeItems(m).forEach(i => all.push(i)); });
     if (!all.length) { showStatus('Plan is empty', true); return; }
     openGroceryTarget(all, 'the madpakke week');
   });
@@ -2381,7 +2384,7 @@ async function suggestMadpakkeWeek() {
   madpakkePlan.days = {};
   const used = new Set();
   const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(all).find(e => !used.has(e[0])) || all[0];
-  PLAN_DAYS.forEach(([key]) => {
+  MADPAKKE_DAYS.forEach(([key]) => {
     const pick = (key === MEAT_FREE_DAY && vegBoxes.length) ? pickFrom(vegBoxes) : pickFrom(all);
     used.add(pick[0]);
     madpakkePlan.days[key] = { madpakkeId: pick[0], packed: false };
@@ -2468,7 +2471,7 @@ let mpAssignPending = null;
 function openMadpakkeAssignDay(id) {
   mpAssignPending = id;
   const days = (madpakkePlan && madpakkePlan.days) || {};
-  document.getElementById('mp-assign-options').innerHTML = PLAN_DAYS.map(([key, label]) => {
+  document.getElementById('mp-assign-options').innerHTML = MADPAKKE_DAYS.map(([key, label]) => {
     const slot = days[key]; const cur = slot && allMadpakker[slot.madpakkeId];
     return '<button class="move-list-option" data-day="' + key + '"><span>📅</span><span>' + label +
       (cur ? ' — <span style="color:#888;">' + escapeHtml(cur.name) + '</span>' : '') + '</span></button>';
