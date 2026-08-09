@@ -238,6 +238,7 @@
 
   .day-card { background:white; border-radius:12px; padding:12px 14px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
   .day-card .day-name { font-size:11.5px; font-weight:700; color:#2c6e49; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; }
+  .meat-free-badge { display:inline-block; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:1px 7px; font-size:10px; letter-spacing:0; text-transform:none; font-weight:600; margin-left:6px; }
   .day-card.empty { display:flex; align-items:center; justify-content:space-between; }
   .day-row { display:flex; align-items:center; gap:12px; }
   .day-row .r-emoji { font-size:24px; flex-shrink:0; }
@@ -481,6 +482,7 @@ let allMadpakker = {}; // madpakke (lunchbox) idea database
 let madpakkePlan = null; // the current 5-day madpakke plan
 let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe | madpakke | madpakke-detail
 const MADPAKKE_PARTS = [['main','🍱 Main'],['snack','🥨 Snack'],['evening','🌙 Evening snack'],['gront','🥕 Grønt']];
+const MEAT_FREE_DAY = 'tue'; // Tuesday is a vegetarian day for both plans
 const GROCERY_CATS = ['Bread','Fruits','Veggies','Køledisk','Frozen stuff','Kød','Asian','Pantry','Baking','Mejeri','Dry snacks','Husholdning','Slik & kaffe','Cereals','Other'];
 const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday']];
 
@@ -1497,6 +1499,55 @@ const RECIPE_SEED = [
     proteinVeg:{name:'White beans / hvide bønner (1 can, optional)',cat:'Pantry'}, proteinMeat:null,
     ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Leek / porre',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Stock / bouillon',cat:'Pantry'},{name:'Cream / fløde',cat:'Mejeri'},{name:'Bread / brød',cat:'Bread'}],
     steps:['Fry the leek and onion.','Add diced potatoes (and beans) with stock; simmer 15 min.','Blend smooth and stir in cream.','Serve with bread.'] },
+
+  // ----- More Indian: quick, protein- and carb-rich, no beef/pork/lamb -----
+  { seedKey:'rajma', cuisine:'Indian', source:'Indian classic', name:'Rajma masala (kidney beans) with rice', emoji:'🍛', time:30,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Kidney beans / kidneybønner (2 cans)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Garam masala & cumin / garam masala',cat:'Pantry'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Fry onion, garlic and ginger with the spices.','Add tomatoes; cook down 5 min.','Add the kidney beans and a splash of water; simmer 12 min.','Serve with rice.'] },
+  { seedKey:'paneer-bhurji', cuisine:'Indian', source:'Indian classic', name:'Paneer bhurji with roti', emoji:'🧀', time:20,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Paneer (250g) / paneer',cat:'Mejeri'}, proteinMeat:{name:'Chicken breast (300g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Garam masala & turmeric / garam masala',cat:'Pantry'},{name:'Roti or naan / naan',cat:'Bread'}],
+    steps:['Fry onion, pepper and spices.','Add chopped tomato; cook 3 min.','Crumble in the paneer (or diced chicken) and toss 4 min.','Serve with warm roti or naan.'] },
+  { seedKey:'egg-curry', cuisine:'Indian', source:'Indian classic', name:'Egg curry (anda masala) with rice', emoji:'🍛', time:25,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Eggs (6) / æg',cat:'Mejeri'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Garam masala / garam masala',cat:'Pantry'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Hard-boil the eggs; halve them.','Fry onion, garlic, ginger and spices, then add tomatoes; simmer 8 min.','Slip in the eggs (or cooked chicken) and coat in the sauce.','Serve with rice.'] },
+  { seedKey:'chilla', cuisine:'Indian', source:'Indian classic', name:'Besan chilla (chickpea pancakes)', emoji:'🥞', time:15,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Chickpea flour / besan (gram flour)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Tomato',cat:'Veggies'},{name:'Spinach / spinat',cat:'Veggies'},{name:'Turmeric & chili / gurkemeje',cat:'Pantry'},{name:'Yoghurt or chutney / yoghurt',cat:'Mejeri'}],
+    steps:['Whisk besan with water and spices into a batter.','Stir in finely chopped onion, tomato and spinach.','Fry thin pancakes ~2 min per side.','Serve with yoghurt or chutney.'] },
+  { seedKey:'keema', cuisine:'Indian', source:'Indian classic', name:'Chicken keema with pav', emoji:'🍛', time:25,
+    tags:['high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Soya mince or peas / sojahakket',cat:'Frozen stuff'}, proteinMeat:{name:'Minced chicken (400g) / hakket kylling',cat:'Kød'},
+    ingredients:[{name:'Peas / ærter',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Garlic & ginger / hvidløg & ingefær',cat:'Veggies'},{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Garam masala / garam masala',cat:'Pantry'},{name:'Bread rolls / pav / boller',cat:'Bread'}],
+    steps:['Fry onion, garlic, ginger and garam masala.','Add minced chicken (or soya) and brown.','Add tomatoes and peas; simmer 12 min.','Serve with soft bread rolls (pav).'] },
+  { seedKey:'veg-pulao', cuisine:'Indian', source:'Indian classic', name:'Vegetable pulao with paneer', emoji:'🍚', time:30,
+    tags:['vegetarian','high-protein','kid-friendly'], rating:4,
+    proteinVeg:{name:'Paneer (200g) / paneer',cat:'Mejeri'}, proteinMeat:{name:'Chicken (300g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Basmati rice / ris',cat:'Pantry'},{name:'Frozen peas & carrots / ærter',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Whole spices (cardamom, bay) / krydderier',cat:'Pantry'},{name:'Cashews (optional) / cashewnødder',cat:'Dry snacks'}],
+    steps:['Fry onion and whole spices, add rice and veg.','Add measured water; simmer covered 12 min.','Pan-fry paneer (or chicken) and fold through.','Rest 5 min, then fluff and serve.'] },
+
+  // ----- Fast Asian street options (chicken/tofu, no pork) -----
+  { seedKey:'bao', cuisine:'Chinese', source:'Family favourite', name:'Steamed bao buns (chicken or tofu)', emoji:'🥟', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Firm tofu (400g) / tofu',cat:'Køledisk'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Bao buns (frozen) / bao',cat:'Frozen stuff'},{name:'Hoisin sauce / hoisin',cat:'Asian'},{name:'Cucumber / agurk',cat:'Veggies'},{name:'Spring onion / forårsløg',cat:'Veggies'},{name:'Sesame / sesam',cat:'Asian'}],
+    steps:['Steam the bao buns per pack.','Pan-fry chicken (or tofu) and toss in hoisin.','Fill the buns with the filling, cucumber and spring onion.','Sprinkle with sesame.'] },
+  { seedKey:'banh-mi', cuisine:'Vietnamese', source:'Family favourite', name:'Bánh mì (chicken or tofu)', emoji:'🥖', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Firm tofu (400g) / tofu',cat:'Køledisk'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Baguette / flûte',cat:'Bread'},{name:'Carrot & cucumber / gulerod & agurk',cat:'Veggies'},{name:'Coriander / koriander',cat:'Veggies'},{name:'Mayo & sriracha / mayo',cat:'Pantry'},{name:'Soy sauce / soja',cat:'Asian'}],
+    steps:['Pan-fry chicken (or tofu) with a splash of soy.','Quick-pickle grated carrot and cucumber in a little vinegar.','Split the baguette and spread with mayo and sriracha.','Fill with the protein, pickles and coriander.'] },
+  { seedKey:'gyoza', cuisine:'Chinese', source:'Family favourite', name:'Gyoza / potstickers with rice', emoji:'🥟', time:15,
+    tags:['kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Vegetable gyoza (frozen) / grøntsagsgyoza',cat:'Frozen stuff'}, proteinMeat:{name:'Chicken gyoza (frozen) / kyllingegyoza',cat:'Frozen stuff'},
+    ingredients:[{name:'Cooked rice / ris',cat:'Pantry'},{name:'Edamame',cat:'Frozen stuff'},{name:'Soy + sesame dip / soja',cat:'Asian'},{name:'Spring onion / forårsløg',cat:'Veggies'}],
+    steps:['Pan-fry the gyoza per pack (crisp base, then steam).','Warm the rice and edamame.','Mix a quick soy and sesame dip.','Serve the gyoza over rice with the dip.'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1615,21 +1666,23 @@ function renderMealPlan() {
   const days = plan.days || {};
 
   const dayCards = PLAN_DAYS.map(([key, label]) => {
+    const badge = key === MEAT_FREE_DAY ? ' <span class="meat-free-badge">🌱 meat-free</span>' : '';
     const slot = days[key];
     const r = slot && allRecipes[slot.recipeId];
     if (!r) {
-      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + '</div>' +
+      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + badge + '</div>' +
         '<button class="pick-btn" data-pick-day="' + key + '">＋ Pick a recipe</button></div>';
     }
-    const protein = slot.protein || 'veg';
-    const toggle = (r.proteinMeat && r.proteinMeat.name)
+    // On the meat-free day, hide the chicken toggle and keep it vegetarian.
+    const protein = key === MEAT_FREE_DAY ? 'veg' : (slot.protein || 'veg');
+    const toggle = (key !== MEAT_FREE_DAY && r.proteinMeat && r.proteinMeat.name)
       ? '<div class="protein-toggle" data-day="' + key + '">' +
           '<button class="' + (protein === 'veg' ? 'on' : '') + '" data-protein="veg">🌱 Veg</button>' +
           '<button class="meat ' + (protein === 'meat' ? 'on' : '') + '" data-protein="meat">🍗 Chicken</button>' +
         '</div>'
       : '';
     return '<div class="day-card">' +
-      '<div class="day-name">' + label + '</div>' +
+      '<div class="day-name">' + label + badge + '</div>' +
       '<div class="day-row">' +
         '<div class="r-emoji">' + (r.emoji || '🍽️') + '</div>' +
         '<div class="r-info" data-open-recipe="' + slot.recipeId + '">' +
@@ -1693,15 +1746,19 @@ async function setDayProtein(dayKey, protein) {
   showStatus('✓ Saved', true);
 }
 async function suggestFreshWeek() {
-  // Prefer quick, kid-friendly, well-rated recipes; keep the first days vegetarian.
+  // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
-  const veg = ranked.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
-  const ordered = veg.concat(ranked.filter(([id]) => !veg.some(([vid]) => vid === id)));
-  const chosen = ordered.slice(0, 5);
-  if (chosen.length < 5) { showStatus('Add more recipes first', true); return; }
+  const vegList = ranked.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
+  if (ranked.length < 5 || !vegList.length) { showStatus('Add more recipes first', true); return; }
   mealPlan = mealPlan || { label: 'This week', days: {} };
   mealPlan.days = {};
-  PLAN_DAYS.forEach(([key], i) => { mealPlan.days[key] = { recipeId: chosen[i][0], protein: 'veg', cooked: false }; });
+  const used = new Set();
+  const nextUnused = list => { for (const e of list) if (!used.has(e[0])) return e; return list[0]; };
+  PLAN_DAYS.forEach(([key]) => {
+    const pick = key === MEAT_FREE_DAY ? nextUnused(vegList) : nextUnused(ranked);
+    used.add(pick[0]);
+    mealPlan.days[key] = { recipeId: pick[0], protein: 'veg', cooked: false };
+  });
   renderMealPlan();
   showStatus('Saving…');
   await savePlan();
@@ -1861,6 +1918,21 @@ function openGroceryTarget(ings, sourceName) {
 }
 function closeGroceryTarget() { document.getElementById('grocery-target-modal').classList.add('hidden'); pendingGroceryIngs = null; }
 
+// Basics we always have at home — skipped when adding a recipe/box to the grocery
+// list. Only skips items that are *purely* staples; compound items like
+// "Milk & butter" or "Olive oil & paprika" still get added.
+const STAPLE_WORDS = ['salt','pepper','peber','oil','olie','olive','vegetable','sunflower','vinegar','eddike','butter','smør','sugar','sukker','water','vand'];
+function isPantryStaple(name) {
+  const eng = ((name || '').split('/')[0] || '').toLowerCase();
+  const cleaned = eng
+    .replace(/\(.*?\)/g, ' ')                         // drop parentheticals
+    .replace(/\d+\s*(g|kg|ml|l|cl|dl|cans?|tbsp|tsp)?/g, ' ') // drop quantities
+    .replace(/[&,+]|\band\b|\bor\b|\bel\.\b/g, ' ')   // drop connectors
+    .replace(/[^a-zæøå\s]/g, ' ');
+  const tokens = cleaned.split(/\s+/).map(t => t.trim()).filter(Boolean);
+  return tokens.length > 0 && tokens.every(t => STAPLE_WORDS.includes(t));
+}
+
 async function addIngredientsToList(ings, targetListId) {
   const list = allLists[targetListId]; if (!list) return 0;
   const items = list.items || {};
@@ -1869,7 +1941,7 @@ async function addIngredientsToList(ings, targetListId) {
   const patch = {}; let added = 0;
   ings.forEach((ing, idx) => {
     const key = (ing.name || '').toLowerCase().trim();
-    if (!key || existing.has(key)) return;
+    if (!key || existing.has(key) || isPantryStaple(ing.name)) return;
     existing.add(key);
     maxOrder++;
     const newId = 'i' + Date.now() + '_' + idx + Math.floor(Math.random() * 1000);
@@ -2014,7 +2086,7 @@ const MADPAKKE_SEED = [
       snack:[{name:'Cheese / ost',cat:'Mejeri'}],
       evening:[{name:'Berries / bær',cat:'Fruits'}],
       gront:[{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Cucumber / agurk',cat:'Veggies'}] } },
-  { seedKey:'pandekage-roll', name:'Pancake / æggekage roll box', emoji:'🥞', rating:4, source:'Family favourite',
+  { seedKey:'pandekage-roll', name:'Pancake / æggekage roll box', emoji:'🥞', rating:4, source:'Family favourite', veg:true,
     components:{ main:[{name:'Pancake or egg-cake rolls / pandekager',cat:'Mejeri'}],
       snack:[{name:'Skyr',cat:'Mejeri'},{name:'Wholegrain crackers / grovkiks',cat:'Dry snacks'}],
       evening:[{name:'Banana / banan',cat:'Fruits'}],
@@ -2024,6 +2096,23 @@ const MADPAKKE_SEED = [
       snack:[{name:'Hummus + carrot / hummus',cat:'Køledisk'}],
       evening:[{name:'Nuts & raisins / nødder & rosiner',cat:'Dry snacks'}],
       gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'}] } },
+
+  // ----- Vegetarian boxes (used for meat-free Tuesday) -----
+  { seedKey:'egg-cheese', name:'Egg & cheese box', emoji:'🥚', rating:5, source:'Family favourite', veg:true,
+    components:{ main:[{name:'Hard-boiled eggs (2) / kogte æg',cat:'Mejeri'},{name:'Cheese sandwich on rye / ostemad',cat:'Bread'}],
+      snack:[{name:'Cheese cubes / ostehaps',cat:'Mejeri'},{name:'Wholegrain crackers / grovkiks',cat:'Dry snacks'}],
+      evening:[{name:'Skyr with berries / skyr',cat:'Mejeri'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'}] } },
+  { seedKey:'hummus-bean', name:'Hummus & bean wrap box', emoji:'🌯', rating:4, source:'Family favourite', veg:true,
+    components:{ main:[{name:'Tortilla wrap',cat:'Bread'},{name:'Hummus + kidney beans / hummus & bønner',cat:'Køledisk'},{name:'Grated cheese / revet ost',cat:'Mejeri'}],
+      snack:[{name:'Nuts or edamame / nødder',cat:'Dry snacks'}],
+      evening:[{name:'Yoghurt',cat:'Mejeri'}],
+      gront:[{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}] } },
+  { seedKey:'paneer-wrap', name:'Paneer / halloumi wrap box', emoji:'🧀', rating:4, source:'Family favourite', veg:true,
+    components:{ main:[{name:'Tortilla or naan / naan',cat:'Bread'},{name:'Grilled paneer or halloumi / paneer',cat:'Mejeri'}],
+      snack:[{name:'Edamame',cat:'Frozen stuff'}],
+      evening:[{name:'Banana / banan',cat:'Fruits'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Tomato',cat:'Veggies'}] } },
 ];
 
 // Prep minutes per box — all quick morning assembly (frozen items like focaccia,
@@ -2032,6 +2121,7 @@ const MADPAKKE_PREP = {
   'focaccia-frikadelle':10, 'poelsehorn':10, 'pizzasnegle':10, 'leftover-pizza':5,
   'leftover-burger':5, 'rugbrod-classic':10, 'wrap-box':10, 'pastasalat':10,
   'pandekage-roll':10, 'frikadelle-flatbread':10,
+  'egg-cheese':10, 'hummus-bean':10, 'paneer-wrap':10,
 };
 
 async function seedMadpakker() {
@@ -2083,14 +2173,15 @@ function renderMadpakke() {
   const days = plan.days || {};
 
   const dayCards = PLAN_DAYS.map(([key, label]) => {
+    const badge = key === MEAT_FREE_DAY ? ' <span class="meat-free-badge">🌱 meat-free</span>' : '';
     const slot = days[key];
     const m = slot && allMadpakker[slot.madpakkeId];
     if (!m) {
-      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + '</div>' +
+      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + badge + '</div>' +
         '<button class="pick-btn" data-pick-day="' + key + '">＋ Pick a box</button></div>';
     }
     return '<div class="day-card">' +
-      '<div class="day-name">' + label + '</div>' +
+      '<div class="day-name">' + label + badge + '</div>' +
       '<div class="day-row">' +
         '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
         '<div class="r-info" data-open-mp="' + slot.madpakkeId + '">' +
@@ -2156,10 +2247,17 @@ async function clearMadpakkeDay(dayKey) {
 async function suggestMadpakkeWeek() {
   const ranked = Object.entries(allMadpakker).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   if (ranked.length < 5) { showStatus('Add more ideas first', true); return; }
-  // Spread variety: step through the ranked list so the 5 days are not identical.
+  // Spread variety; Tuesday always gets a vegetarian box (meat-free day).
+  const vegBoxes = ranked.filter(([id, m]) => m.veg);
   madpakkePlan = madpakkePlan || { days: {} };
   madpakkePlan.days = {};
-  PLAN_DAYS.forEach(([key], i) => { madpakkePlan.days[key] = { madpakkeId: ranked[i % ranked.length][0], packed: false }; });
+  const used = new Set();
+  const nextUnused = list => { for (const e of list) if (!used.has(e[0])) return e; return list[0]; };
+  PLAN_DAYS.forEach(([key]) => {
+    const pick = (key === MEAT_FREE_DAY && vegBoxes.length) ? nextUnused(vegBoxes) : nextUnused(ranked);
+    used.add(pick[0]);
+    madpakkePlan.days[key] = { madpakkeId: pick[0], packed: false };
+  });
   renderMadpakke();
   showStatus('Saving…');
   await saveMadpakkePlan();
