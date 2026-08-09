@@ -229,6 +229,7 @@
   .tag { font-size:10.5px; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:2px 7px; white-space:nowrap; }
   .tag.meat { background:#fbeae0; color:#b5651d; }
   .tag.cuisine { background:#eae6f5; color:#5b4b9e; }
+  .tag.store { background:#fdf0d5; color:#9a6a00; }
   .recipe-source { font-size:12px; color:#999; margin-top:10px; }
   .recipe-source a { color:#2c6e49; }
 
@@ -1548,6 +1549,45 @@ const RECIPE_SEED = [
     proteinVeg:{name:'Vegetable gyoza (frozen) / grøntsagsgyoza',cat:'Frozen stuff'}, proteinMeat:{name:'Chicken gyoza (frozen) / kyllingegyoza',cat:'Frozen stuff'},
     ingredients:[{name:'Cooked rice / ris',cat:'Pantry'},{name:'Edamame',cat:'Frozen stuff'},{name:'Soy + sesame dip / soja',cat:'Asian'},{name:'Spring onion / forårsløg',cat:'Veggies'}],
     steps:['Pan-fry the gyoza per pack (crisp base, then steam).','Warm the rice and edamame.','Mix a quick soy and sesame dip.','Serve the gyoza over rice with the dip.'] },
+
+  // ----- South Indian -----
+  { seedKey:'dosa', cuisine:'South Indian', source:'South Indian classic', name:'Masala dosa (ready batter)', emoji:'🥞', time:30,
+    tags:['vegetarian','kid-friendly'], rating:5,
+    proteinVeg:{name:'Ready dosa batter / dosabatter',cat:'Køledisk'}, proteinMeat:null,
+    ingredients:[{name:'Potatoes / kartofler',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Mustard seeds & turmeric / sennepsfrø & gurkemeje',cat:'Pantry'},{name:'Coconut chutney (ready) / kokoschutney',cat:'Pantry'}],
+    steps:['Boil and lightly mash potatoes; temper with mustard seeds, onion and turmeric.','Spread dosa batter thin on a hot pan; crisp 2–3 min.','Add a spoon of potato masala and fold.','Serve with coconut chutney.'] },
+  { seedKey:'idli', cuisine:'South Indian', source:'South Indian classic', name:'Idli with sambar (ready batter)', emoji:'🍚', time:25,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Ready idli batter / idlibatter',cat:'Køledisk'}, proteinMeat:null,
+    ingredients:[{name:'Sambar mix / sambar',cat:'Pantry'},{name:'Carrot & beans / gulerod & bønner',cat:'Veggies'},{name:'Onion / løg',cat:'Veggies'},{name:'Coconut chutney / kokoschutney',cat:'Pantry'}],
+    steps:['Steam the idli batter in an idli mould ~10 min.','Simmer the sambar mix with chopped veg until soft.','Serve the idlis hot with sambar.','Coconut chutney on the side.'] },
+  { seedKey:'curd-rice', cuisine:'South Indian', source:'South Indian classic', name:'Curd rice (dahi rice)', emoji:'🍚', time:15,
+    tags:['vegetarian','high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Yoghurt / yoghurt naturel',cat:'Mejeri'}, proteinMeat:null,
+    ingredients:[{name:'Cooked rice / ris',cat:'Pantry'},{name:'Cucumber & carrot / agurk & gulerod',cat:'Veggies'},{name:'Mustard seeds / sennepsfrø',cat:'Pantry'},{name:'Cashews (optional) / cashewnødder',cat:'Dry snacks'}],
+    steps:['Mix cooled rice with plenty of yoghurt and a little salt.','Stir in grated cucumber and carrot.','Temper mustard seeds in a little oil and pour over.','Serve chilled — also a lovely next-day madpakke.'] },
+  { seedKey:'upma', cuisine:'South Indian', source:'South Indian classic', name:'Vegetable upma (semolina)', emoji:'🥣', time:20,
+    tags:['vegetarian','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Semolina / semulje (durum)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Onion / løg',cat:'Veggies'},{name:'Carrot & peas / gulerod & ærter',cat:'Frozen stuff'},{name:'Mustard seeds / sennepsfrø',cat:'Pantry'},{name:'Cashews (optional) / cashewnødder',cat:'Dry snacks'}],
+    steps:['Dry-roast the semolina until fragrant; set aside.','Temper mustard seeds, onion and veg (and cashews).','Add hot water, then stir in the semolina.','Cook 3–4 min until fluffy.'] },
+
+  // ----- More Vietnamese / Thai -----
+  { seedKey:'summer-rolls', cuisine:'Vietnamese', source:'Family favourite', name:'Fresh summer rolls (chicken or tofu)', emoji:'🥬', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Firm tofu (300g) / tofu',cat:'Køledisk'}, proteinMeat:{name:'Cooked chicken (300g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Rice paper / rispapir',cat:'Asian'},{name:'Rice noodles / risnudler',cat:'Asian'},{name:'Carrot, cucumber, lettuce / gulerod & agurk',cat:'Veggies'},{name:'Peanut dipping sauce / peanutsauce',cat:'Pantry'},{name:'Mint & coriander / mynte & koriander',cat:'Veggies'}],
+    steps:['Soak the rice noodles; drain.','Dip rice paper in warm water to soften.','Fill with noodles, chicken (or tofu), veg and herbs; roll tight.','Serve with peanut dipping sauce.'] },
+  { seedKey:'thai-fried-rice', cuisine:'Thai', source:'Family favourite', name:'Thai fried rice (khao pad)', emoji:'🍚', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:4,
+    proteinVeg:{name:'Eggs (3) / æg',cat:'Mejeri'}, proteinMeat:{name:'Chicken (300g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Cooked rice / ris',cat:'Pantry'},{name:'Carrot & peas / gulerod & ærter',cat:'Frozen stuff'},{name:'Spring onion & garlic / forårsløg & hvidløg',cat:'Veggies'},{name:'Soy & fish sauce / soja & fiskesauce',cat:'Asian'},{name:'Lime',cat:'Fruits'}],
+    steps:['Scramble the eggs; set aside.','Stir-fry garlic, chicken (or just veg) and the veg on high heat.','Add the rice and sauces; toss until hot.','Fold in the eggs and spring onion; squeeze over lime.'] },
+  { seedKey:'pad-krapow', cuisine:'Thai', source:'Family favourite', name:'Thai basil chicken (pad krapow)', emoji:'🌶️', time:20,
+    tags:['high-protein','kid-friendly','quick'], rating:5,
+    proteinVeg:{name:'Firm tofu or soya mince / tofu',cat:'Køledisk'}, proteinMeat:{name:'Minced chicken (400g) / hakket kylling',cat:'Kød'},
+    ingredients:[{name:'Jasmine rice / jasminris',cat:'Pantry'},{name:'Garlic / hvidløg',cat:'Veggies'},{name:'Thai basil / thaibasilikum',cat:'Veggies'},{name:'Soy + oyster sauce / soja & østerssauce',cat:'Asian'},{name:'Green beans / grønne bønner',cat:'Veggies'}],
+    steps:['Fry the garlic, then the minced chicken (or tofu) until browned.','Add the beans and the sauces; stir-fry 3 min.','Toss through a big handful of Thai basil.','Serve over jasmine rice (add a fried egg if you like).'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1605,7 +1645,27 @@ function starsHtml(value, interactive, id) {
 function recipeTagsHtml(r) {
   return (r.cuisine ? '<span class="tag cuisine">' + escapeHtml(r.cuisine) + '</span>' : '') +
     (r.tags || []).map(t => '<span class="tag">' + (TAG_LABELS[t] || escapeHtml(t)) + '</span>').join('') +
+    (recipeStoreHint(r) ? '<span class="tag store">🏬 ' + escapeHtml(recipeStoreHint(r)) + '</span>' : '') +
     (r.proteinMeat && r.proteinMeat.name ? '<span class="tag meat">🍗 chicken swap</span>' : '');
+}
+
+// Speciality ingredients that usually mean a trip to an Asian/Indian store.
+// Mainstream Danish-supermarket items (curry paste, soy, fish sauce) are not flagged.
+const SPECIALTY_ITEMS = [
+  { kw:['paneer'], store:'Indian/Asian store' },
+  { kw:['besan','gram flour','chickpea flour'], store:'Indian/Asian store' },
+  { kw:['dosa','idli','sambar'], store:'Indian/Asian store' },
+  { kw:['bao'], store:'Asian store' },
+  { kw:['gyoza'], store:'Asian store' },
+  { kw:['rice paper','rispapir'], store:'Asian store' },
+  { kw:['thai basil','thaibasilik'], store:'Asian store' },
+  { kw:['hoisin'], store:'Asian store' },
+];
+function recipeStoreHint(r) {
+  const blob = JSON.stringify([r.proteinVeg, r.proteinMeat, r.ingredients || []]).toLowerCase();
+  const stores = new Set();
+  SPECIALTY_ITEMS.forEach(s => { if (s.kw.some(k => blob.includes(k))) stores.add(s.store); });
+  return [...stores].join(' · ');
 }
 
 // A filter is either one of the fixed tag keys or a cuisine name.
