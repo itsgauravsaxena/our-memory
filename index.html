@@ -408,6 +408,7 @@
       <label data-tag="high-protein"><input type="checkbox" value="high-protein"> 💪 High protein</label>
       <label data-tag="kid-friendly"><input type="checkbox" value="kid-friendly"> 🧒 Kid-friendly</label>
       <label data-tag="toddler"><input type="checkbox" value="toddler"> 👶 Toddler</label>
+      <label data-tag="weekend"><input type="checkbox" value="weekend"> 🍲 Weekend</label>
       <label data-tag="quick"><input type="checkbox" value="quick"> ⚡ Quick</label>
     </div>
     <div class="field-label">Veg protein</div>
@@ -1643,6 +1644,39 @@ const RECIPE_SEED = [
     proteinVeg:{name:'Chickpeas / kikærter',cat:'Pantry'}, proteinMeat:{name:'Chicken (400g) / kylling',cat:'Kød'},
     ingredients:[{name:'Rice / ris',cat:'Pantry'},{name:'Carrot, peas & corn / gulerod',cat:'Frozen stuff'},{name:'Onion / løg',cat:'Veggies'},{name:'Mild stock & turmeric / bouillon',cat:'Pantry'}],
     steps:['Soften onion, add small chicken pieces (or chickpeas).','Stir in rice, veg, turmeric and stock.','Cover and simmer ~15 min until the rice is soft.','Rest 5 min — soft, mild and easy to spoon.'] },
+
+  // ----- Weekend Indian: delicious, worth the extra time (allowed over 30 min).
+  //        Chicken / fish / veg — no beef, pork or lamb. -----
+  { seedKey:'chicken-biryani', cuisine:'Indian', source:'Indian classic', name:'Chicken biryani', emoji:'🍛', time:60,
+    tags:['weekend','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Paneer & mixed veg / paneer & grønt',cat:'Mejeri'}, proteinMeat:{name:'Chicken thighs (600g) / kyllingelår',cat:'Kød'},
+    ingredients:[{name:'Basmati rice / basmatiris',cat:'Pantry'},{name:'Yoghurt / yoghurt',cat:'Mejeri'},{name:'Onions (for birista) / løg',cat:'Veggies'},{name:'Biryani masala & saffron / biryanikrydderi',cat:'Pantry'},{name:'Ginger, garlic, mint & coriander / ingefær',cat:'Veggies'}],
+    steps:['Marinate chicken (or paneer + veg) in yoghurt, ginger-garlic and biryani masala ~20 min.','Fry sliced onions until golden (birista); parboil the rice with whole spices.','Layer the rice over the marinated chicken with fried onions, mint and coriander.','Cover tightly and cook on low (dum) ~25 min; rest, then fluff gently.'] },
+  { seedKey:'butter-chicken-scratch', cuisine:'Indian', source:'Indian classic', name:'Butter chicken from scratch', emoji:'🍗', time:50,
+    tags:['weekend','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Paneer (400g) / paneer',cat:'Mejeri'}, proteinMeat:{name:'Chicken thighs (600g) / kyllingelår',cat:'Kød'},
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Cream & butter / fløde & smør',cat:'Mejeri'},{name:'Yoghurt (marinade) / yoghurt',cat:'Mejeri'},{name:'Garam masala & kasuri methi / garam masala',cat:'Pantry'},{name:'Ginger & garlic / ingefær & hvidløg',cat:'Veggies'},{name:'Naan or rice / naan',cat:'Bread'}],
+    steps:['Marinate chicken (or paneer) in yoghurt and spices ~20 min; grill or pan-char.','Simmer tomatoes with ginger-garlic and spices, then blend smooth.','Stir in butter and cream; add the charred chicken and simmer 10 min.','Finish with kasuri methi; serve with naan or rice.'] },
+  { seedKey:'chole-bhature', cuisine:'Indian', source:'Indian classic', name:'Chole bhature', emoji:'🍛', time:45,
+    tags:['weekend','vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Chickpeas / kikærter (2 cans)',cat:'Pantry'}, proteinMeat:null,
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Chole masala / cholekrydderi',cat:'Pantry'},{name:'Plain flour (bhature) / hvedemel',cat:'Baking'},{name:'Yoghurt / yoghurt',cat:'Mejeri'},{name:'Ginger & garlic / ingefær & hvidløg',cat:'Veggies'}],
+    steps:['Simmer chickpeas with onion, tomato and chole masala ~25 min until rich.','Make a soft dough (flour, yoghurt, a little oil); rest and roll.','Deep-fry the bhature until puffed and golden.','Serve the chole hot with the fried bhature.'] },
+  { seedKey:'paneer-butter-masala', cuisine:'Indian', source:'Indian classic', name:'Paneer butter masala', emoji:'🧀', time:40,
+    tags:['weekend','vegetarian','high-protein','kid-friendly'], rating:5,
+    proteinVeg:{name:'Paneer (400g) / paneer',cat:'Mejeri'}, proteinMeat:{name:'Chicken (500g) / kylling',cat:'Kød'},
+    ingredients:[{name:'Chopped tomatoes / flåede tomater (2 cans)',cat:'Pantry'},{name:'Cashews / cashewnødder',cat:'Dry snacks'},{name:'Cream & butter / fløde & smør',cat:'Mejeri'},{name:'Garam masala / garam masala',cat:'Pantry'},{name:'Ginger & garlic / ingefær & hvidløg',cat:'Veggies'},{name:'Naan or rice / naan',cat:'Bread'}],
+    steps:['Simmer tomatoes with cashews, ginger-garlic and spices; blend to a silky sauce.','Return to the pan with butter and cream.','Add cubed paneer (or chicken) and simmer 10 min.','Serve with naan or rice.'] },
+  { seedKey:'kashmiri-chicken', cuisine:'Indian', source:'Indian classic', name:'Kashmiri-style chicken curry', emoji:'🍛', time:50,
+    tags:['weekend','high-protein'], rating:4,
+    proteinVeg:{name:'Chickpeas & potato / kikærter',cat:'Pantry'}, proteinMeat:{name:'Chicken thighs (700g) / kyllingelår',cat:'Kød'},
+    ingredients:[{name:'Yoghurt / yoghurt',cat:'Mejeri'},{name:'Onion / løg',cat:'Veggies'},{name:'Whole spices (cardamom, cloves, cinnamon) / hele krydderier',cat:'Pantry'},{name:'Kashmiri chilli & fennel / kashmiri chili & fennikel',cat:'Pantry'},{name:'Ginger & garlic / ingefær & hvidløg',cat:'Veggies'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Fry the whole spices and onion, then the ginger-garlic.','Add chicken (or chickpeas + potato) and brown.','Stir in yoghurt, kashmiri chilli and ground fennel; simmer gently ~30 min.','Serve with rice — rich and gently warming.'] },
+  { seedKey:'fish-curry', cuisine:'Indian', source:'Indian classic', name:'Goan coconut fish curry', emoji:'🐟', time:40,
+    tags:['weekend','high-protein'], rating:4,
+    proteinVeg:{name:'Chickpeas or paneer / kikærter',cat:'Pantry'}, proteinMeat:{name:'White fish, salmon or chicken (500g) / fisk el. kylling',cat:'Køledisk'},
+    ingredients:[{name:'Coconut milk / kokosmælk (1 can)',cat:'Pantry'},{name:'Chopped tomatoes / flåede tomater (1 can)',cat:'Pantry'},{name:'Onion / løg',cat:'Veggies'},{name:'Curry leaves & mustard seeds / karryblade & sennepsfrø',cat:'Pantry'},{name:'Tamarind or lime / lime',cat:'Fruits'},{name:'Basmati rice / ris',cat:'Pantry'}],
+    steps:['Temper mustard seeds and curry leaves; soften the onion.','Add tomatoes and spices, then the coconut milk; simmer 10 min.','Slip in the fish (or chickpeas) and simmer gently ~8 min.','Finish with tamarind or lime; serve with rice.'] },
 ];
 
 // Additive seeding: add any seed recipe whose key hasn't been applied yet, without
@@ -1675,8 +1709,8 @@ async function seedMealPlanIfMissing() {
     'Butter chicken / chana masala',
     'Thai red/green curry',
     'Build-your-own tacos',
-    'Quick veggie / chicken pizza',
-    'One-pot mild chicken & rice',
+    'Chicken biryani',
+    'Butter chicken from scratch',
   ];
   const days = {};
   PLAN_DAYS.forEach(([key], i) => {
@@ -1690,7 +1724,8 @@ async function loadRecipes() { allRecipes = (await fbGet('/recipes')) || {}; }
 async function loadMealPlan() { mealPlan = (await fbGet('/mealplan')) || null; }
 
 // ----- shared bits -----
-const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick', toddler:'👶 toddler' };
+const TAG_LABELS = { vegetarian:'🌱 veg', 'high-protein':'💪 protein', 'kid-friendly':'🧒 kids', quick:'⚡ quick', toddler:'👶 toddler', weekend:'🍲 weekend' };
+const WEEKEND_DAYS = ['sat', 'sun']; // dinner days that allow longer, special dishes
 
 function starsHtml(value, interactive, id) {
   value = Math.round(value || 0);
@@ -1703,7 +1738,7 @@ function recipeTagsHtml(r) {
   return (r.cuisine ? '<span class="tag cuisine">' + escapeHtml(r.cuisine) + '</span>' : '') +
     (r.tags || []).map(t => '<span class="tag">' + (TAG_LABELS[t] || escapeHtml(t)) + '</span>').join('') +
     (recipeStoreHint(r) ? '<span class="tag store">🏬 ' + escapeHtml(recipeStoreHint(r)) + '</span>' : '') +
-    (r.proteinMeat && r.proteinMeat.name ? '<span class="tag meat">🍗 chicken swap</span>' : '');
+    (r.proteinMeat && r.proteinMeat.name && /chicken|kylling/i.test(r.proteinMeat.name) ? '<span class="tag meat">🍗 chicken swap</span>' : '');
 }
 
 // Speciality ingredients that usually mean a trip to an Asian/Indian store.
@@ -1732,7 +1767,7 @@ function recipeMatchesFilter(r, f) {
   return r.cuisine === f;
 }
 function filterChipsHtml(active) {
-  const base = [['all','All'],['toddler','👶 Toddler'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
+  const base = [['all','All'],['toddler','👶 Toddler'],['weekend','🍲 Weekend'],['vegetarian','🌱 Veg'],['quick','⚡ Quick'],['kid-friendly','🧒 Kids'],['high-protein','💪 Protein']];
   const cuisines = [...new Set(Object.values(allRecipes).map(r => r && r.cuisine).filter(Boolean))].sort();
   const all = base.concat(cuisines.map(c => [c, c]));
   return all.map(([k, l]) => '<button class="chip ' + (k === active ? 'active' : '') + '" data-f="' + escapeHtml(k) + '">' + escapeHtml(l) + '</button>').join('');
@@ -1873,9 +1908,11 @@ async function suggestFreshWeek() {
   // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   const all = Object.entries(allRecipes);
-  const vegList = all.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
-  const festiveList = all.filter(([id, r]) => isFestive(r));
-  if (all.length < 5 || !vegList.length) { showStatus('Add more recipes first', true); return; }
+  const quick = all.filter(([id, r]) => (r.time || 0) <= 30);        // weekday pool (quick)
+  const vegQuick = quick.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
+  const festiveQuick = quick.filter(([id, r]) => isFestive(r));
+  const weekendList = all.filter(([id, r]) => (r.tags || []).includes('weekend')); // longer, special
+  if (all.length < 5 || !vegQuick.length) { showStatus('Add more recipes first', true); return; }
   mealPlan = mealPlan || { label: 'This week', days: {} };
   mealPlan.days = {};
   const used = new Set();
@@ -1884,9 +1921,10 @@ async function suggestFreshWeek() {
   const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(all).find(e => !used.has(e[0])) || all[0];
   PLAN_DAYS.forEach(([key]) => {
     let pick;
-    if (key === MEAT_FREE_DAY) pick = pickFrom(vegList);            // Tuesday: vegetarian
-    else if (key === FESTIVE_DAY && festiveList.length) pick = pickFrom(festiveList); // Friday: festive
-    else pick = pickFrom(all);
+    if (key === MEAT_FREE_DAY) pick = pickFrom(vegQuick.length ? vegQuick : quick);          // Tuesday: quick vegetarian
+    else if (key === FESTIVE_DAY) pick = pickFrom(festiveQuick.length ? festiveQuick : quick); // Friday: quick festive
+    else if (WEEKEND_DAYS.includes(key)) pick = pickFrom(weekendList.length ? weekendList : quick); // Sat/Sun: special (longer OK)
+    else pick = pickFrom(quick);                                                             // Mon/Wed/Thu: quick
     used.add(pick[0]);
     mealPlan.days[key] = { recipeId: pick[0], protein: 'veg', cooked: false };
   });
