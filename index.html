@@ -1703,6 +1703,12 @@ function recipeIngredients(r, protein) {
   return out;
 }
 
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
 function setSubViewHeader(title) {
   document.getElementById('page-title').textContent = title;
   document.getElementById('back-btn').classList.remove('hidden');
@@ -1818,18 +1824,21 @@ async function setDayProtein(dayKey, protein) {
 async function suggestFreshWeek() {
   // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
-  const vegList = ranked.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
-  const festiveList = ranked.filter(([id, r]) => isFestive(r));
-  if (ranked.length < 5 || !vegList.length) { showStatus('Add more recipes first', true); return; }
+  const all = Object.entries(allRecipes);
+  const vegList = all.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
+  const festiveList = all.filter(([id, r]) => isFestive(r));
+  if (all.length < 5 || !vegList.length) { showStatus('Add more recipes first', true); return; }
   mealPlan = mealPlan || { label: 'This week', days: {} };
   mealPlan.days = {};
   const used = new Set();
-  const nextUnused = list => { for (const e of list) if (!used.has(e[0])) return e; return list[0]; };
+  // Random each time so every tap proposes a genuinely fresh week; falls back to
+  // any unused recipe if a preferred pool is exhausted.
+  const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(all).find(e => !used.has(e[0])) || all[0];
   PLAN_DAYS.forEach(([key]) => {
     let pick;
-    if (key === MEAT_FREE_DAY) pick = nextUnused(vegList);          // Tuesday: vegetarian
-    else if (key === FESTIVE_DAY && festiveList.length) pick = nextUnused(festiveList); // Friday: festive
-    else pick = nextUnused(ranked);
+    if (key === MEAT_FREE_DAY) pick = pickFrom(vegList);            // Tuesday: vegetarian
+    else if (key === FESTIVE_DAY && festiveList.length) pick = pickFrom(festiveList); // Friday: festive
+    else pick = pickFrom(all);
     used.add(pick[0]);
     mealPlan.days[key] = { recipeId: pick[0], protein: 'veg', cooked: false };
   });
@@ -2319,16 +2328,16 @@ async function clearMadpakkeDay(dayKey) {
   showStatus('✓ Removed', true);
 }
 async function suggestMadpakkeWeek() {
-  const ranked = Object.entries(allMadpakker).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
-  if (ranked.length < 5) { showStatus('Add more ideas first', true); return; }
-  // Spread variety; Tuesday always gets a vegetarian box (meat-free day).
-  const vegBoxes = ranked.filter(([id, m]) => m.veg);
+  const all = Object.entries(allMadpakker);
+  if (all.length < 5) { showStatus('Add more ideas first', true); return; }
+  // Random each time; Tuesday always gets a vegetarian box (meat-free day).
+  const vegBoxes = all.filter(([id, m]) => m.veg);
   madpakkePlan = madpakkePlan || { days: {} };
   madpakkePlan.days = {};
   const used = new Set();
-  const nextUnused = list => { for (const e of list) if (!used.has(e[0])) return e; return list[0]; };
+  const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(all).find(e => !used.has(e[0])) || all[0];
   PLAN_DAYS.forEach(([key]) => {
-    const pick = (key === MEAT_FREE_DAY && vegBoxes.length) ? nextUnused(vegBoxes) : nextUnused(ranked);
+    const pick = (key === MEAT_FREE_DAY && vegBoxes.length) ? pickFrom(vegBoxes) : pickFrom(all);
     used.add(pick[0]);
     madpakkePlan.days[key] = { madpakkeId: pick[0], packed: false };
   });
