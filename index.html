@@ -230,6 +230,12 @@
   .tag.meat { background:#fbeae0; color:#b5651d; }
   .tag.cuisine { background:#eae6f5; color:#5b4b9e; }
   .tag.store { background:#fdf0d5; color:#9a6a00; }
+  /* Grocery auto-add tab */
+  .add-bar-auto { margin-top:0; position:sticky; top:var(--header-h,62px); z-index:14; }
+  .add-bar-auto input[type="text"] { flex:1 1 auto; }
+  .groc-group { background:white; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:10px; }
+  .groc-group-head { padding:10px 14px; font-size:12px; font-weight:700; color:#2c6e49; text-transform:uppercase; letter-spacing:0.03em; background:#f0f5f2; }
+  .groc-group ul { padding:0 14px; }
   .recipe-source { font-size:12px; color:#999; margin-top:10px; }
   .recipe-source a { color:#2c6e49; }
 
@@ -532,6 +538,55 @@ function sanitizeKey(text) {
   return text.replace(/[.#$\[\]\/\s]/g, '_').substring(0, 200);
 }
 
+// ---------- Grocery auto-sort (type an item -> it files itself under a category) ----------
+let catMemory = {}; // learned item(lowercased key) -> category, shared across grocery lists
+// Keyword -> category dictionary (English + Danish). First matching category wins,
+// so the list is ordered from more-specific to more-general.
+const CATEGORY_KEYWORDS = [
+  ['Fruits', ['apple','æble','banan','banana','orange','appelsin','grape','drue','berry','bær','strawberr','jordbær','blueberr','blåbær','raspberr','hindbær','mango','lemon','citron','lime','avocado','pear','pære','melon','vandmelon','kiwi','peach','fersken','nectarin','plum','blomme','pineapple','ananas','cherry','kirsebær','fig','figen','date','daddel','pomegranate','granatæble','clementin','mandarin']],
+  ['Veggies', ['onion','løg','garlic','hvidløg','potato','kartof','carrot','gulerod','tomato','tomat','cucumber','agurk','bell pepper','peberfrugt','capsicum','spinach','spinat','broccoli','lettuce','salat','cabbage','spidskål','kål','courgette','squash','zucchini','aubergine','ginger','ingefær','sweetcorn','majs','mushroom','svamp','champignon','leek','porre','celery','selleri','cauliflower','blomkål','coriander','koriander','parsley','persille','basil','basilik','chili','herb','krydderurter','spring onion','forårsløg','beet','rødbede','radish','radise','asparagus','asparges','green bean','grønne bønner','pea','ært','kale','grønkål']],
+  ['Mejeri', ['milk','mælk','cheese','ost','yoghurt','yogurt','skyr','butter','smør','cream','fløde','egg','æg','paneer','halloumi','feta','mozzarella','parmesan','creme fraiche','crème fraîche','kvark','flødeost','ymer','koldskål']],
+  ['Kød', ['chicken','kylling','mince','hakket','minced','turkey','kalkun','fish','fisk','salmon','laks','cod','torsk','tuna','tun','frikadel','kødbol','meatball','sausage','pølse','ham ','skinke','bacon','duck','and']],
+  ['Bread', ['bread','brød','rugbrød','bun','bolle','tortilla','wrap','naan','pav','baguette','flûte','pita','pizza base','pizzabund','toast','knækbrød','crispbread','croissant','roll']],
+  ['Baking', ['flour','mel','yeast','gær','baking powder','bagepulver','breadcrumb','rasp','vanilla','vanilje','cocoa','kakao','icing','marcipan','almond flour','mandelmel']],
+  ['Cereals', ['oats','havregr','muesli','mysli','cereal','cornflakes','granola','porridge','grød']],
+  ['Asian', ['soy','soja','noodle','nudler','curry paste','fish sauce','fiskesauce','hoisin','oyster','sesame','sesam','rice paper','rispapir','miso','sriracha','sweet chili','coconut milk','kokosmælk','wok','ramen']],
+  ['Pantry', ['rice','ris','pasta','spaghetti','macaroni','makaroni','lasagne','oil','olie','vinegar','eddike','passata','ketchup','mayo','bean','bønne','chickpea','kikært','lentil','linser','stock','bouillon','spice','krydderi','curry','garam','paprika','cumin','spidskommen','turmeric','gurkemeje','honey','honning','jam','marmelade','peanut butter','peanutbutter','sugar','sukker','salt','pepper','peber','tinned','dåse','canned','tamarind','chutney','masala','sambar','besan','couscous','bulgur','quinoa','tomato sauce','flåede tomater']],
+  ['Frozen stuff', ['edamame','fish finger','fiskefinger','gyoza','ice cream','flødeis','fries','pommes','nugget']],
+  ['Køledisk', ['tofu','hummus','dip ','pesto','pålæg','tzatziki']],
+  ['Dry snacks', ['nuts','nødder','cashew','almond','mandel','walnut','valnød','cracker','kiks','chips','crisp','raisin','rosin','sev','popcorn','snack','bar ']],
+  ['Slik & kaffe', ['chocolate','chokolade','nutella','candy','slik','coffee','kaffe','tea','chai','cookie','biscuit','småkage']],
+  ['Husholdning', ['soap','sæbe','detergent','vaskemiddel','toilet','toiletpapir','paper towel','køkkenrulle','foil','folie','freezer bag','fryse','dishwash','opvask','cleaning','rengøring','battery','batteri','trash','skrald','napkin','serviet','sponge','svamp']],
+];
+function wordStart(text, kw) {
+  let from = 0, i;
+  while ((i = text.indexOf(kw, from)) !== -1) {
+    const before = i === 0 ? '' : text[i - 1];
+    if (!/[a-zæøå0-9]/.test(before)) return true;
+    from = i + 1;
+  }
+  return false;
+}
+// Best-guess grocery category for a typed item: learned memory first, then keywords.
+function guessCategory(text) {
+  const t = (text || '').toLowerCase().trim();
+  if (!t) return 'Other';
+  const key = sanitizeKey(t);
+  if (catMemory[key]) return catMemory[key];
+  if (/(^|[^a-zæøå])(frozen|frost|frossen|frys)/.test(t)) return 'Frozen stuff';
+  for (const [cat, words] of CATEGORY_KEYWORDS) {
+    if (words.some(w => wordStart(t, w))) return cat;
+  }
+  return 'Other';
+}
+// Remember an explicit category choice so the same item auto-sorts there next time.
+async function learnCategory(text, group) {
+  const key = sanitizeKey((text || '').toLowerCase());
+  if (!key || !group || group === 'Other') return;
+  catMemory[key] = group;
+  await fbPatch('/catmemory', { [key]: group });
+}
+
 // ---------- Seed data for the Croatia trip list (migrated from the old flat format) ----------
 const CROATIA_SEED = [
   ['Gaurav','Solbriller'],['Gaurav','6 T-shirts (2 lyse, 2 marine/oliven, 2 mønstrede – alle matcher hinanden)'],
@@ -811,16 +866,19 @@ function renderListView() {
     return;
   }
 
-  if (total === 0) {
+  const showAddTab = !isTravel; // grocery/shopping lists get the fast auto-sort "Add" tab
+  if (total === 0 && !showAddTab) {
     content.innerHTML = '<div class="empty-state">This list is empty.<br>Add your first item below.</div>' + addBarHtml(groupNames);
   } else {
-    // Keep whichever tab was already open for this list; default to the first group only the first time.
-    if (!activeGroupByList[currentListId] || !groupNames.includes(activeGroupByList[currentListId])) {
-      activeGroupByList[currentListId] = groupNames[0];
+    const tabGroups = showAddTab ? ['__add__'].concat(groupNames) : groupNames;
+    // Keep whichever tab was already open; default to the Add tab on grocery lists.
+    if (!activeGroupByList[currentListId] || !tabGroups.includes(activeGroupByList[currentListId])) {
+      activeGroupByList[currentListId] = showAddTab ? '__add__' : groupNames[0];
     }
     const activeGroup = activeGroupByList[currentListId];
 
-    const tabsHtml = '<div class="subtabstrip">' + groupNames.map(g => {
+    const tabsHtml = '<div class="subtabstrip">' + tabGroups.map(g => {
+      if (g === '__add__') return '<button class="subtab-btn ' + (g === activeGroup ? 'active' : '') + '" data-group="__add__">🪄 Add</button>';
       const gc = isTravel
         ? groups[g].filter(([id,i]) => i.packed).length
         : groups[g].filter(([id,i]) => i.checked).length;
@@ -832,12 +890,27 @@ function renderListView() {
       ? '<div class="stage-legend"><span>🏠 Have it / bought</span><span>🧳 Packed</span><span>🔙 Packed for home</span></div>'
       : '';
 
-    const activeItems = groups[activeGroup] || [];
-    const panelHtml = '<div class="subtab-panel"><ul>' +
-      activeItems.map(([itemId, item]) => itemRowHtml(itemId, item, isTravel)).join('') +
-      '</ul></div>';
+    let panelHtml;
+    if (activeGroup === '__add__') {
+      const grouped = groupNames.length
+        ? groupNames.map(g => groceryGroupBlock(g, groups)).join('')
+        : '<div class="empty-state" style="padding:26px;">No items yet — start typing above.</div>';
+      panelHtml =
+        '<form class="add-bar add-bar-auto" id="quick-add-form">' +
+          '<input type="text" id="quick-add-input" placeholder="Type an item — it sorts itself…" required autocomplete="off">' +
+          '<input type="hidden" id="quick-add-group" value="__auto__">' +
+          '<button type="submit">+</button>' +
+        '</form>' +
+        '<div class="section-hint">Each item is auto-filed by category. Tap a category tab to shop by aisle.</div>' +
+        grouped;
+    } else {
+      const activeItems = groups[activeGroup] || [];
+      panelHtml = '<div class="subtab-panel"><ul>' +
+        activeItems.map(([itemId, item]) => itemRowHtml(itemId, item, isTravel)).join('') +
+        '</ul></div>' + addBarHtml(groupNames, activeGroup);
+    }
 
-    content.innerHTML = tabsHtml + legendHtml + panelHtml + addBarHtml(groupNames, activeGroup);
+    content.innerHTML = tabsHtml + legendHtml + panelHtml;
   }
 
   content.querySelectorAll('.subtab-btn').forEach(btn => {
@@ -914,6 +987,14 @@ function itemRowHtml(itemId, item, isTravel, groupLabel) {
   '</li>';
 }
 
+// One category block for the grocery "Add" tab — the sorted shopping list forming live.
+function groceryGroupBlock(g, groups) {
+  const arr = groups[g] || [];
+  const done = arr.filter(([id, i]) => i.checked).length;
+  return '<div class="groc-group"><div class="groc-group-head">' + escapeHtml(g) + ' (' + done + '/' + arr.length + ')</div><ul>' +
+    arr.map(([id, it]) => itemRowHtml(id, it, false)).join('') + '</ul></div>';
+}
+
 function addBarHtml(groupNames, activeGroup) {
   const options = groupNames.map(g => '<option value="' + escapeHtml(g) + '"' + (g === activeGroup ? ' selected' : '') + '>' + escapeHtml(g) + '</option>').join('');
   return '<form class="add-bar" id="quick-add-form">' +
@@ -930,10 +1011,12 @@ async function handleQuickAdd(e) {
   const text = textInput.value.trim();
   if (!text) return;
 
-  let group = groupSelect.value;
-  if (group === '__new__') {
-    group = prompt('Name for new group:', 'Other') || 'Other';
-  }
+  const rawGroup = groupSelect.value;
+  const fromAuto = rawGroup === '__auto__';
+  let group;
+  if (fromAuto) group = guessCategory(text);              // 🪄 Add tab: file it automatically
+  else if (rawGroup === '__new__') group = prompt('Name for new group:', 'Other') || 'Other';
+  else group = rawGroup;
 
   const list = allLists[currentListId];
   const items = list.items || {};
@@ -943,16 +1026,22 @@ async function handleQuickAdd(e) {
 
   items[newId] = newItem;
   list.items = items;
-  activeGroupByList[currentListId] = group;
+  // Stay on the Add tab when auto-adding so you can keep typing; otherwise jump to the group.
+  activeGroupByList[currentListId] = fromAuto ? '__add__' : group;
 
   textInput.value = '';
   renderListView();
-  document.getElementById('quick-add-input').focus();
+  const inp = document.getElementById('quick-add-input');
+  if (inp) inp.focus();
 
   showStatus('Saving…');
   const ok = await fbPatch('/lists/' + currentListId + '/items', { [newId]: newItem });
-  showStatus(ok ? '✓ Added' : '⚠ Could not save', true);
-  if (ok) logChange('added', newItem.text, newItem.group);
+  showStatus(ok ? (fromAuto ? '✓ ' + text + ' → ' + group : '✓ Added') : '⚠ Could not save', true);
+  if (ok) {
+    logChange('added', newItem.text, newItem.group);
+    // Learn from an explicit category choice so it auto-sorts there next time.
+    if (!fromAuto && group !== 'Other') learnCategory(text, group);
+  }
 }
 
 async function toggleItem(itemId, stage, value) {
@@ -2812,6 +2901,7 @@ async function init() {
   await seedMadpakker();
   await seedMadpakkePlanIfMissing();
   await seedBreakfastPlanIfMissing();
+  catMemory = (await fbGet('/catmemory')) || {};
   await loadAllLists();
   await loadRecipes();
   await loadMealPlan();
