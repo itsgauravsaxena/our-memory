@@ -446,6 +446,7 @@
     <h3 id="madpakke-editor-title">New madpakke</h3>
     <input type="text" id="mp-emoji" maxlength="4" placeholder="Emoji (e.g. 🍱)" value="🍱">
     <input type="text" id="mp-name" placeholder="Name (e.g. Focaccia & frikadelle box)">
+    <input type="number" id="mp-prep" placeholder="Prep time in minutes (e.g. 10)">
     <div class="field-label">Each part — one item per line, "Name | Category"</div>
     <div class="field-label">🍱 Main</div>
     <textarea id="mp-main" rows="2" placeholder="Focaccia (frozen) | Frozen stuff&#10;Frikadeller (2) | Kød"></textarea>
@@ -2030,18 +2031,32 @@ const MADPAKKE_SEED = [
       gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'}] } },
 ];
 
+// Prep minutes per box — all quick morning assembly (frozen items like focaccia,
+// pølsehorn and pizzasnegle can be baked the night before, so mornings stay fast).
+const MADPAKKE_PREP = {
+  'focaccia-frikadelle':10, 'poelsehorn':10, 'pizzasnegle':10, 'leftover-pizza':5,
+  'leftover-burger':5, 'rugbrod-classic':10, 'wrap-box':10, 'pastasalat':10,
+  'pandekage-roll':10, 'frikadelle-flatbread':10,
+};
+
 async function seedMadpakker() {
   const applied = (await fbGet('/meta/seededMadpakkeKeys')) || {};
   const existing = (await fbGet('/madpakker')) || {};
   const existingNames = new Set(Object.values(existing).map(m => m && m.name));
+  const seedByName = {}; MADPAKKE_SEED.forEach(m => { seedByName[m.name] = m; });
   const patch = {}, patchKeys = {};
   MADPAKKE_SEED.forEach((m, i) => {
     if (applied[m.seedKey]) return;
-    if (!existingNames.has(m.name)) patch['m_' + m.seedKey] = Object.assign({ createdAt: Date.now() + i }, m);
+    if (!existingNames.has(m.name)) patch['m_' + m.seedKey] = Object.assign({ createdAt: Date.now() + i, prep: MADPAKKE_PREP[m.seedKey] || 10 }, m);
     patchKeys[m.seedKey] = true;
   });
   if (Object.keys(patch).length) await fbPatch('/madpakker', patch);
   if (Object.keys(patchKeys).length) await fbPatch('/meta/seededMadpakkeKeys', patchKeys);
+  // Backfill prep onto any boxes seeded before the prep field existed.
+  for (const [id, doc] of Object.entries(existing)) {
+    const seed = doc && seedByName[doc.name];
+    if (seed && doc.prep == null) await fbPatch('/madpakker/' + id, { prep: MADPAKKE_PREP[seed.seedKey] || 10 });
+  }
 }
 async function seedMadpakkePlanIfMissing() {
   if (await fbGet('/madpakkeplan')) return;
@@ -2085,7 +2100,7 @@ function renderMadpakke() {
         '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
         '<div class="r-info" data-open-mp="' + slot.madpakkeId + '">' +
           '<h3>' + escapeHtml(m.name) + '</h3>' +
-          '<div class="recipe-meta">' + starsHtml(m.rating, false) + '</div>' +
+          '<div class="recipe-meta">' + starsHtml(m.rating, false) + (m.prep ? '<span>⏱ ' + m.prep + ' min prep</span>' : '') + '</div>' +
         '</div>' +
         '<button class="icon-mini" data-clear-day="' + key + '" title="Remove">✕</button>' +
       '</div>' +
@@ -2098,12 +2113,12 @@ function renderMadpakke() {
     return '<div class="recipe-card" data-open-mp="' + id + '">' +
       '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
       '<div class="r-info"><h3>' + escapeHtml(m.name) + '</h3>' +
-        '<div class="recipe-meta">' + starsHtml(m.rating, false) + (mainNames ? '<span>' + escapeHtml(mainNames) + '</span>' : '') + '</div>' +
+        '<div class="recipe-meta">' + starsHtml(m.rating, false) + (m.prep ? '<span>⏱ ' + m.prep + ' min</span>' : '') + (mainNames ? '<span>' + escapeHtml(mainNames) + '</span>' : '') + '</div>' +
       '</div></div>';
   }).join('');
 
   content.innerHTML =
-    '<div class="section-hint">Plan the week of lunchboxes, then shop for it. Each box has a main, a snack, an evening snack and grønt — protein-first.</div>' +
+    '<div class="section-hint">Plan the week of lunchboxes, then shop for it. Each box has a main, a snack, an evening snack and grønt — protein-first and quick to prepare (frozen bits can be baked the night before).</div>' +
     dayCards +
     '<div class="plan-actions">' +
       '<button class="secondary" id="mp-fill-btn">✨ Suggest a week</button>' +
@@ -2179,6 +2194,7 @@ function renderMadpakkeDetail(id) {
   const content = document.getElementById('content');
   content.innerHTML =
     '<div class="detail-section">' +
+      (m.prep ? '<div class="recipe-meta" style="margin-bottom:8px;">⏱ ' + m.prep + ' min to prepare</div>' : '') +
       '<div class="field-label" style="margin:0 0 4px;">Tap to rate</div>' + starsHtml(m.rating, true, id) + sourceHtml +
     '</div>' +
     '<div class="detail-actions">' +
@@ -2250,6 +2266,7 @@ function openMadpakkeEditor(id) {
   document.getElementById('madpakke-editor-title').textContent = m ? 'Edit madpakke' : 'New madpakke';
   document.getElementById('mp-emoji').value = m ? (m.emoji || '🍱') : '🍱';
   document.getElementById('mp-name').value = m ? m.name : '';
+  document.getElementById('mp-prep').value = m ? (m.prep || '') : '';
   ['main','snack','evening','gront'].forEach(k => {
     const items = (m && m.components && m.components[k]) || [];
     document.getElementById('mp-' + k).value = items.map(i => i.name + ' | ' + (i.cat || 'Other')).join('\n');
@@ -2266,6 +2283,7 @@ async function saveMadpakke() {
   const mp = {
     name,
     emoji: document.getElementById('mp-emoji').value.trim() || '🍱',
+    prep: parseInt(document.getElementById('mp-prep').value, 10) || 0,
     components,
     source: document.getElementById('mp-source').value.trim(),
   };
