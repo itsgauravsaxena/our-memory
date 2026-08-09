@@ -425,6 +425,45 @@
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="madpakke-picker-modal">
+  <div class="modal-box modal-scroll">
+    <h3>Pick a madpakke</h3>
+    <div id="mp-picker-list"></div>
+    <button class="btn-cancel" id="cancel-mp-picker" style="width:100%; margin-top:6px;">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="madpakke-assign-modal">
+  <div class="modal-box">
+    <h3>Add to which day?</h3>
+    <div id="mp-assign-options"></div>
+    <button class="btn-cancel" id="cancel-mp-assign" style="width:100%; margin-top:6px;">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="madpakke-editor-modal">
+  <div class="modal-box modal-scroll">
+    <h3 id="madpakke-editor-title">New madpakke</h3>
+    <input type="text" id="mp-emoji" maxlength="4" placeholder="Emoji (e.g. 🍱)" value="🍱">
+    <input type="text" id="mp-name" placeholder="Name (e.g. Focaccia & frikadelle box)">
+    <div class="field-label">Each part — one item per line, "Name | Category"</div>
+    <div class="field-label">🍱 Main</div>
+    <textarea id="mp-main" rows="2" placeholder="Focaccia (frozen) | Frozen stuff&#10;Frikadeller (2) | Kød"></textarea>
+    <div class="field-label">🥨 Snack</div>
+    <textarea id="mp-snack" rows="2" placeholder="Cheese cubes | Mejeri"></textarea>
+    <div class="field-label">🌙 Evening snack</div>
+    <textarea id="mp-evening" rows="2" placeholder="Skyr with berries | Mejeri"></textarea>
+    <div class="field-label">🥕 Grønt</div>
+    <textarea id="mp-gront" rows="2" placeholder="Cucumber sticks | Veggies"></textarea>
+    <div class="field-label">Source / credit (optional)</div>
+    <input type="text" id="mp-source" placeholder="e.g. Family favourite">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancel-madpakke-editor">Cancel</button>
+      <button class="btn-create" id="save-madpakke-editor">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const BASE_URL = 'https://ourmemory-7cd11-default-rtdb.europe-west1.firebasedatabase.app';
 const statusEl = document.getElementById('sync-status');
@@ -437,7 +476,10 @@ let lastRenderedListId = null; // tracks whether the last renderListView() call 
 let searchQuery = ''; // current in-list search text; filters items across every group
 let allRecipes = {};  // recipe database, keyed by recipe id
 let mealPlan = null;  // the current 5-day dinner plan
-let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe
+let allMadpakker = {}; // madpakke (lunchbox) idea database
+let madpakkePlan = null; // the current 5-day madpakke plan
+let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe | madpakke | madpakke-detail
+const MADPAKKE_PARTS = [['main','🍱 Main'],['snack','🥨 Snack'],['evening','🌙 Evening snack'],['gront','🥕 Grønt']];
 const GROCERY_CATS = ['Bread','Fruits','Veggies','Køledisk','Frozen stuff','Kød','Asian','Pantry','Baking','Mejeri','Dry snacks','Husholdning','Slik & kaffe','Cereals','Other'];
 const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday']];
 
@@ -613,7 +655,10 @@ function renderDashboard() {
       '<div class="count">' + (plannedCount ? plannedCount + ' dinners planned' : 'Plan 5 days of dinners') + '</div></div></div>' +
     '<div class="nav-card" onclick="location.hash=\'recipes\'">' +
       '<div class="emoji">📖</div><div class="info"><h3>Recipes</h3>' +
-      '<div class="count">' + Object.keys(allRecipes).length + ' saved · rate &amp; manage</div></div></div>';
+      '<div class="count">' + Object.keys(allRecipes).length + ' saved · rate &amp; manage</div></div></div>' +
+    '<div class="nav-card" onclick="location.hash=\'madpakke\'">' +
+      '<div class="emoji">🍱</div><div class="info"><h3>Madpakke</h3>' +
+      '<div class="count">' + Object.keys(allMadpakker).length + ' lunchbox ideas · plan &amp; shop</div></div></div>';
 
   const listsHtml = listIds.length
     ? listIds.map(id => {
@@ -1560,6 +1605,7 @@ function showFab(char, onclick) {
 
 function goBack() {
   if (currentView === 'recipe') location.hash = 'recipes';
+  else if (currentView === 'madpakke-detail') location.hash = 'madpakke';
   else location.hash = '';
 }
 
@@ -1925,6 +1971,319 @@ async function saveRecipe() {
   if (currentView === 'recipe') renderRecipeDetail(id);
 }
 
+// ========== Madpakke (son's lunchbox) ==========
+
+// Seeded madpakke ideas: protein-rich, colourful, several small parts (main, snack,
+// evening snack, grønt). Includes the frozen favourites (focaccia, pølsehorn,
+// pizzasnegle) and leftovers, plus more inspiration. My own adaptations; sources
+// credited where relevant. Ingredients name Danish-supermarket items too.
+const MADPAKKE_SEED = [
+  { seedKey:'focaccia-frikadelle', name:'Focaccia & frikadelle box', emoji:'🍱', rating:5, source:'Family favourite',
+    components:{ main:[{name:'Focaccia (frozen) / focaccia',cat:'Frozen stuff'},{name:'Frikadeller or chicken meatballs (2) / frikadeller',cat:'Kød'}],
+      snack:[{name:'Cheese cubes / ostehaps',cat:'Mejeri'},{name:'Wholegrain crackers / grovkiks',cat:'Dry snacks'}],
+      evening:[{name:'Skyr with berries / skyr med bær',cat:'Mejeri'}],
+      gront:[{name:'Cucumber sticks / agurk',cat:'Veggies'},{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'}] } },
+  { seedKey:'poelsehorn', name:'Pølsehorn box', emoji:'🌭', rating:5, source:'Family favourite',
+    components:{ main:[{name:'Pølsehorn (frozen)',cat:'Frozen stuff'}],
+      snack:[{name:'Hard-boiled egg / kogt æg',cat:'Mejeri'},{name:'Rye crackers / rugkiks',cat:'Dry snacks'}],
+      evening:[{name:'Yoghurt / yoghurt',cat:'Mejeri'}],
+      gront:[{name:'Carrot sticks / gulerod',cat:'Veggies'},{name:'Bell pepper strips / peberfrugt',cat:'Veggies'}] } },
+  { seedKey:'pizzasnegle', name:'Pizzasnegle box', emoji:'🍕', rating:5, source:'Family favourite',
+    components:{ main:[{name:'Pizzasnegle (frozen)',cat:'Frozen stuff'}],
+      snack:[{name:'Cheese / ost',cat:'Mejeri'},{name:'Edamame',cat:'Frozen stuff'}],
+      evening:[{name:'Banana & a few nuts / banan & nødder',cat:'Fruits'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Sweetcorn / majs',cat:'Pantry'}] } },
+  { seedKey:'leftover-pizza', name:'Leftover pizza box', emoji:'🍕', rating:4, source:'Leftovers',
+    components:{ main:[{name:'Leftover pizza slices / pizza',cat:'Frozen stuff'}],
+      snack:[{name:'Skyr',cat:'Mejeri'}],
+      evening:[{name:'Grapes / druer',cat:'Fruits'}],
+      gront:[{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}] } },
+  { seedKey:'leftover-burger', name:'Leftover burger box', emoji:'🍔', rating:4, source:'Leftovers',
+    components:{ main:[{name:'Leftover burger patty / burger',cat:'Kød'},{name:'Mini bun / burgerbolle',cat:'Bread'}],
+      snack:[{name:'Cheese cubes / ostehaps',cat:'Mejeri'}],
+      evening:[{name:'Apple slices + peanut butter / æble & peanutbutter',cat:'Fruits'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'}] } },
+  { seedKey:'rugbrod-classic', name:'Rugbrød open-sandwich box', emoji:'🥪', rating:5, source:'Inspired by Skolemælk', sourceUrl:'https://www.skolemaelk.dk/madpakker-og-opskrifter/temaer-og-inspiration/madpakken/',
+    components:{ main:[{name:'Rye bread / rugbrød',cat:'Bread'},{name:'Egg + chicken or liver pâté / æg, kylling el. leverpostej',cat:'Kød'}],
+      snack:[{name:'Cheese / ost',cat:'Mejeri'},{name:'Wholegrain crackers / grovkiks',cat:'Dry snacks'}],
+      evening:[{name:'Skyr',cat:'Mejeri'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Tomato',cat:'Veggies'}] } },
+  { seedKey:'wrap-box', name:'Chicken & hummus wrap box', emoji:'🌯', rating:5, source:'Inspired by Valdemarsro', sourceUrl:'https://www.valdemarsro.dk/madpakke-opskrifter/',
+    components:{ main:[{name:'Tortilla wrap',cat:'Bread'},{name:'Chicken + hummus / kylling & hummus',cat:'Kød'}],
+      snack:[{name:'Nuts or edamame / nødder',cat:'Dry snacks'}],
+      evening:[{name:'Yoghurt',cat:'Mejeri'}],
+      gront:[{name:'Bell pepper / peberfrugt',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}] } },
+  { seedKey:'pastasalat', name:'Pasta salad box (leftover-friendly)', emoji:'🥗', rating:4, source:'Inspired by Valdemarsro', sourceUrl:'https://www.valdemarsro.dk/madpakke-opskrifter/',
+    components:{ main:[{name:'Pasta salad with chicken or chickpeas / pastasalat',cat:'Pantry'},{name:'Sweetcorn / majs',cat:'Pantry'}],
+      snack:[{name:'Cheese / ost',cat:'Mejeri'}],
+      evening:[{name:'Berries / bær',cat:'Fruits'}],
+      gront:[{name:'Cherry tomatoes / cherrytomater',cat:'Veggies'},{name:'Cucumber / agurk',cat:'Veggies'}] } },
+  { seedKey:'pandekage-roll', name:'Pancake / æggekage roll box', emoji:'🥞', rating:4, source:'Family favourite',
+    components:{ main:[{name:'Pancake or egg-cake rolls / pandekager',cat:'Mejeri'}],
+      snack:[{name:'Skyr',cat:'Mejeri'},{name:'Wholegrain crackers / grovkiks',cat:'Dry snacks'}],
+      evening:[{name:'Banana / banan',cat:'Fruits'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Carrot / gulerod',cat:'Veggies'}] } },
+  { seedKey:'frikadelle-flatbread', name:'Meatball & flatbread box', emoji:'🧆', rating:5, source:'Family favourite',
+    components:{ main:[{name:'Frikadeller (2–3) / frikadeller',cat:'Kød'},{name:'Naan or flatbread / naan',cat:'Bread'}],
+      snack:[{name:'Hummus + carrot / hummus',cat:'Køledisk'}],
+      evening:[{name:'Nuts & raisins / nødder & rosiner',cat:'Dry snacks'}],
+      gront:[{name:'Cucumber / agurk',cat:'Veggies'},{name:'Bell pepper / peberfrugt',cat:'Veggies'}] } },
+];
+
+async function seedMadpakker() {
+  const applied = (await fbGet('/meta/seededMadpakkeKeys')) || {};
+  const existing = (await fbGet('/madpakker')) || {};
+  const existingNames = new Set(Object.values(existing).map(m => m && m.name));
+  const patch = {}, patchKeys = {};
+  MADPAKKE_SEED.forEach((m, i) => {
+    if (applied[m.seedKey]) return;
+    if (!existingNames.has(m.name)) patch['m_' + m.seedKey] = Object.assign({ createdAt: Date.now() + i }, m);
+    patchKeys[m.seedKey] = true;
+  });
+  if (Object.keys(patch).length) await fbPatch('/madpakker', patch);
+  if (Object.keys(patchKeys).length) await fbPatch('/meta/seededMadpakkeKeys', patchKeys);
+}
+async function seedMadpakkePlanIfMissing() {
+  if (await fbGet('/madpakkeplan')) return;
+  const all = (await fbGet('/madpakker')) || {};
+  const idByName = {};
+  Object.entries(all).forEach(([id, m]) => { if (m) idByName[m.name] = id; });
+  const starters = ['Focaccia & frikadelle box','Rugbrød open-sandwich box','Pizzasnegle box','Chicken & hummus wrap box','Pølsehorn box'];
+  const days = {};
+  PLAN_DAYS.forEach(([key], i) => { const id = idByName[starters[i]]; if (id) days[key] = { madpakkeId: id, packed: false }; });
+  await fbPut('/madpakkeplan', { days });
+}
+async function loadMadpakker() { allMadpakker = (await fbGet('/madpakker')) || {}; }
+async function loadMadpakkePlan() { madpakkePlan = (await fbGet('/madpakkeplan')) || null; }
+
+// Flatten every part of a madpakke into one ingredient list (for the grocery list).
+function madpakkeItems(m) {
+  const out = [];
+  MADPAKKE_PARTS.forEach(([key]) => (m.components && m.components[key] || []).forEach(i => out.push(i)));
+  return out;
+}
+
+// ----- Madpakke view: weekly plan on top, idea library below -----
+function renderMadpakke() {
+  currentView = 'madpakke';
+  setSubViewHeader('🍱 Madpakke');
+  showFab('+', () => openMadpakkeEditor(null));
+  const content = document.getElementById('content');
+  const plan = madpakkePlan || { days: {} };
+  const days = plan.days || {};
+
+  const dayCards = PLAN_DAYS.map(([key, label]) => {
+    const slot = days[key];
+    const m = slot && allMadpakker[slot.madpakkeId];
+    if (!m) {
+      return '<div class="day-card empty"><div class="day-name" style="margin:0;">' + label + '</div>' +
+        '<button class="pick-btn" data-pick-day="' + key + '">＋ Pick a box</button></div>';
+    }
+    return '<div class="day-card">' +
+      '<div class="day-name">' + label + '</div>' +
+      '<div class="day-row">' +
+        '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
+        '<div class="r-info" data-open-mp="' + slot.madpakkeId + '">' +
+          '<h3>' + escapeHtml(m.name) + '</h3>' +
+          '<div class="recipe-meta">' + starsHtml(m.rating, false) + '</div>' +
+        '</div>' +
+        '<button class="icon-mini" data-clear-day="' + key + '" title="Remove">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const ideas = Object.entries(allMadpakker).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0) || a[1].name.localeCompare(b[1].name));
+  const ideaCards = ideas.map(([id, m]) => {
+    const mainNames = (m.components && m.components.main || []).map(i => i.name.split(' / ')[0]).join(', ');
+    return '<div class="recipe-card" data-open-mp="' + id + '">' +
+      '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
+      '<div class="r-info"><h3>' + escapeHtml(m.name) + '</h3>' +
+        '<div class="recipe-meta">' + starsHtml(m.rating, false) + (mainNames ? '<span>' + escapeHtml(mainNames) + '</span>' : '') + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  content.innerHTML =
+    '<div class="section-hint">Plan the week of lunchboxes, then shop for it. Each box has a main, a snack, an evening snack and grønt — protein-first.</div>' +
+    dayCards +
+    '<div class="plan-actions">' +
+      '<button class="secondary" id="mp-fill-btn">✨ Suggest a week</button>' +
+      '<button id="mp-grocery-btn">🛒 Add the week to grocery list</button>' +
+    '</div>' +
+    '<div class="dash-heading">Madpakke ideas</div>' +
+    '<div class="section-hint">Tap one to view, rate or shop for it. Tap ＋ to add your own.</div>' +
+    ideaCards;
+
+  content.querySelectorAll('[data-pick-day]').forEach(b => b.addEventListener('click', () => openMadpakkePicker(id => assignMadpakkeToDay(b.dataset.pickDay, id))));
+  content.querySelectorAll('[data-open-mp]').forEach(b => b.addEventListener('click', () => { location.hash = 'madpakke-' + b.dataset.openMp; }));
+  content.querySelectorAll('[data-clear-day]').forEach(b => b.addEventListener('click', () => clearMadpakkeDay(b.dataset.clearDay)));
+  document.getElementById('mp-fill-btn').addEventListener('click', suggestMadpakkeWeek);
+  document.getElementById('mp-grocery-btn').addEventListener('click', () => {
+    const all = [];
+    PLAN_DAYS.forEach(([key]) => { const slot = days[key]; const m = slot && allMadpakker[slot.madpakkeId]; if (m) madpakkeItems(m).forEach(i => all.push(i)); });
+    if (!all.length) { showStatus('Plan is empty', true); return; }
+    openGroceryTarget(all, 'the madpakke week');
+  });
+}
+
+async function saveMadpakkePlan() { await fbPut('/madpakkeplan', madpakkePlan); }
+async function assignMadpakkeToDay(dayKey, id) {
+  if (!madpakkePlan) madpakkePlan = { days: {} };
+  if (!madpakkePlan.days) madpakkePlan.days = {};
+  madpakkePlan.days[dayKey] = { madpakkeId: id, packed: false };
+  closeMadpakkePicker();
+  renderMadpakke();
+  showStatus('Saving…');
+  await saveMadpakkePlan();
+  showStatus('✓ Added', true);
+}
+async function clearMadpakkeDay(dayKey) {
+  if (!madpakkePlan || !madpakkePlan.days) return;
+  delete madpakkePlan.days[dayKey];
+  renderMadpakke();
+  await saveMadpakkePlan();
+  showStatus('✓ Removed', true);
+}
+async function suggestMadpakkeWeek() {
+  const ranked = Object.entries(allMadpakker).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
+  if (ranked.length < 5) { showStatus('Add more ideas first', true); return; }
+  // Spread variety: step through the ranked list so the 5 days are not identical.
+  madpakkePlan = madpakkePlan || { days: {} };
+  madpakkePlan.days = {};
+  PLAN_DAYS.forEach(([key], i) => { madpakkePlan.days[key] = { madpakkeId: ranked[i % ranked.length][0], packed: false }; });
+  renderMadpakke();
+  showStatus('Saving…');
+  await saveMadpakkePlan();
+  showStatus('✓ Week planned', true);
+}
+
+// ----- Madpakke detail -----
+function renderMadpakkeDetail(id) {
+  const m = allMadpakker[id];
+  if (!m) { location.hash = 'madpakke'; return; }
+  currentView = 'madpakke-detail';
+  setSubViewHeader((m.emoji || '🍱') + ' ' + m.name);
+  showFab(null);
+  const sourceHtml = m.source
+    ? '<div class="recipe-source">' + (m.sourceUrl
+        ? 'Inspiration: <a href="' + escapeHtml(m.sourceUrl) + '" target="_blank" rel="noopener">' + escapeHtml(m.source) + '</a>'
+        : escapeHtml(m.source)) + '</div>'
+    : '';
+  const partsHtml = MADPAKKE_PARTS.map(([key, label]) => {
+    const items = (m.components && m.components[key]) || [];
+    if (!items.length) return '';
+    return '<div class="detail-section"><h4>' + label + '</h4><ul class="ing">' +
+      items.map(i => '<li>' + escapeHtml(i.name) + ' <span class="tag">' + escapeHtml(i.cat || 'Other') + '</span></li>').join('') +
+    '</ul></div>';
+  }).join('');
+
+  const content = document.getElementById('content');
+  content.innerHTML =
+    '<div class="detail-section">' +
+      '<div class="field-label" style="margin:0 0 4px;">Tap to rate</div>' + starsHtml(m.rating, true, id) + sourceHtml +
+    '</div>' +
+    '<div class="detail-actions">' +
+      '<button id="mp-grocery">🛒 Add to grocery list</button>' +
+      '<button id="mp-plan">📅 Add to a day</button>' +
+      '<button id="mp-edit">✎ Edit</button>' +
+      '<button class="danger" id="mp-delete">🗑 Delete</button>' +
+    '</div>' + partsHtml;
+
+  content.querySelectorAll('.stars.interactive .star').forEach(st => st.addEventListener('click', () => setMadpakkeRating(id, parseInt(st.dataset.val, 10))));
+  document.getElementById('mp-grocery').addEventListener('click', () => openGroceryTarget(madpakkeItems(m), m.name));
+  document.getElementById('mp-plan').addEventListener('click', () => openMadpakkeAssignDay(id));
+  document.getElementById('mp-edit').addEventListener('click', () => openMadpakkeEditor(id));
+  document.getElementById('mp-delete').addEventListener('click', () => deleteMadpakke(id));
+}
+async function setMadpakkeRating(id, val) {
+  const m = allMadpakker[id]; if (!m) return;
+  m.rating = val;
+  renderMadpakkeDetail(id);
+  await fbPatch('/madpakker/' + id, { rating: val });
+  showStatus('✓ Rated', true);
+}
+async function deleteMadpakke(id) {
+  const m = allMadpakker[id]; if (!m) return;
+  if (!confirm('Delete madpakke "' + m.name + '"?')) return;
+  delete allMadpakker[id];
+  await fbDelete('/madpakker/' + id);
+  location.hash = 'madpakke';
+  showStatus('✓ Deleted', true);
+}
+
+// ----- Madpakke picker (for a plan day) -----
+let mpPickerOnPick = null;
+function openMadpakkePicker(onPick) {
+  mpPickerOnPick = onPick;
+  const list = Object.entries(allMadpakker).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
+  document.getElementById('mp-picker-list').innerHTML = list.length ? list.map(([id, m]) =>
+    '<div class="recipe-card" data-pick="' + id + '">' +
+      '<div class="r-emoji">' + (m.emoji || '🍱') + '</div>' +
+      '<div class="r-info"><h3>' + escapeHtml(m.name) + '</h3><div class="recipe-meta">' + starsHtml(m.rating, false) + '</div></div>' +
+    '</div>').join('') : '<div class="section-hint">No ideas yet.</div>';
+  document.getElementById('mp-picker-list').querySelectorAll('[data-pick]').forEach(c =>
+    c.addEventListener('click', () => { if (mpPickerOnPick) mpPickerOnPick(c.dataset.pick); }));
+  document.getElementById('madpakke-picker-modal').classList.remove('hidden');
+}
+function closeMadpakkePicker() { document.getElementById('madpakke-picker-modal').classList.add('hidden'); mpPickerOnPick = null; }
+
+// ----- Add a madpakke to a plan day (from detail) -----
+let mpAssignPending = null;
+function openMadpakkeAssignDay(id) {
+  mpAssignPending = id;
+  const days = (madpakkePlan && madpakkePlan.days) || {};
+  document.getElementById('mp-assign-options').innerHTML = PLAN_DAYS.map(([key, label]) => {
+    const slot = days[key]; const cur = slot && allMadpakker[slot.madpakkeId];
+    return '<button class="move-list-option" data-day="' + key + '"><span>📅</span><span>' + label +
+      (cur ? ' — <span style="color:#888;">' + escapeHtml(cur.name) + '</span>' : '') + '</span></button>';
+  }).join('');
+  document.getElementById('mp-assign-options').querySelectorAll('[data-day]').forEach(b =>
+    b.addEventListener('click', () => { closeMadpakkeAssignDay(); assignMadpakkeToDay(b.dataset.day, mpAssignPending); }));
+  document.getElementById('madpakke-assign-modal').classList.remove('hidden');
+}
+function closeMadpakkeAssignDay() { document.getElementById('madpakke-assign-modal').classList.add('hidden'); }
+
+// ----- Madpakke editor -----
+let editingMadpakkeId = null;
+function openMadpakkeEditor(id) {
+  editingMadpakkeId = id;
+  const m = id ? allMadpakker[id] : null;
+  document.getElementById('madpakke-editor-title').textContent = m ? 'Edit madpakke' : 'New madpakke';
+  document.getElementById('mp-emoji').value = m ? (m.emoji || '🍱') : '🍱';
+  document.getElementById('mp-name').value = m ? m.name : '';
+  ['main','snack','evening','gront'].forEach(k => {
+    const items = (m && m.components && m.components[k]) || [];
+    document.getElementById('mp-' + k).value = items.map(i => i.name + ' | ' + (i.cat || 'Other')).join('\n');
+  });
+  document.getElementById('mp-source').value = m ? (m.source || '') : '';
+  document.getElementById('madpakke-editor-modal').classList.remove('hidden');
+}
+function closeMadpakkeEditor() { document.getElementById('madpakke-editor-modal').classList.add('hidden'); editingMadpakkeId = null; }
+async function saveMadpakke() {
+  const name = document.getElementById('mp-name').value.trim();
+  if (!name) { showStatus('Name required', true); return; }
+  const components = {};
+  ['main','snack','evening','gront'].forEach(k => { components[k] = parseIngredientLines(document.getElementById('mp-' + k).value); });
+  const mp = {
+    name,
+    emoji: document.getElementById('mp-emoji').value.trim() || '🍱',
+    components,
+    source: document.getElementById('mp-source').value.trim(),
+  };
+  const id = editingMadpakkeId || ('m' + Date.now());
+  if (editingMadpakkeId) {
+    mp.rating = allMadpakker[id].rating || 0;
+    mp.createdAt = allMadpakker[id].createdAt || Date.now();
+    if (allMadpakker[id].sourceUrl) mp.sourceUrl = allMadpakker[id].sourceUrl;
+  } else { mp.rating = 0; mp.createdAt = Date.now(); }
+  allMadpakker[id] = mp;
+  closeMadpakkeEditor();
+  showStatus('Saving…');
+  await fbPut('/madpakker/' + id, mp);
+  showStatus('✓ Saved', true);
+  location.hash = 'madpakke-' + id;
+  if (currentView === 'madpakke-detail') renderMadpakkeDetail(id);
+}
+
 // ---------- Routing ----------
 function handleRoute() {
   const hash = location.hash.replace('#', '');
@@ -1940,6 +2299,12 @@ function handleRoute() {
   } else if (hash.startsWith('recipe-')) {
     currentListId = null;
     renderRecipeDetail(hash.replace('recipe-', ''));
+  } else if (hash === 'madpakke') {
+    currentListId = null;
+    renderMadpakke();
+  } else if (hash.startsWith('madpakke-')) {
+    currentListId = null;
+    renderMadpakkeDetail(hash.replace('madpakke-', ''));
   } else {
     currentListId = null;
     renderDashboard();
@@ -1957,9 +2322,13 @@ async function init() {
   await seedCroatiaListIfMissing();
   await seedRecipes();
   await seedMealPlanIfMissing();
+  await seedMadpakker();
+  await seedMadpakkePlanIfMissing();
   await loadAllLists();
   await loadRecipes();
   await loadMealPlan();
+  await loadMadpakker();
+  await loadMadpakkePlan();
   handleRoute();
 
   window.addEventListener('hashchange', handleRoute);
@@ -2023,6 +2392,11 @@ async function init() {
     setTimeout(() => lbl.classList.toggle('on', lbl.querySelector('input').checked), 0);
   }));
 
+  document.getElementById('cancel-mp-picker').addEventListener('click', closeMadpakkePicker);
+  document.getElementById('cancel-mp-assign').addEventListener('click', closeMadpakkeAssignDay);
+  document.getElementById('cancel-madpakke-editor').addEventListener('click', closeMadpakkeEditor);
+  document.getElementById('save-madpakke-editor').addEventListener('click', saveMadpakke);
+
   setInterval(async () => {
     const activeInput = document.getElementById('quick-add-input');
     const formHasFocus = document.activeElement && document.activeElement.closest && document.activeElement.closest('#quick-add-form');
@@ -2033,6 +2407,10 @@ async function init() {
     if (currentView === 'mealplan' || currentView === 'recipes' || currentView === 'recipe') {
       allRecipes = (await fbGet('/recipes')) || {};
       mealPlan = (await fbGet('/mealplan')) || null;
+    }
+    if (currentView === 'madpakke' || currentView === 'madpakke-detail') {
+      allMadpakker = (await fbGet('/madpakker')) || {};
+      madpakkePlan = (await fbGet('/madpakkeplan')) || null;
     }
     handleRoute();
   }, 6000);
