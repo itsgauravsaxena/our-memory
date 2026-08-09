@@ -2105,32 +2105,43 @@ async function suggestFreshWeek() {
   const festiveQuick = quick.filter(([id, r]) => isFestive(r));
   const weekendList = all.filter(([id, r]) => (r.tags || []).includes('weekend')); // longer, special
   const isIndian = r => ['Indian', 'South Indian'].includes(r.cuisine || '');
-  const nonIndianNice = all.filter(([id, r]) => !isIndian(r) && (isFestive(r) || (r.time || 0) <= 30)); // non-Indian weekend option
+  const nonIndianFestive = all.filter(([id, r]) => !isIndian(r) && isFestive(r));       // fun non-Indian weekend
+  const nonIndianNice = all.filter(([id, r]) => !isIndian(r) && (isFestive(r) || (r.time || 0) <= 30));
   if (all.length < 5 || !vegQuick.length) { showStatus('Add more recipes first', true); return; }
   mealPlan = mealPlan || { label: 'This week', days: {} };
   mealPlan.days = {};
   const used = new Set();
-  // Random each time so every tap proposes a genuinely fresh week; falls back to
-  // any unused recipe if a preferred pool is exhausted.
-  const pickFrom = pool => shuffled(pool).find(e => !used.has(e[0])) || shuffled(all).find(e => !used.has(e[0])) || all[0];
-  // Keep the week varied: at most 2 Indian dinners on weekdays, and exactly one
-  // Indian cook at the weekend (the other weekend day is something non-Indian).
-  const indianWeekendDay = Math.random() < 0.5 ? 'sat' : 'sun';
-  let weekdayIndian = 0;
+  const firstUnused = list => shuffled(list).find(e => !used.has(e[0]));
+
+  // Give each weekday a different cuisine so the week is varied: one Italian, one
+  // Mexican, one Asian, one Indian and one European/other across Mon–Fri.
+  const bucketOf = r => {
+    const c = r.cuisine || '';
+    if (['Indian', 'South Indian'].includes(c)) return 'Indian';
+    if (c === 'Italian') return 'Italian';
+    if (c === 'Mexican') return 'Mexican';
+    if (['Chinese', 'Thai', 'Vietnamese'].includes(c)) return 'Asian';
+    return 'European';
+  };
+  const weekdayBuckets = shuffled(['Italian', 'Mexican', 'Asian', 'Indian', 'European']);
+  const bucketByDay = {};
+  PLAN_DAYS.filter(([k]) => !WEEKEND_DAYS.includes(k)).forEach(([k], i) => { bucketByDay[k] = weekdayBuckets[i]; });
+  const indianWeekendDay = Math.random() < 0.5 ? 'sat' : 'sun'; // exactly one Indian weekend cook
+
   PLAN_DAYS.forEach(([key]) => {
     const weekend = WEEKEND_DAYS.includes(key);
-    let pool;
-    if (weekend) pool = (key === indianWeekendDay) ? (weekendList.length ? weekendList : all) : (nonIndianNice.length ? nonIndianNice : all);
-    else if (key === MEAT_FREE_DAY) pool = vegQuick.length ? vegQuick : quick;        // Tuesday: quick vegetarian
-    else if (key === FESTIVE_DAY) pool = festiveQuick.length ? festiveQuick : quick;  // Friday: quick festive
-    else pool = quick;                                                                // Mon/Wed/Thu: quick
-    if (!weekend && weekdayIndian >= 2) {                                             // cap weekday Indian at 2
-      const ni = pool.filter(([id, r]) => !isIndian(r));
-      if (ni.length) pool = ni;
+    let pool, fallback;
+    if (weekend) {
+      if (key === indianWeekendDay) { pool = weekendList; fallback = all; }
+      else { pool = nonIndianFestive; fallback = nonIndianNice; }
+    } else {
+      pool = quick.filter(([id, r]) => bucketOf(r) === bucketByDay[key]);
+      if (key === MEAT_FREE_DAY) { pool = pool.filter(([id, r]) => (r.tags || []).includes('vegetarian')); fallback = vegQuick; }
+      else if (key === FESTIVE_DAY) { pool = pool.filter(([id, r]) => isFestive(r)); fallback = festiveQuick; }
+      else fallback = quick;
     }
-    const pick = pickFrom(pool.length ? pool : (weekend ? all : quick));
+    const pick = firstUnused(pool) || firstUnused(fallback) || firstUnused(all) || all[0];
     used.add(pick[0]);
-    if (!weekend && isIndian(pick[1])) weekdayIndian++;
     mealPlan.days[key] = { recipeId: pick[0], protein: 'veg', cooked: false };
   });
   renderMealPlan();
