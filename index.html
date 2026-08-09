@@ -240,6 +240,7 @@
   .day-card { background:white; border-radius:12px; padding:12px 14px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
   .day-card .day-name { font-size:11.5px; font-weight:700; color:#2c6e49; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; }
   .meat-free-badge { display:inline-block; background:#e8f1ec; color:#2c6e49; border-radius:10px; padding:1px 7px; font-size:10px; letter-spacing:0; text-transform:none; font-weight:600; margin-left:6px; }
+  .festive-badge { display:inline-block; background:#fdeccf; color:#b5651d; border-radius:10px; padding:1px 7px; font-size:10px; letter-spacing:0; text-transform:none; font-weight:600; margin-left:6px; }
   .day-card.empty { display:flex; align-items:center; justify-content:space-between; }
   .day-row { display:flex; align-items:center; gap:12px; }
   .day-row .r-emoji { font-size:24px; flex-shrink:0; }
@@ -484,6 +485,10 @@ let madpakkePlan = null; // the current 5-day madpakke plan
 let currentView = 'dashboard'; // dashboard | list | mealplan | recipes | recipe | madpakke | madpakke-detail
 const MADPAKKE_PARTS = [['main','🍱 Main'],['snack','🥨 Snack'],['evening','🌙 Evening snack'],['gront','🥕 Grønt']];
 const MEAT_FREE_DAY = 'tue'; // Tuesday is a vegetarian day for both plans
+const FESTIVE_DAY = 'fri';   // Friday dinner is always a fun/festive one (fredagshygge)
+// Fun, shareable "treat" dinners for Friday.
+const FESTIVE_RECIPES = new Set(['tacos','pizza','burgers','black-bean-quesadilla','bao','banh-mi','pad-thai','summer-rolls','gyoza','butter-chicken-chana','kokoskarry-fad','tikka-wraps','veg-pulao','pad-krapow','thai-curry']);
+function isFestive(r) { return !!(r && (r.festive || (r.seedKey && FESTIVE_RECIPES.has(r.seedKey)))); }
 const GROCERY_CATS = ['Bread','Fruits','Veggies','Køledisk','Frozen stuff','Kød','Asian','Pantry','Baking','Mejeri','Dry snacks','Husholdning','Slik & kaffe','Cereals','Other'];
 const PLAN_DAYS = [['mon','Monday'],['tue','Tuesday'],['wed','Wednesday'],['thu','Thursday'],['fri','Friday']];
 
@@ -1730,7 +1735,8 @@ function renderMealPlan() {
   const days = plan.days || {};
 
   const dayCards = PLAN_DAYS.map(([key, label]) => {
-    const badge = key === MEAT_FREE_DAY ? ' <span class="meat-free-badge">🌱 meat-free</span>' : '';
+    const badge = key === MEAT_FREE_DAY ? ' <span class="meat-free-badge">🌱 meat-free</span>'
+                : key === FESTIVE_DAY ? ' <span class="festive-badge">🎉 festive</span>' : '';
     const slot = days[key];
     const r = slot && allRecipes[slot.recipeId];
     if (!r) {
@@ -1813,13 +1819,17 @@ async function suggestFreshWeek() {
   // Well-rated first; Tuesday always gets a vegetarian recipe (meat-free day).
   const ranked = Object.entries(allRecipes).sort((a, b) => (b[1].rating || 0) - (a[1].rating || 0));
   const vegList = ranked.filter(([id, r]) => (r.tags || []).includes('vegetarian'));
+  const festiveList = ranked.filter(([id, r]) => isFestive(r));
   if (ranked.length < 5 || !vegList.length) { showStatus('Add more recipes first', true); return; }
   mealPlan = mealPlan || { label: 'This week', days: {} };
   mealPlan.days = {};
   const used = new Set();
   const nextUnused = list => { for (const e of list) if (!used.has(e[0])) return e; return list[0]; };
   PLAN_DAYS.forEach(([key]) => {
-    const pick = key === MEAT_FREE_DAY ? nextUnused(vegList) : nextUnused(ranked);
+    let pick;
+    if (key === MEAT_FREE_DAY) pick = nextUnused(vegList);          // Tuesday: vegetarian
+    else if (key === FESTIVE_DAY && festiveList.length) pick = nextUnused(festiveList); // Friday: festive
+    else pick = nextUnused(ranked);
     used.add(pick[0]);
     mealPlan.days[key] = { recipeId: pick[0], protein: 'veg', cooked: false };
   });
