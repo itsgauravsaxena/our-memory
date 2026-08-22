@@ -179,6 +179,20 @@
   .btn-create { background: #2c6e49; color: white; }
 
   #sync-status { text-align: center; font-size: 12px; color: #2c6e49; padding: 6px 0 2px; min-height: 16px; }
+
+  /* Login gate */
+  .login-gate { position: fixed; inset: 0; z-index: 60; background: #2c6e49; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .login-box { background: white; border-radius: 16px; padding: 32px 24px; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,0.2); }
+  .login-emoji { font-size: 44px; }
+  .login-box h2 { margin: 10px 0 6px; font-size: 22px; color: #1a1a1a; }
+  .login-box p { margin: 0 0 20px; font-size: 14px; color: #666; }
+  .google-btn { display: inline-flex; align-items: center; gap: 10px; border: 1.5px solid #ddd; background: white; color: #1a1a1a;
+    border-radius: 24px; padding: 11px 20px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .google-btn .g { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; color: #4285F4; font-weight: 800; border: 1px solid #eee; }
+  .login-err { color: #c0392b !important; font-size: 12.5px !important; margin-top: 14px !important; min-height: 16px; }
+  .account-row { text-align: center; font-size: 11.5px; color: #999; padding: 0 0 14px; }
+  .account-row button { background: none; border: none; color: #2c6e49; font-size: 11.5px; text-decoration: underline; cursor: pointer; padding: 0; }
   .hidden { display: none !important; }
 
   /* Search */
@@ -288,6 +302,18 @@
 </head>
 <body>
 
+<div class="login-gate" id="login-gate">
+  <div class="login-box">
+    <div class="login-emoji">🗂️</div>
+    <h2>Our Memory</h2>
+    <p>Sign in to see your lists, recipes and meal plans.</p>
+    <button id="google-signin-btn" class="google-btn">
+      <span class="g">G</span> Sign in with Google
+    </button>
+    <p class="login-err" id="login-err"></p>
+  </div>
+</div>
+
 <div class="topbar" id="topbar">
   <button class="back-btn hidden" id="back-btn">‹</button>
   <h1 id="page-title">My Lists</h1>
@@ -309,6 +335,7 @@
 
 <button class="fab" id="fab-add">+</button>
 <p id="sync-status"></p>
+<div class="account-row hidden" id="account-row">🔒 <span id="account-email"></span> · <button id="signout-btn">Sign out</button></div>
 
 <div class="modal-overlay hidden" id="new-list-modal">
   <div class="modal-box">
@@ -477,8 +504,29 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script>
 const BASE_URL = 'https://ourmemory-7cd11-default-rtdb.europe-west1.firebasedatabase.app';
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA2Hxh5PPmU80LowdM13294s7FEeug5NzQ",
+  authDomain: "ourmemory-7cd11.firebaseapp.com",
+  databaseURL: BASE_URL,
+  projectId: "ourmemory-7cd11",
+  storageBucket: "ourmemory-7cd11.firebasestorage.app",
+  messagingSenderId: "420189925991",
+  appId: "1:420189925991:web:dd0338724951b7f69b9ac2"
+};
+let auth = null; // Firebase Auth instance (set up at the bottom, after sign-in gate)
+// The auth query-param carries your Google login token so the database rules can
+// verify each request. getIdToken() returns a cached token and refreshes it as needed.
+async function authParam() {
+  try {
+    const u = auth && auth.currentUser;
+    if (!u) return '';
+    return '?auth=' + (await u.getIdToken());
+  } catch (e) { return ''; }
+}
 const statusEl = document.getElementById('sync-status');
 
 let allLists = {};
@@ -510,26 +558,26 @@ function showStatus(msg, ok) {
 
 async function fbGet(path) {
   try {
-    const res = await fetch(BASE_URL + path + '.json');
+    const res = await fetch(BASE_URL + path + '.json' + await authParam());
     if (!res.ok) return null;
     return await res.json();
   } catch (e) { console.error('fbGet failed', e); return null; }
 }
 async function fbPut(path, value) {
   try {
-    const res = await fetch(BASE_URL + path + '.json', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
+    const res = await fetch(BASE_URL + path + '.json' + await authParam(), { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
     return res.ok;
   } catch (e) { console.error('fbPut failed', e); return false; }
 }
 async function fbPatch(path, value) {
   try {
-    const res = await fetch(BASE_URL + path + '.json', { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
+    const res = await fetch(BASE_URL + path + '.json' + await authParam(), { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(value) });
     return res.ok;
   } catch (e) { console.error('fbPatch failed', e); return false; }
 }
 async function fbDelete(path) {
   try {
-    const res = await fetch(BASE_URL + path + '.json', { method: 'DELETE' });
+    const res = await fetch(BASE_URL + path + '.json' + await authParam(), { method: 'DELETE' });
     return res.ok;
   } catch (e) { console.error('fbDelete failed', e); return false; }
 }
@@ -3021,7 +3069,57 @@ async function init() {
   }, 6000);
 }
 
-init();
+// ---------- Auth gate: require Google sign-in before the app loads ----------
+let appStarted = false;
+function showLogin() {
+  document.getElementById('login-gate').classList.remove('hidden');
+  document.getElementById('account-row').classList.add('hidden');
+}
+function showApp(user) {
+  document.getElementById('login-gate').classList.add('hidden');
+  const ar = document.getElementById('account-row');
+  ar.classList.remove('hidden');
+  document.getElementById('account-email').textContent = user.email || user.displayName || 'signed in';
+}
+async function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  const errEl = document.getElementById('login-err');
+  errEl.textContent = '';
+  try {
+    await auth.signInWithPopup(provider);
+  } catch (e) {
+    // Popups are often blocked on mobile — fall back to a full-page redirect.
+    if (['auth/popup-blocked','auth/cancelled-popup-request','auth/popup-closed-by-user','auth/operation-not-supported-in-this-environment'].includes(e.code)) {
+      try { await auth.signInWithRedirect(provider); } catch (e2) { errEl.textContent = 'Sign-in failed: ' + e2.message; }
+    } else {
+      errEl.textContent = 'Sign-in failed: ' + e.message;
+    }
+  }
+}
+
+function bootstrapAuth() {
+  if (typeof firebase === 'undefined') {
+    document.getElementById('login-err').textContent = 'Could not load sign-in. Check your connection and refresh.';
+    return;
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  auth = firebase.auth();
+  try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+  document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
+  document.getElementById('signout-btn').addEventListener('click', () => {
+    auth.signOut().finally(() => location.reload());
+  });
+  auth.getRedirectResult().catch(e => { document.getElementById('login-err').textContent = e.message; });
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      showApp(user);
+      if (!appStarted) { appStarted = true; init(); }
+    } else {
+      showLogin();
+    }
+  });
+}
+bootstrapAuth();
 </script>
 </body>
 </html>
